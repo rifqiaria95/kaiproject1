@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -24,19 +25,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Ambil menuGroups dan urutkan berdasarkan order (ascending)
-        $menuGroups = MenuGroup::with(['menuDetails' => function ($query) {
-            $query->orderBy('order', 'asc');
-        }])->orderBy('order', 'asc')->get();
+        // Cek apakah tabel 'menu_groups' sudah ada sebelum mengambil data
+        if (Schema::hasTable('menu_groups')) {
+            $menuGroups = MenuGroup::with(['menuDetails' => function ($query) {
+                $query->orderBy('order', 'asc');
+            }])->orderBy('order', 'asc')->get();
 
-        // Bagikan data ke semua view
-        View::share('menuGroups', $menuGroups);
+            // Bagikan data ke semua view
+            View::share('menuGroups', $menuGroups);
+        }
 
+        // Custom pesan validasi
         Validator::replacer('required', function ($message, $attribute, $rule, $parameters) {
             return "Kolom " . str_replace('_', ' ', $attribute) . " harus diisi!";
         });
 
-        // Jika ingin mengubah nama field di semua validasi
         \Illuminate\Support\Facades\Validator::extendImplicit('custom', function () {
             return false;
         });

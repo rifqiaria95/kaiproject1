@@ -48,13 +48,21 @@ class MenuDetailController extends Controller
 
     public function edit($id)
     {
-        $menuGroup = MenuDetail::findOrFail($id);
+        $menuDetail = MenuDetail::find($id); // Gunakan find() dulu, bukan findOrFail()
+
+        if (!$menuDetail) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak ditemukan'
+            ], 404);
+        }
 
         return response()->json([
             'success' => true,
-            'menu' => $menuGroup
+            'menuDetail' => $menuDetail
         ]);
     }
+
 
     public function update(Request $request, $id)
     {
@@ -62,8 +70,8 @@ class MenuDetailController extends Controller
             'name' => 'required|string|max:255'
         ]);
 
-        $menuGroup = MenuDetail::findOrFail($id);
-        $menuGroup->update($request->all());
+        $menuDetail = MenuDetail::findOrFail($id);
+        $menuDetail->update($request->all());
 
         return response()->json([
             'success' => true,

@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Mono;
 
 use App\Models\MenuGroup;
 use App\Models\MenuDetail;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
-use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Permission;
 
 class RolePermissionController extends Controller
 {
@@ -145,11 +145,16 @@ class RolePermissionController extends Controller
 
     public function getPermissions()
     {
-        $permissions = Permission::with(['menuDetails', 'menuGroups'])->get();
+        $permissions = Permission::with(['menuGroups', 'menuDetails'])
+            ->get()
+            ->sortBy(function ($permission) {
+                return optional($permission->menuGroups->first())->name . optional($permission->menuDetails->first())->name;
+            });
 
         return response()->json([
             'permissions' => $permissions
         ]);
     }
+
 
 }

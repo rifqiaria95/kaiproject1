@@ -74,10 +74,24 @@ class MenuGroupController extends Controller
     }
 
 
-    public function destroy(MenuGroup $menuGroup)
+    public function destroy($id)
     {
+        $menuGroup = MenuGroup::where('id', $id)->first();
+
+        if (!$menuGroup) {
+            return response()->json([
+                'status' => 404,
+                'errors' => 'Data Menu Tidak Ditemukan'
+            ]);
+        }
+
+        // Hapus data (Soft Delete)
         $menuGroup->delete();
-        return redirect()->route('menu-groups.index')->with('success', 'Menu Group berhasil dihapus');
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Data Menu Berhasil Dihapus'
+        ]);
     }
 }
 

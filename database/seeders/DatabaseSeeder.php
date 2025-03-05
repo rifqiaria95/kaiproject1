@@ -3,9 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\MenuDetail;
 use App\Models\UnitBerat;
+use App\Models\MenuDetail;
 use App\Models\MenuGroup;
+use App\Models\Vendor;
+use App\Models\Kendaraan;
+use App\Models\Pelanggan;
 use Illuminate\Database\Seeder;
 use Laravolt\Indonesia\Seeds\CitiesSeeder;
 use Laravolt\Indonesia\Seeds\VillagesSeeder;
@@ -19,19 +22,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory(5)->create();
-
         $this->call([
+            ProvincesSeeder::class,
+            CitiesSeeder::class,
+            DistrictsSeeder::class,
+            VillagesSeeder::class,
             MenuSeeder::class,
             UnitBeratSeeder::class,
-            VillagesSeeder::class,
-            DistrictsSeeder::class,
-            CitiesSeeder::class,
-            ProvincesSeeder::class,
             RolePermissionSeeder::class,
+            VendorSeeder::class,
             UserSeeder::class,
         ]);
+
+        Kendaraan::factory(10)->create();
+        Pelanggan::factory(10)->create();
+        User::factory(5)->create();
+
+
     }
 }

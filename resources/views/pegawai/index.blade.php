@@ -128,7 +128,7 @@
                         <form id="formPegawai" class="form-horizontal" enctype="multipart/form-data">
                             @csrf
                             <div class="modal-body">
-                                <input type="hidden" name="id_pegawai" id="id_pegawai">
+                                <input type="hidden" name="id" id="id">
                                 <input type="hidden" name="user_id" id="user_id">
                                 <ul id="save_errorList"></ul>
                                 <div class="row">
@@ -367,8 +367,9 @@
       <!-- / Content -->
 @endsection
 @section('script')
-<!-- Tambahkan di dalam <head> -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    window.userPermissions = @json(auth()->user()->getAllPermissions()->pluck('name'));
+</script>
 <script src="{{ asset('assets/vendor/libs/moment/moment.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/@form-validation/popular.js') }}"></script>

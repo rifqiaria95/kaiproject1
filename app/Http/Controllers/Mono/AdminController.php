@@ -13,7 +13,7 @@ class AdminController extends Controller
 {
     public function getDeletedRecords(Request $request)
     {
-        $pegawai = Pegawai::onlyTrashed()->select('id_pegawai as id', 'nm_pegawai as nama', 'deleted_at', DB::raw("'Pegawai' as kategori"));
+        $pegawai = Pegawai::onlyTrashed()->select('id as id', 'nm_pegawai as nama', 'deleted_at', DB::raw("'Pegawai' as kategori"));
         $menu    = MenuDetail::onlyTrashed()->select('id', 'name as nama', 'deleted_at', DB::raw("'Menu' as kategori"));
         $users   = User::onlyTrashed()->select('id as id', 'name as nama', 'deleted_at', DB::raw("'User' as kategori"));
 
@@ -40,7 +40,7 @@ class AdminController extends Controller
 
         switch ($kategori) {
             case 'Pegawai':
-                Pegawai::onlyTrashed()->where('id_pegawai', $id)->restore();
+                Pegawai::onlyTrashed()->where('id', $id)->restore();
                 break;
             case 'Menu':
                 MenuDetail::onlyTrashed()->where('id', $id)->restore();

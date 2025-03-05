@@ -13,4 +13,9 @@ class UnitBerat extends Model
     protected $table = 'unit_berat';
 
     protected $fillable = ['nama', 'simbol'];
+
+    public function item()
+    {
+        return $this->hasMany(Item::class);
+    }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Mono;
 
+use Laravolt\Indonesia\Models\Province;
+use Laravolt\Indonesia\Models\City;
 use App\Models\Pegawai;
-use App\Models\Kota;
 use App\Models\User;
-use App\Models\Provinsi;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePegawaiRequest;
 use App\Http\Requests\UpdatePegawaiRequest;
@@ -21,7 +21,7 @@ class PegawaiController extends Controller
     {
         // Menampilkan Data pegawai
         $pegawai  = Pegawai::withoutTrashed()->with('user');
-        $provinsi = Provinsi::all();
+        $provinsi = Province::all();
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($pegawai)
@@ -85,9 +85,9 @@ class PegawaiController extends Controller
         }
     }
 
-    public function edit($id_pegawai)
+    public function edit($id)
     {
-        $pegawai = Pegawai::with('user')->where('id_pegawai', $id_pegawai)->first();
+        $pegawai = Pegawai::with('user')->where('id', $id)->first();
 
         return response()->json($pegawai);
     }
@@ -129,9 +129,9 @@ class PegawaiController extends Controller
         }
     }
 
-    public function destroy($id_pegawai)
+    public function destroy($id)
     {
-        $pegawai = Pegawai::where('id_pegawai', $id_pegawai)->first();
+        $pegawai = Pegawai::where('id', $id)->first();
 
         if (!$pegawai) {
             return response()->json([
@@ -165,7 +165,7 @@ class PegawaiController extends Controller
     public function profile($id)
     {
         $pegawai = Pegawai::find($id);
-        $user     = User::all();
+        $user    = User::all();
 
         return view('pegawai.profile', compact(['pegawai', 'user']));
     }
@@ -173,14 +173,14 @@ class PegawaiController extends Controller
     public function getKotaByProvinsi($id_provinsi)
     {
         // Cari province_code berdasarkan id_provinsi
-        $provinsi = Provinsi::where('id_provinsi', $id_provinsi)->first();
+        $provinsi = Province::where('id_provinsi', $id_provinsi)->first();
 
         if (!$provinsi) {
-            return response()->json(['error' => 'Provinsi tidak ditemukan'], 404);
+            return response()->json(['error' => 'Province tidak ditemukan'], 404);
         }
 
         // Cari kota berdasarkan province_code
-        $kota = Kota::where('province_code', $provinsi->code)->get();
+        $kota = City::where('province_code', $provinsi->code)->get();
 
         return response()->json($kota);
     }

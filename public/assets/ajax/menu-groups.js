@@ -78,18 +78,30 @@ $(document).ready(function () {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
-                    return (
-                        '<div class="d-flex align-items-center">' +
-                        '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>' +
-                        '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>' +
-                        '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>' +
-                        '<div class="dropdown-menu dropdown-menu-end m-0">' +
-                        '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>' +
-                        '</div>' +
-                        '</div>'
-                    );
+                    let userPermissions = window.userPermissions || [];
+                    let canEdit         = userPermissions.includes("edit menu detail");
+                    let canDelete       = userPermissions.includes("delete menu detail");
+
+                    let buttons = '<div class="d-flex align-items-center">';
+
+                    if (canDelete) {
+                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
+                    }
+
+                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
+
+                    if (canEdit) {
+                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
+                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
+                        buttons += '</div>';
+                    }
+
+                    buttons += '</div>';
+
+                    return buttons;
                 }
-            },
+            }
         ],
         order: [
             [0, 'asc']
@@ -160,6 +172,63 @@ $(document).ready(function () {
             },
             error: function () {
                 toastr.error('Gagal menyimpan data!');
+            }
+        });
+    });
+
+    $(document).on('click', '.delete-record', function () {
+        let id = $(this).data('id');
+
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data menu akan dihapus!",
+            icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
+                cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            buttonsStyling: false,
+            didRender: function () {
+                $('.swal2-actions').css('gap', '10px');
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/menu-groups/delete/' + id,
+                    type: 'DELETE',
+                    data: {
+                        _method: 'DELETE',
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        if (response.status === 200) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message,
+                                customClass: {
+                                  confirmButton: 'btn btn-success waves-effect waves-light'
+                                }
+                            });
+                            $('#TableMGroup').DataTable().ajax.reload();
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                response.errors,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Oops!',
+                            'Terjadi kesalahan saat menghapus data.',
+                            'error'
+                        );
+                    }
+                });
             }
         });
     });

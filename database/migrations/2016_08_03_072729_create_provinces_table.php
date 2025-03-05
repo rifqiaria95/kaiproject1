@@ -18,7 +18,6 @@ class CreateProvincesTable extends Migration
             $table->char('code', 2)->unique();
             $table->string('name', 255);
             $table->text('meta')->nullable();
-            $table->string('permission')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

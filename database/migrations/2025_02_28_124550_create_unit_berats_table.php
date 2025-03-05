@@ -17,7 +17,7 @@ class CreateUnitBeratsTable extends Migration
             $table->id();
             $table->string('nama');
             $table->string('simbol');
-            $table->decimal('konversi_ke_kg', 20, 10);
+            $table->decimal('konversi_ke_kg', 20, 10)->nullable();
             $table->string('permission')->nullable();
             $table->softDeletes();
             $table->timestamps();

@@ -78,18 +78,30 @@ $(document).ready(function () {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
-                    return (
-                        '<div class="d-flex align-items-center">' +
-                        '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>' +
-                        '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>' +
-                        '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>' +
-                        '<div class="dropdown-menu dropdown-menu-end m-0">' +
-                        '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>' +
-                        '</div>' +
-                        '</div>'
-                    );
+                    let userPermissions = window.userPermissions || [];
+                    let canEdit         = userPermissions.includes("edit menu detail");
+                    let canDelete       = userPermissions.includes("delete menu detail");
+
+                    let buttons = '<div class="d-flex align-items-center">';
+
+                    if (canDelete) {
+                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
+                    }
+
+                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
+
+                    if (canEdit) {
+                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
+                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
+                        buttons += '</div>';
+                    }
+
+                    buttons += '</div>';
+
+                    return buttons;
                 }
-            },
+            }
         ],
         order: [
             [0, 'asc']
@@ -101,26 +113,42 @@ $(document).ready(function () {
 
     // Fungsi untuk menampilkan data ke dalam offcanvas (Edit)
     window.ViewData = function (id) {
-        $.ajax({
-            url: `menu-details/edit/${id}/`, // Pastikan route ini benar
-            type: "GET",
-            success: function (response) {
-                if (response.success) {
-                    selectedId = id;
-                    $("#nama_menu").val(response.menu.name);
-                    $("#icon").val(response.menu.icon);
-                    $("#order").val(response.menu.order);
+        $('#tambahModal').modal('show');
 
-                    // Ubah tombol submit agar tahu ini update
-                    $(".data-submit").text("Update").attr("id", "updateMenu");
+        if (id === 0) {
+            // Mode Insert (Tambah Data)
+            $('#modal-judul').text('Tambah Item');
+            $('#formMenuDetails')[0].reset();
+            $('#btn-simpan').val('create');
+        } else {
+            // Mode Edit (Ambil data dari API)
+            $('#modal-judul').text('Edit Item');
+            $('#btn-simpan').val('update');
 
-                    $("#offcanvasAddMenu").offcanvas("show");
+            $.ajax({
+                url: `menu-details/edit/${id}/`, // Pastikan route ini benar
+                type: "GET",
+                success: function (response) {
+                    if (response.success) {
+                        selectedId = id;
+                        $("#nama_menu").val(response.menuDetail.name);
+                        $("#menu_group_id").val(response.menuDetail.menu_group_id);
+                        $("#icon").val(response.menuDetail.icon);
+                        $("#route").val(response.menuDetail.route);
+                        $("#order").val(response.menuDetail.order);
+                        $("#status").val(response.menuDetail.status);
+
+                        // Ubah tombol submit agar tahu ini update
+                        $(".data-submit").text("Update").attr("id", "updateMenu");
+
+                        $("#offcanvasAddMenu").offcanvas("show");
+                    }
+                },
+                error: function () {
+                    toastr.error('Gagal mengambil data!');
                 }
-            },
-            error: function () {
-                toastr.error('Gagal mengambil data!');
-            }
-        });
+            });
+        }
     };
 
     // Submit Form: Tambah & Update

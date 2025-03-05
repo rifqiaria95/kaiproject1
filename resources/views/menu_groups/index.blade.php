@@ -165,6 +165,7 @@
 @endsection
 
 @section('script')
+window.userPermissions = @json(auth()->user()->getAllPermissions()->pluck('name'));
 <script src="{{ asset('assets/ajax/menu-groups.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 @endsection

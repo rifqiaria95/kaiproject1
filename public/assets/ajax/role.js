@@ -194,18 +194,30 @@ $(document).ready(function () {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
-                    return (
-                        '<div class="d-flex align-items-center">' +
-                        '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>' +
-                        '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>' +
-                        '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>' +
-                        '<div class="dropdown-menu dropdown-menu-end m-0">' +
-                        '<a href="javascript:;" class="dropdown-item dropdown-edit" data-id="' + full.id + '">Edit</a>' +
-                        '</div>' +
-                        '</div>'
-                    );
+                    let userPermissions = window.userPermissions || [];
+                    let canEdit         = userPermissions.includes("edit role");
+                    let canDelete       = userPermissions.includes("delete role");
+
+                    let buttons = '<div class="d-flex align-items-center">';
+
+                    if (canDelete) {
+                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
+                    }
+
+                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
+
+                    if (canEdit) {
+                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
+                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
+                        buttons += '</div>';
+                    }
+
+                    buttons += '</div>';
+
+                    return buttons;
                 }
-            },
+            }
         ],
         order: [
             [0, 'desc']

@@ -27,6 +27,14 @@ class UnitBeratSeeder extends Seeder
             ['nama' => 'Mikrogram', 'simbol' => 'µg', 'konversi_ke_kg' => 0.000000001],
             ['nama' => 'Pound', 'simbol' => 'lb', 'konversi_ke_kg' => 0.45359237],
             ['nama' => 'Ons', 'simbol' => 'oz', 'konversi_ke_kg' => 0.02834952],
+            ['nama' => 'Kiloliter', 'simbol' => 'kl'],
+            ['nama' => 'Hektoliter', 'simbol' => 'hl'],
+            ['nama' => 'Dekaliter', 'simbol' => 'dal'],
+            ['nama' => 'Liter', 'simbol' => 'l'],
+            ['nama' => 'Desiliter', 'simbol' => 'dl'],
+            ['nama' => 'Centiliter', 'simbol' => 'cl'],
+            ['nama' => 'Mililiter', 'simbol' => 'ml'],
+            ['nama' => 'Pcs', 'simbol' => 'pcs'],
         ];
 
         foreach ($unitBerats as $unitBerat) {

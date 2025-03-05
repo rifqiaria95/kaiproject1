@@ -8,7 +8,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $('#TablePegawai').DataTable({
+    $('#TableItem').DataTable({
         dom:
             '<"row me-2"' +
             '<"col-md-2"<"me-3"l>>' +
@@ -42,7 +42,7 @@ $(document).ready(function () {
                         var el = $.parseHTML(inner);
                         var result = '';
                         $.each(el, function (index, item) {
-                          if (item.classList !== undefined && item.classList.contains('pegawai-nm_pegawai')) {
+                          if (item.classList !== undefined && item.classList.contains('item-nm_item')) {
                             result = result + item.lastChild.firstChild.textContent;
                           } else if (item.innerText === undefined) {
                             result = result + item.textContent;
@@ -79,7 +79,7 @@ $(document).ready(function () {
                         var el = $.parseHTML(inner);
                         var result = '';
                         $.each(el, function (index, item) {
-                          if (item.classList !== undefined && item.classList.contains('pegawai-nm_pegawai')) {
+                          if (item.classList !== undefined && item.classList.contains('item-nm_item')) {
                             result = result + item.lastChild.firstChild.textContent;
                           } else if (item.innerText === undefined) {
                             result = result + item.textContent;
@@ -103,7 +103,7 @@ $(document).ready(function () {
                         var el = $.parseHTML(inner);
                         var result = '';
                         $.each(el, function (index, item) {
-                          if (item.classList !== undefined && item.classList.contains('pegawai-nm_pegawai')) {
+                          if (item.classList !== undefined && item.classList.contains('item-nm_item')) {
                             result = result + item.lastChild.firstChild.textContent;
                           } else if (item.innerText === undefined) {
                             result = result + item.textContent;
@@ -127,7 +127,7 @@ $(document).ready(function () {
                         var el = $.parseHTML(inner);
                         var result = '';
                         $.each(el, function (index, item) {
-                          if (item.classList !== undefined && item.classList.contains('pegawai-nm_pegawai')) {
+                          if (item.classList !== undefined && item.classList.contains('item-nm_item')) {
                             result = result + item.lastChild.firstChild.textContent;
                           } else if (item.innerText === undefined) {
                             result = result + item.textContent;
@@ -151,7 +151,7 @@ $(document).ready(function () {
                         var el = $.parseHTML(inner);
                         var result = '';
                         $.each(el, function (index, item) {
-                          if (item.classList !== undefined && item.classList.contains('pegawai-nm_pegawai')) {
+                          if (item.classList !== undefined && item.classList.contains('item-nm_item')) {
                             result = result + item.lastChild.firstChild.textContent;
                           } else if (item.innerText === undefined) {
                             result = result + item.textContent;
@@ -165,7 +165,7 @@ $(document).ready(function () {
               ]
             },
             {
-              text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Pegawai</span>',
+              text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Item</span>',
               className: 'add-new btn btn-primary waves-effect waves-light',
               attr: {
                 'data-bs-toggle': 'modal',
@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/pegawai/",
+            url: "/item/",
             type: 'GET'
         },
         columns: [{
@@ -188,44 +188,49 @@ $(document).ready(function () {
                 }
             },
             {
-                data: 'foto_pegawai',
-                name: 'foto_pegawai',
-                render: function (data) {
-                    let imageUrl = data
-                        ? (data.startsWith('http') ? data : '/uploads/pegawai/' + data)
-                        : '/assets/img/avatars/11.png';
-
-                    return '<img src="' + imageUrl + '" alt="Avatar" class="img-thumbnail" width="40" height="40" style="border-radius:50px;" ' + 'onerror="this.onerror=null; this.src=\'/assets/img/avatar/11.png\';" />';
+                data: 'kd_barcode',
+                name: 'kd_barcode'
+            },
+            {
+                data: 'kd_item',
+                name: 'kd_item'
+            },
+            {
+                data: 'nm_item',
+                name: 'nm_item'
+            },
+            {
+                data: 'jenis_item',
+                name: 'jenis_item',
+                render: function (data, type, full, meta) {
+                    var $sparepart = '<span class="badge bg-label-primary">Sparepart</span>';
+                    var $tools = '<span class="badge bg-label-info">Tools</span>';
+                    if (data == 1) {
+                        return $sparepart;
+                    } else if (data == 2) {
+                        return $tools;
+                    } else {
+                        '<span class="badge bg-label-dark">Lainnya</span>'
+                    }
+                    return '';
                 }
             },
             {
-                data: 'nm_pegawai',
-                name: 'nm_pegawai'
+                data: 'stok_satuan',
+                name: 'stok_satuan'
             },
             {
-                data: 'email',
-                name: 'email'
+                data: 'hrg_beli',
+                name: 'hrg_beli',
+                render: function (data) {
+                    return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2 }).format(data);
+                }
             },
             {
-                data: 'jabatan_pegawai',
-                name: 'jabatan_pegawai'
-            },
-            {
-                data: 'no_telp_pegawai',
-                name: 'no_telp_pegawai'
-            },
-            {
-                data: 'active',
-                name: 'active',
-                render: function (data, type, full, meta) {
-                    var $inactive = '<span class="badge bg-label-danger">Inactive</span>';
-                    var $aktif = '<span class="badge bg-label-success">Active</span>';
-                    if (data == 0) {
-                        return $inactive;
-                    } else if (data == 1) {
-                        return $aktif;
-                    }
-                    return '';
+                data: 'hrg_jual',
+                name: 'hrg_jual',
+                render: function (data) {
+                    return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2 }).format(data);
                 }
             },
             {
@@ -233,8 +238,8 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit menu detail");
-                    let canDelete       = userPermissions.includes("delete menu detail");
+                    let canEdit         = userPermissions.includes("edit pelanggan");
+                    let canDelete       = userPermissions.includes("delete pelanggan");
 
                     let buttons = '<div class="d-flex align-items-center">';
 
@@ -247,7 +252,7 @@ $(document).ready(function () {
                     if (canEdit) {
                         buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                         buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
+                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(\'' + full.id + '\')">Edit</a>';
                         buttons += '</div>';
                     }
 
@@ -267,152 +272,138 @@ $(document).ready(function () {
         dropdownParent: $('#tambahModal')
     });
 
-    $('#pegawai-provinsi').on('change', function() {
-        var id_provinsi = $(this).val();
+    $("#hrg_beli, #hrg_jual").on("input", function () {
+        let value = $(this).val().replace(/[^0-9]/g, '');
 
-        $('#pegawai-kota').empty().append('<option selected disabled>Loading...</option>');
-
-        $.ajax({
-            url: "/pegawai/get-kota/" + id_provinsi,
-            type: "GET",
-            xhrFields: { withCredentials: true },
-            success: function (response) {
-
-                $('#pegawai-kota').empty().append('<option selected disabled>Pilih Kota</option>');
-
-                response.forEach(function (data) { // Gunakan response langsung
-                    $('#pegawai-kota').append('<option value="' + data.id_kota + '">' + data.name + '</option>');
-                });
-            },
-            error: function (xhr, status, error) {
-                console.error(xhr.responseText);
-            }
-        });
-    });
-
-    $(document).ready(function(){
-        $('#formPegawai').on('submit', function(e){
-            e.preventDefault();
-
-            let formData = new FormData(this);
-            let id = $('#id').val();
-            let url = '';
-
-            if(id == "" || id == 0){
-                url = "/pegawai/store";
-            } else {
-                url = "/pegawai/update/" + id;
-                formData.append('_method', 'PUT');
-            }
-
-            // Bersihkan error sebelumnya
-            $('.text-danger').remove();
-            $('.is-invalid').removeClass('is-invalid');
-
-            $.ajax({
-                url: url,
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response){
-                    if(response.status == 200){
-                        toastr.success('Data berhasil disimpan!');
-                        $('#formPegawai')[0].reset();
-                        $('#TablePegawai').DataTable().ajax.reload(null, false);
-                        let modal = bootstrap.Modal.getInstance(document.getElementById('tambahModal'));
-                        modal.hide();
-                    } else {
-                        toastr.error('Terjadi kesalahan, silakan coba lagi!');
-                    }
-                },
-                error: function(xhr){
-                    if(xhr.status === 400) {
-                        let errors = xhr.responseJSON.errors;
-                        let errorMessage = "Harap periksa kembali inputan Anda!";
-
-                        $.each(errors, function(key, value){
-                            let inputField = $('[name="' + key + '"]');
-                            inputField.addClass('is-invalid');
-                            inputField.after('<span class="text-danger">' + value[0] + '</span>');
-                            toastr.error(value[0]);
-                        });
-
-                    } else {
-                        toastr.error('Terjadi kesalahan, silakan coba lagi!');
-                    }
-                }
-            });
-        });
-
-        // Function untuk mengisi modal saat update
-        window.ViewData = function (id) {
-            $('#tambahModal').modal('show');
-
-            if (id === 0) {
-                // Mode Insert (Tambah Data)
-                $('#modal-judul').text('Tambah Pegawai');
-                $('#formPegawai')[0].reset();
-                $('#btn-simpan').val('create');
-            } else {
-                // Mode Edit (Ambil data dari API)
-                $('#modal-judul').text('Edit Pegawai');
-                $('#btn-simpan').val('update');
-
-                $.ajax({
-                    url: '/pegawai/edit/' + id,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log(response);
-                        if (response) {
-                            $('#id').val(response.id);
-                            $('#user_id').val(response.user_id);
-                            $('#nm_pegawai').val(response.nm_pegawai);
-                            $('#jenis_kelamin').val(response.jenis_kelamin);
-                            $('#tgl_lahir_pegawai').val(response.tgl_lahir_pegawai);
-                            $('#email').val(response.user.email);
-                            $('#no_telp_pegawai').val(response.no_telp_pegawai);
-                            $('#no_ktp_pegawai').val(response.no_ktp_pegawai);
-                            $('#no_sim_pegawai').val(response.no_sim_pegawai);
-                            $('#no_npwp_pegawai').val(response.no_npwp_pegawai);
-                            $('#active').val(response.active);
-                            $('#alamat_pegawai').val(response.alamat_pegawai);
-                            $('#pegawai-provinsi').val(response.id_provinsi).trigger('change');
-                            $.ajax({
-                                url: "/pegawai/get-kota/" + response.id_provinsi,
-                                type: "GET",
-                                success: function(kotaResponse) {
-                                    $('#pegawai-kota').empty().append('<option selected disabled>Pilih Kota</option>');
-
-                                    kotaResponse.forEach(function (data) {
-                                        $('#pegawai-kota').append('<option value="' + data.id_kota + '">' + data.name + '</option>');
-                                    });
-
-                                    $('#pegawai-kota').val(response.id_kota).trigger('change');
-                                }
-                            });
-                            $('#tgl_masuk_pegawai').val(response.tgl_masuk_pegawai);
-                            $('#tgl_keluar_pegawai').val(response.tgl_keluar_pegawai);
-                            $('#jabatan_pegawai').val(response.jabatan_pegawai);
-                            $('#gaji_pegawai').val(response.gaji_pegawai);
-                        }
-                    },
-                    error: function() {
-                        alert('Gagal mengambil data!');
-                    }
-                });
-            }
+        if (value === "") {
+            $(this).val("");
+            return;
         }
 
+        let number = parseInt(value, 10);
+        let formattedValue = number.toLocaleString('id-ID');
+
+        $(this).val(formattedValue);
     });
+
+    $("#formItem").on("submit", function () {
+        $("#hrg_beli, #hrg_jual").each(function () {
+            let value = $(this).val().replace(/\./g, "");
+            $(this).val(value);
+        });
+    });
+
+
+    $('#formItem').on('submit', function(e){
+        e.preventDefault();
+
+        let formData = new FormData(this);
+        let id = $('#id').val();
+        let url = '';
+
+        if(id == "" || id == 0){
+            url = "/item/store";
+        } else {
+            url = "/item/update/" + id;
+            formData.append('_method', 'PUT');
+        }
+
+        // Bersihkan error sebelumnya
+        $('.text-danger').remove();
+        $('.is-invalid').removeClass('is-invalid');
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response){
+                if(response.status == 200){
+                    toastr.success('Data berhasil disimpan!');
+                    $('#formItem')[0].reset();
+                    $('#TableItem').DataTable().ajax.reload(null, false);
+                    let modal = bootstrap.Modal.getInstance(document.getElementById('tambahModal'));
+                    modal.hide();
+                } else {
+                    toastr.error('Terjadi kesalahan, silakan coba lagi!');
+                }
+            },
+            error: function(xhr){
+                if(xhr.status === 400) {
+                    let errors = xhr.responseJSON.errors;
+                    let errorMessage = "Harap periksa kembali inputan Anda!";
+
+                    $.each(errors, function(key, value){
+                        let inputField = $('[name="' + key + '"]');
+                        inputField.addClass('is-invalid');
+                        inputField.after('<span class="text-danger">' + value[0] + '</span>');
+                        toastr.error(value[0]);
+                    });
+
+                } else {
+                    toastr.error('Terjadi kesalahan, silakan coba lagi!');
+                }
+            }
+        });
+    });
+
+    // Function untuk mengisi modal saat update
+    window.ViewData = function (id) {
+        $('#tambahModal').modal('show');
+
+        if (id === 0) {
+            // Mode Insert (Tambah Data)
+            $('#modal-judul').text('Tambah Item');
+            $('#formItem')[0].reset();
+            $('#btn-simpan').val('create');
+        } else {
+            // Mode Edit (Ambil data dari API)
+            $('#modal-judul').text('Edit Item');
+            $('#btn-simpan').val('update');
+
+            $.ajax({
+                url: '/item/edit/' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response) {
+                        $('#id').val(response.id);
+                        $('#id_satuan').val(response.id_satuan);
+                        $('#id_vendor').val(response.id_vendor);
+                        $('#nm_item').val(response.nm_item);
+                        $('#jenis_item').val(response.jenis_item);
+                        $('#tgl_masuk_item').val(response.tgl_masuk_item);
+                        $('#merk').val(response.merk);
+                        $('#stok').val(response.stok);
+                        $('#hrg_beli').val(formatRupiah(response.hrg_beli));
+                        $('#hrg_jual').val(formatRupiah(response.hrg_jual));
+                        $('#rak').val(response.rak);
+                        $('#deskripsi').val(response.deskripsi);
+                        $('#foto_item').val(response.foto_item).trigger('change');
+                    }
+                },
+                error: function() {
+                    alert('Gagal mengambil data!');
+                }
+            });
+        }
+    }
+
+    // Fungsi untuk format angka ke 900.000,00
+    function formatRupiah(angka) {
+        let number = parseFloat(angka).toFixed(2)
+            .replace(".", ",");
+
+        return number.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
     $(document).on('click', '.delete-record', function () {
         let id = $(this).data('id');
 
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: "Data pegawai akan dihapus!",
+            text: "Data role akan dihapus!",
             icon: 'warning',
             customClass: {
                 confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
@@ -427,7 +418,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/pegawai/delete/' + id,
+                    url: '/item/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',
@@ -435,12 +426,15 @@ $(document).ready(function () {
                     },
                     success: function (response) {
                         if (response.status === 200) {
-                            Swal.fire(
-                                'Deleted!',
-                                'Data Pegawai Berhasil Dihapus.',
-                                'success'
-                            );
-                            $('#TablePegawai').DataTable().ajax.reload(); // Reload DataTable
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message,
+                                customClass: {
+                                  confirmButton: 'btn btn-success waves-effect waves-light'
+                                }
+                            });
+                            $('#TableItem').DataTable().ajax.reload();
                         } else {
                             Swal.fire(
                                 'Error!',
@@ -460,5 +454,6 @@ $(document).ready(function () {
             }
         });
     });
+
 
 });

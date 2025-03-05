@@ -19,7 +19,6 @@ class CreateVillagesTable extends Migration
             $table->char('district_code', 7);
             $table->string('name', 255);
             $table->text('meta')->nullable();
-            $table->string('permission')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

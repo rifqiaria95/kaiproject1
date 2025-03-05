@@ -171,14 +171,14 @@
 
                                             @php
                                                 $groupedPermissions = $permissions->groupBy(function ($permission) {
-                                                    return optional($permission->menuGroups->first())->id . '-' . optional($permission->menuDetails->first())->id;
+                                                    return optional($permission->menuDetails->first())->id . '-' . optional($permission->menuDetails->first())->id;
                                                 });
                                             @endphp
 
                                             @foreach ($groupedPermissions as $key => $permissionGroup)
                                                 @php
                                                     $firstPermission = $permissionGroup->first();
-                                                    $menuGroup = $firstPermission->menuGroups->first();
+                                                    $menuGroup       = $firstPermission->menuDetails->first();
                                                 @endphp
                                                 <tr>
                                                     <!-- Menampilkan Menu Group -->
@@ -236,51 +236,14 @@
                     </div>
                 </div>
             </div>
-              <!--/ Add Role Modal -->
-              <!--/ Add Role Modal -->
-            {{-- <div class="modal fade text-start" id="tambahModal" tabindex="-1" aria-labelledby="myModalLabel18" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-md">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-
-                        </div>
-                        <form id="formRole" name="formRole" class="form-horizontal" enctype="multipart/form-data">
-                            @csrf
-                            <div class="modal-body">
-                                <input type="hidden" name="id" id="id">
-                                <input type="hidden" id="guard_name" name="guard_name" class="guard_name form-control" value="web">
-                                <ul class="alert alert-warning d-none" id="modalJudulEdit"></ul>
-                                <div class="text-center mb-6">
-                                    <p>Set role permissions</p>
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-md-12">
-                                        <label class="form-label">Nama Role</label>
-                                        <input type="text" id="name" name="name" class="name form-control" value="" required>
-                                    </div>
-                                </div>
-                                <div class="row g-3 mt-5">
-                                    <div class="col-12">
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary btn-block" id="btn-update" value="create">Simpan
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> --}}
-
         </div>
       </div>
       <!-- / Content -->
 @endsection
 @section('script')
-<script src="{{ asset('assets/vendor/libs/sweetalert2/sweetalert2.js') }}"></script>
+<script>
+    window.userPermissions = @json(auth()->user()->getAllPermissions()->pluck('name'));
+</script>
 <script src="{{ asset('assets/vendor/libs/moment/moment.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/@form-validation/popular.js') }}"></script>

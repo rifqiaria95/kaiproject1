@@ -148,7 +148,9 @@
 @endsection
 
 @section('script')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    window.userPermissions = @json(auth()->user()->getAllPermissions()->pluck('name'));
+</script>
 <script src="{{ asset('assets/ajax/satuan.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 @endsection

@@ -19,7 +19,6 @@ class CreateCitiesTable extends Migration
             $table->char('province_code', 2);
             $table->string('name', 255);
             $table->text('meta')->nullable();
-            $table->string('permission')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\Mono\DashboardController;
-use App\Http\Controllers\Mono\AdminController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Mono\PegawaiController;
 use App\Http\Controllers\Mono\ItemController;
 use App\Http\Controllers\Mono\UnitController;
-use App\Http\Controllers\Mono\MenuGroupController;
-use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\UserController;
-use App\Http\Controllers\Mono\RolePermissionController;
+use App\Http\Controllers\Mono\AdminController;
+use App\Http\Controllers\Mono\PegawaiController;
+use App\Http\Controllers\Mono\DashboardController;
+use App\Http\Controllers\Mono\MenuGroupController;
+use App\Http\Controllers\Mono\PelangganController;
+use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\PermissionController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Mono\RolePermissionController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -20,6 +21,48 @@ Route::get('/', function () {
 // Route untuk Semua Role
 Route::middleware('auth', 'role:superadmin|admin|user')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Route User
+    Route::prefix('satuan')->name('satuan.')->group(function () {
+        Route::get('/', [UnitController::class, 'index'])->name('index');
+        Route::post('/store', [UnitController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [UnitController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [UnitController::class, 'destroy'])->name('destroy');
+        Route::get('/profile/{id}', [UnitController::class, 'profile'])->name('profile');
+    });
+
+    // Route Pegawai
+    Route::prefix('pegawai')->name('pegawai.')->group(function () {
+        Route::get('/', [PegawaiController::class, 'index'])->name('index');
+        Route::post('/store', [PegawaiController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [PegawaiController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [PegawaiController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [PegawaiController::class, 'destroy'])->name('destroy');
+        Route::get('/profile/{id}', [PegawaiController::class, 'profile'])->name('profile');
+        Route::get('/get-kota/{id_provinsi}', [PegawaiController::class, 'getKotaByProvinsi'])->name('pegawai.get-kota');
+    });
+
+    // Route Item
+    Route::prefix('item')->name('item.')->group(function () {
+        Route::get('/', [ItemController::class, 'index'])->name('index');
+        Route::post('/store', [ItemController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [ItemController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [ItemController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [ItemController::class, 'destroy'])->name('destroy');
+        Route::get('/profile/{id}', [ItemController::class, 'profile'])->name('profile');
+    });
+
+    // Route Pelanggan
+    Route::prefix('pelanggan')->name('pelanggan.')->group(function () {
+        Route::get('/', [PelangganController::class, 'index'])->name('index');
+        Route::post('/store', [PelangganController::class, 'store'])->name('store');
+        Route::get('/edit/{id:uuid}', [PelangganController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [PelangganController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [PelangganController::class, 'destroy'])->name('destroy');
+        Route::get('/get-kota/{id_provinsi}', [PelangganController::class, 'getKotaByProvinsi'])->name('pelanggan.get-kota');
+        Route::get('/profile/{id}', [PelangganController::class, 'profile'])->name('profile');
+    });
 });
 
 // Route untuk Superadmin
@@ -66,6 +109,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::post('/store', [MenuGroupController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [MenuGroupController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [MenuGroupController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [MenuGroupController::class, 'destroy'])->name('destroy');
     });
 
     // Route Menu Details
@@ -81,39 +125,6 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::get('/deleted/data', [AdminController::class, 'getDeletedRecords'])->name('deleted.data');
     Route::post('/deleted/restore', [AdminController::class, 'restoreRecord'])->name('deleted.restore');
 
-});
-
-Route::middleware('auth', 'role:superadmin|admin')->group(function () {
-
-    // Route User
-    Route::prefix('satuan')->name('satuan.')->group(function () {
-        Route::get('/', [UnitController::class, 'index'])->name('index');
-        Route::post('/store', [UnitController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('edit');
-        Route::put('/update/{id}', [UnitController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [UnitController::class, 'destroy'])->name('destroy');
-        Route::get('/profile/{id}', [UnitController::class, 'profile'])->name('profile');
-    });
-
-    // Route Pegawai
-    Route::prefix('pegawai')->name('pegawai.')->group(function () {
-        Route::get('/', [PegawaiController::class, 'index'])->name('index');
-        Route::post('/store', [PegawaiController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [PegawaiController::class, 'edit'])->name('edit');
-        Route::put('/update/{id}', [PegawaiController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [PegawaiController::class, 'destroy'])->name('destroy');
-        Route::get('/profile/{id}', [PegawaiController::class, 'profile'])->name('profile');
-        Route::get('/get-kota/{id_provinsi}', [PegawaiController::class, 'getKotaByProvinsi'])->name('pegawai.get-kota');
-    });
-
-    // Route Item
-    Route::prefix('item')->name('item.')->group(function () {
-        Route::get('/', [ItemController::class, 'index'])->name('index');
-        Route::get('/edit/{id}', [ItemController::class, 'edit'])->name('edit');
-        Route::post('/update/{id}', [ItemController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [ItemController::class, 'destroy'])->name('destroy');
-        Route::get('/profile/{id}', [ItemController::class, 'profile'])->name('profile');
-    });
 });
 
 require __DIR__.'/auth.php';
