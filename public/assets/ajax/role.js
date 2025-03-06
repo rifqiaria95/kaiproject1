@@ -257,7 +257,7 @@ $(document).ready(function () {
     });
 
     // Fungsi untuk menampilkan data ke dalam modal (Tambah/Edit)
-    function ViewData(id) {
+    window.ViewData = function (id) {
         $('#tambahModal').modal('show');
 
         if (id === 0) {
@@ -276,7 +276,6 @@ $(document).ready(function () {
                 url: `/role/edit/${id}/`,
                 type: "GET",
                 success: function (response) {
-                    console.log("Response dari server:", response);
 
                     if (!response.role) {
                         toastr.error("Role tidak ditemukan.");
@@ -317,11 +316,6 @@ $(document).ready(function () {
                 formData.append("_method", "PUT");
             }
 
-            // Debug: Lihat data sebelum dikirim
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ": " + pair[1]);
-            }
-
             $.ajax({
                 url: url,
                 type: method,
@@ -329,7 +323,6 @@ $(document).ready(function () {
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    console.log("Response dari server:", response);
                     if (response.success) {
                         $("#tambahModal").modal("hide");
                         $("#formRole")[0].reset();

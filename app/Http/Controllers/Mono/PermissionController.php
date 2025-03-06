@@ -38,8 +38,8 @@ class PermissionController extends Controller
         $request->validate([
             'name'            => 'required|string|max:255|unique:permissions,name',
             'roles'           => 'array',
-            'menu_groups'     => 'array',
-            'menu_details'    => 'array',
+            'menu_groups'  => 'required|string|max:255',
+            'menu_details' => 'required|string|max:255',
         ]);
 
         // Buat permission baru
@@ -76,7 +76,12 @@ class PermissionController extends Controller
 
         return response()->json([
             'success'    => true,
-            'permission' => $permission,
+            'permission' => [
+                'id'           => $permission->id,
+                'name'         => $permission->name,
+                'menu_groups'  => $permission->menuGroups->pluck('id'), // Ambil hanya ID
+                'menu_details' => $permission->menuDetails->pluck('id') // Ambil hanya ID
+            ],
         ]);
     }
 
@@ -85,8 +90,8 @@ class PermissionController extends Controller
         $request->validate([
             'name'         => 'required|string|max:255|unique:permissions,name,' . $id,
             'roles'        => 'array',
-            'menu_groups'  => 'array',
-            'menu_details' => 'array',
+            'menu_groups'  => 'required|string|max:255',
+            'menu_details' => 'required|string|max:255',
         ]);
 
         $permission = Permission::findOrFail($id);

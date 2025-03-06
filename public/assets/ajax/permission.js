@@ -259,32 +259,24 @@ $(document).ready(function () {
         dropdownParent: $('#tambahModal')
     });
 
-    $('#tambahModal').on('hidden.bs.modal', function () {
-        $('#formPermission')[0].reset();
-        $('#permissionList').empty();
-    });
-
-    $(document).on("click", ".dropdown-edit", function () {
-        var roleId = $(this).data("id");
-        ViewData(roleId);
-    });
-
-    $(document).on("click", ".add-new", function () {
-        ViewData(0);
-    });
-
-    // Fungsi untuk menampilkan modal (Tambah/Edit)
     window.ViewData = function (id) {
         $('#tambahModal').modal('show');
 
         if (id === 0) {
-            $('#modal-judul').text('Tambah Permission');
-            $('#formPermission')[0].reset();
-            $('#btn-simpan').val('create');
+            // Mode Tambah Data
+            $("#modal-judul").text("Tambah Permission");
+            $("#formPermission")[0].reset();
+            $("#id").val("");
+            $("#btn-simpan").val("create");
+
+            // Reset Select2
+            $("#menu_groups").val("").trigger("change");
+            $("#menu_details").val("").trigger("change");
 
         } else {
+            // Mode Edit (Ambil data dari API)
             $('#modal-judul').text('Edit Permission');
-            $('#btn-simpan').val('simpan');
+            $('#btn-simpan').val('update');
 
             $.ajax({
                 url: `/permission/edit/${id}/`,
@@ -292,9 +284,10 @@ $(document).ready(function () {
                 success: function (response) {
                     console.log(response);
                     if (response.success) {
-                        selectedId = id;
                         $("#id").val(response.permission.id);
                         $("#name").val(response.permission.name);
+                        $("#menu_groups").val(response.permission.menu_groups).trigger("change");
+                        $("#menu_details").val(response.permission.menu_details).trigger("change");
                     }
                 },
                 error: function () {
@@ -327,6 +320,11 @@ $(document).ready(function () {
                 if (response.success) {
                     $("#tambahModal").modal("hide");
                     $("#formPermission")[0].reset();
+                    $("#id").val("");
+
+                    $("#menu_groups").prop("selectedIndex", 0).trigger("change");
+                    $("#menu_details").prop("selectedIndex", 0).trigger("change");
+
                     toastr.success(response.message);
                     $("#TablePermission").DataTable().ajax.reload(null, false);
                 } else {
@@ -349,13 +347,18 @@ $(document).ready(function () {
 
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: "Data permission akan dihapus!",
+            text: "Data role akan dihapus!",
             icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
+                cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+            },
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
+            cancelButtonText: 'Batal',
+            buttonsStyling: false,
+            didRender: function () {
+                $('.swal2-actions').css('gap', '10px');
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -367,11 +370,14 @@ $(document).ready(function () {
                     },
                     success: function (response) {
                         if (response.status === 200) {
-                            Swal.fire(
-                                'Deleted!',
-                                'Data permission Berhasil dihapus.',
-                                'success'
-                            );
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message,
+                                customClass: {
+                                  confirmButton: 'btn btn-success waves-effect waves-light'
+                                }
+                            });
                             $('#TablePermission').DataTable().ajax.reload(null, false);
                         } else {
                             Swal.fire(

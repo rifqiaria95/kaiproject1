@@ -7,10 +7,6 @@ $(document).ready(function () {
 
 });
 
-if ($.fn.DataTable.isDataTable('#TablePelanggan')) {
-    $('#TablePelanggan').DataTable().destroy();
-}
-
 $('#TablePelanggan').DataTable({
     dom:
         '<"row me-2"' +
@@ -168,7 +164,7 @@ $('#TablePelanggan').DataTable({
           ]
         },
         {
-          text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Pelanggan</span>',
+          text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Vendor</span>',
           className: 'add-new btn btn-primary waves-effect waves-light',
           attr: {
             'data-bs-toggle': 'modal',
@@ -180,7 +176,7 @@ $('#TablePelanggan').DataTable({
     processing: true,
     serverSide: true,
     ajax: {
-        url: "/pelanggan/",
+        url: "/vendor/",
         type: 'GET'
     },
     columns: [{
@@ -191,49 +187,24 @@ $('#TablePelanggan').DataTable({
             }
         },
         {
-            data: 'nm_pelanggan',
-            name: 'nm_pelanggan'
+            data: 'nm_vendor',
+            name: 'nm_vendor'
         },
         {
-            data: 'alamat_pelanggan',
-            name: 'alamat_pelanggan'
+            data: 'alamat_vendor',
+            name: 'alamat_vendor'
         },
         {
-            data: 'plat_nomor',
-            name: 'plat_nomor',
-            render: function (data, type, full, meta) {
-                return '<span class="badge bg-label-primary">'+ data +'</span>'
-            }
-        },
-        {
-            data: 'no_hp_pelanggan',
-            name: 'no_hp_pelanggan'
-        },
-        {
-            data: 'deskripsi',
-            name: 'deskripsi'
-        },
-        {
-            data: 'status',
-            name: 'status',
-            render: function (data, type, full, meta) {
-                var $inactive = '<span class="badge bg-label-danger">Inactive</span>';
-                var $aktif = '<span class="badge bg-label-success">Active</span>';
-                if (data == 0) {
-                    return $inactive;
-                } else if (data == 1) {
-                    return $aktif;
-                }
-                return '';
-            }
+            data: 'no_hp_vendor',
+            name: 'no_hp_vendor'
         },
         {
             data: 'aksi',
             name: 'aksi',
             render: function (data, type, full, meta) {
                 let userPermissions = window.userPermissions || [];
-                let canEdit         = userPermissions.includes("edit pelanggan");
-                let canDelete       = userPermissions.includes("delete pelanggan");
+                let canEdit         = userPermissions.includes("edit vendor");
+                let canDelete       = userPermissions.includes("delete vendor");
 
                 let buttons = '<div class="d-flex align-items-center">';
 
@@ -265,184 +236,3 @@ $('#TablePelanggan').DataTable({
 $('.select2').select2({
     dropdownParent: $('#tambahModal')
 });
-
-$('#pelanggan-provinsi').on('change', function() {
-    var id_provinsi = $(this).val();
-
-    $('#pelanggan-kota').empty().append('<option selected disabled>Loading...</option>');
-
-    $.ajax({
-        url: "/pelanggan/get-kota/" + id_provinsi,
-        type: "GET",
-        xhrFields: { withCredentials: true },
-        success: function (response) {
-
-            $('#pelanggan-kota').empty().append('<option selected disabled>Pilih Kota</option>');
-
-            response.forEach(function (data) { // Gunakan response langsung
-                $('#pelanggan-kota').append('<option value="' + data.id_kota + '">' + data.name + '</option>');
-            });
-        },
-        error: function (xhr, status, error) {
-            console.error(xhr.responseText);
-        }
-    });
-});
-
-$('#formPelanggan').on('submit', function(e){
-    e.preventDefault();
-
-    let formData = new FormData(this);
-    let id = $('#id').val();
-    let url = '';
-
-    if(id == "" || id == 0){
-        url = "/pelanggan/store";
-    } else {
-        url = "/pelanggan/update/" + id;
-        formData.append('_method', 'PUT');
-    }
-
-    // Bersihkan error sebelumnya
-    $('.text-danger').remove();
-    $('.is-invalid').removeClass('is-invalid');
-
-    $.ajax({
-        url: url,
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response){
-            if(response.status == 200){
-                toastr.success('Data berhasil disimpan!');
-                $('#formPelanggan')[0].reset();
-                $('#TablePelanggan').DataTable().ajax.reload(null, false);
-                let modal = bootstrap.Modal.getInstance(document.getElementById('tambahModal'));
-                modal.hide();
-            } else {
-                toastr.error('Terjadi kesalahan, silakan coba lagi!');
-            }
-        },
-        error: function(xhr){
-            if(xhr.status === 400) {
-                let errors = xhr.responseJSON.errors;
-                let errorMessage = "Harap periksa kembali inputan Anda!";
-
-                $.each(errors, function(key, value){
-                    let inputField = $('[name="' + key + '"]');
-                    inputField.addClass('is-invalid');
-                    inputField.after('<span class="text-danger">' + value[0] + '</span>');
-                    toastr.error(value[0]);
-                });
-
-            } else {
-                toastr.error('Terjadi kesalahan, silakan coba lagi!');
-            }
-        }
-    });
-});
-
-// Function untuk mengisi modal saat update
-window.ViewData = function (id) {
-    $('#tambahModal').modal('show');
-
-    if (id === 0) {
-        // Mode Insert (Tambah Data)
-        $('#modal-judul').text('Tambah Pegawai');
-        $('#formPelanggan')[0].reset();
-        $('#btn-simpan').val('create');
-    } else {
-        // Mode Edit (Ambil data dari API)
-        $('#modal-judul').text('Edit Pegawai');
-        $('#btn-simpan').val('update');
-
-        $.ajax({
-            url: '/pelanggan/edit/' + id,
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                if (response) {
-                    $('#id').val(response.id);
-                    $('#nm_pelanggan').val(response.nm_pelanggan);
-                    $('#alamat_pelanggan').val(response.alamat_pelanggan);
-                    $('#no_hp_pelanggan').val(response.no_hp_pelanggan);
-                    $('#plat_nomor').val(response.plat_nomor);
-                    $('#deskripsi').val(response.deskripsi);
-                    $('#id_kendaraan').val(response.id_kendaraan);
-                    $('#active').val(response.active);
-                    $('#pelanggan-provinsi').val(response.id_provinsi).trigger('change');
-                    $.ajax({
-                        url: "/pelanggan/get-kota/" + response.id_provinsi,
-                        type: "GET",
-                        success: function(kotaResponse) {
-                            $('#pelanggan-kota').empty().append('<option selected disabled>Pilih Kota</option>');
-
-                            kotaResponse.forEach(function (data) {
-                                $('#pelanggan-kota').append('<option value="' + data.id_kota + '">' + data.name + '</option>');
-                            });
-
-                            $('#pelanggan-kota').val(response.id_kota).trigger('change');
-                        }
-                    });
-                    $('#status').val(response.status);
-                }
-            },
-            error: function() {
-                alert('Gagal mengambil data!');
-            }
-        });
-    }
-
-}
-
-$(document).on('click', '.delete-record', function () {
-    console.log("Delete diklik!");
-
-    let id = $(this).data('id');
-
-    Swal.fire({
-        title: 'Apakah Anda yakin?',
-        text: "Data role akan dihapus!",
-        icon: 'warning',
-        customClass: {
-            confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
-            cancelButton: 'btn btn-label-secondary waves-effect waves-light'
-        },
-        showCancelButton: true,
-        cancelButtonText: 'Batal',
-        buttonsStyling: false,
-        didRender: function () {
-            $('.swal2-actions').css('gap', '10px');
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/pelanggan/delete/' + id,
-                type: 'DELETE',
-                data: {
-                    _method: 'DELETE',
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response.status === 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: response.message,
-                            customClass: {
-                              confirmButton: 'btn btn-success waves-effect waves-light'
-                            }
-                        });
-                        $('#TablePelanggan').DataTable().ajax.reload();
-                    }
-                },
-                error: function () {
-                    Swal.fire('Oops!', 'Terjadi kesalahan saat menghapus data.', 'error');
-                }
-            });
-        }
-    });
-});
-

@@ -10,6 +10,7 @@ use App\Http\Controllers\Mono\PegawaiController;
 use App\Http\Controllers\Mono\DashboardController;
 use App\Http\Controllers\Mono\MenuGroupController;
 use App\Http\Controllers\Mono\PelangganController;
+use App\Http\Controllers\Mono\VendorController;
 use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\PermissionController;
 use App\Http\Controllers\Mono\RolePermissionController;
@@ -19,7 +20,7 @@ Route::get('/', function () {
 });
 
 // Route untuk Semua Role
-Route::middleware('auth', 'role:superadmin|admin|user')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Route User
@@ -62,6 +63,17 @@ Route::middleware('auth', 'role:superadmin|admin|user')->group(function () {
         Route::delete('/delete/{id}', [PelangganController::class, 'destroy'])->name('destroy');
         Route::get('/get-kota/{id_provinsi}', [PelangganController::class, 'getKotaByProvinsi'])->name('pelanggan.get-kota');
         Route::get('/profile/{id}', [PelangganController::class, 'profile'])->name('profile');
+    });
+
+    // Route Pelanggan
+    Route::prefix('vendor')->name('vendor.')->group(function () {
+        Route::get('/', [VendorController::class, 'index'])->name('index');
+        Route::post('/store', [VendorController::class, 'store'])->name('store');
+        Route::get('/edit/{id:uuid}', [VendorController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [VendorController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [VendorController::class, 'destroy'])->name('destroy');
+        Route::get('/get-kota/{id_provinsi}', [VendorController::class, 'getKotaByProvinsi'])->name('vendor.get-kota');
+        Route::get('/profile/{id}', [VendorController::class, 'profile'])->name('profile');
     });
 });
 
