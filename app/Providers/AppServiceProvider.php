@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use App\Models\MenuGroup;
 use App\Models\MenuDetail;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if (env('APP_ENV') !== 'local') {
+            URL::forceScheme('https');
+        }
+
         // Cek apakah tabel 'menu_groups' sudah ada sebelum mengambil data
         if (Schema::hasTable('menu_groups')) {
             $menuGroups = MenuGroup::with(['menuDetails' => function ($query) {

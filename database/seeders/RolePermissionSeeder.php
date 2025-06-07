@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use App\Models\MenuGroup;
 use App\Models\MenuDetail;
 use Illuminate\Database\Seeder;
+use App\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class RolePermissionSeeder extends Seeder

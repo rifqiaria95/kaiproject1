@@ -16,7 +16,7 @@
     />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login | Bengkel App</title>
+    <title>Login | Kainnova Digital Solutions</title>
 
     <meta name="description" content="" />
 

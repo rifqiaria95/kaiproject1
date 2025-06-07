@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Mono;
 
 use App\Models\MenuGroup;
 use App\Models\MenuDetail;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {

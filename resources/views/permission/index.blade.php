@@ -1,9 +1,9 @@
 @extends('layouts.main')
 @section('css')
-<link rel="stylesheet" href="{{ asset('/assets/vendor/libs/select2/select2.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/tagify/tagify.css') }}" />
-<link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
-<link rel="stylesheet" href="{{ asset('/assets/vendor/libs/@form-validation/form-validation.css') }}" />
+<link rel="stylesheet" href="{{ url('/assets/vendor/libs/select2/select2.css') }}" />
+<link rel="stylesheet" href="{{ url('assets/vendor/libs/tagify/tagify.css') }}" />
+<link rel="stylesheet" href="{{ url('assets/vendor/libs/bootstrap-select/bootstrap-select.css') }}" />
+<link rel="stylesheet" href="{{ url('/assets/vendor/libs/@form-validation/form-validation.css') }}" />
 @endsection
 @section('content')
     <!-- Content -->
@@ -123,6 +123,7 @@
                 <div class="modal-dialog modal-dialog-centered modal-md">
                     <div class="modal-content">
                         <div class="modal-header">
+                            <h5 class="modal-title text-center" id="myModalLabel18">Tambah Permission</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <form id="formPermission" name="formPermission" class="form-horizontal" enctype="multipart/form-data">
@@ -176,14 +177,14 @@
 <script>
     window.userPermissions = @json(auth()->user()->getAllPermissions()->pluck('name'));
 </script>
-<script src="{{ asset('assets/vendor/libs/moment/moment.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/tagify/tagify.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/bootstrap-select/bootstrap-select.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/popular.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
-<script src="{{ asset('assets/ajax/permission.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/moment/moment.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/select2/select2.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/tagify/tagify.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/bootstrap-select/bootstrap-select.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+<script src="{{ url('assets/ajax/permission.js') }}"></script>
 @endsection

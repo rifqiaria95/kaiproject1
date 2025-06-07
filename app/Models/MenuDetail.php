@@ -23,7 +23,7 @@ class MenuDetail extends Model
 
     public function menuGroup()
     {
-        return $this->belongsTo(MenuGroup::class);
+        return $this->belongsTo(MenuGroup::class, 'menu_group_id');
     }
 
     public function permissions(): BelongsToMany
