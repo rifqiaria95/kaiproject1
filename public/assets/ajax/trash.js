@@ -65,4 +65,39 @@ $(document).ready(function () {
             }
         });
     });
+
+    $(document).on('click', '.delete-record', function () {
+        let id = $(this).data('id');
+        let kategori = $(this).data('kategori');
+
+        Swal.fire({
+            title: 'Hapus data?',
+            text: "Data akan dihapus!",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/deleted/delete',
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        id: id,
+                        kategori: kategori
+                    },
+                    success: function (response) {
+                        Swal.fire('Deleted!', response.message, 'success');
+                        $('#deletedTable').DataTable().ajax.reload();
+                    },
+                    error: function () {
+                        Swal.fire('Oops!', 'Terjadi kesalahan.', 'error');
+                    }
+                });
+            }
+        });
+    });
 });

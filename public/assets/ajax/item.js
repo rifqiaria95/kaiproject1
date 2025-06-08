@@ -200,46 +200,20 @@ $(document).ready(function () {
                 name: 'nm_item'
             },
             {
-                data: 'jenis_item',
-                name: 'jenis_item',
-                render: function (data, type, full, meta) {
-                    var $sparepart = '<span class="badge bg-label-primary">Sparepart</span>';
-                    var $tools = '<span class="badge bg-label-info">Tools</span>';
-                    if (data == 1) {
-                        return $sparepart;
-                    } else if (data == 2) {
-                        return $tools;
-                    } else {
-                        '<span class="badge bg-label-dark">Lainnya</span>'
-                    }
-                    return '';
-                }
+                data: 'kategori',
+                name: 'kategori',
             },
             {
                 data: 'stok_satuan',
                 name: 'stok_satuan'
             },
             {
-                data: 'hrg_beli',
-                name: 'hrg_beli',
-                render: function (data) {
-                    return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2 }).format(data);
-                }
-            },
-            {
-                data: 'hrg_jual',
-                name: 'hrg_jual',
-                render: function (data) {
-                    return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2 }).format(data);
-                }
-            },
-            {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit pelanggan");
-                    let canDelete       = userPermissions.includes("delete pelanggan");
+                    let canEdit         = userPermissions.includes("edit item");
+                    let canDelete       = userPermissions.includes("delete item");
 
                     let buttons = '<div class="d-flex align-items-center">';
 
@@ -252,7 +226,7 @@ $(document).ready(function () {
                     if (canEdit) {
                         buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                         buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(\'' + full.id + '\')">Edit</a>';
+                        buttons += '<a href="javascript:;" class="dropdown-item edit-record" data-id="' + full.id + '">Edit</a>';
                         buttons += '</div>';
                     }
 
@@ -272,138 +246,97 @@ $(document).ready(function () {
         dropdownParent: $('#tambahModal')
     });
 
-    $("#hrg_beli, #hrg_jual").on("input", function () {
-        let value = $(this).val().replace(/[^0-9]/g, '');
-
-        if (value === "") {
-            $(this).val("");
-            return;
-        }
-
-        let number = parseInt(value, 10);
-        let formattedValue = number.toLocaleString('id-ID');
-
-        $(this).val(formattedValue);
-    });
-
-    $("#formItem").on("submit", function () {
-        $("#hrg_beli, #hrg_jual").each(function () {
-            let value = $(this).val().replace(/\./g, "");
-            $(this).val(value);
-        });
-    });
-
-
     $('#formItem').on('submit', function(e){
-        e.preventDefault();
+      e.preventDefault();
 
-        let formData = new FormData(this);
-        let id = $('#id').val();
-        let url = '';
+      $('#formItem .form-control, #formItem .form-select').removeClass('is-invalid');
+      $('#formItem .text-danger.small').text('');
 
-        if(id == "" || id == 0){
-            url = "/item/store";
-        } else {
-            url = "/item/update/" + id;
-            formData.append('_method', 'PUT');
-        }
+      let formData = new FormData(this);
+      let id = $('#id').val();
+      let url = '';
 
-        // Bersihkan error sebelumnya
-        $('.text-danger').remove();
-        $('.is-invalid').removeClass('is-invalid');
+      if(id == "" || id == 0){
+          url = "/item/store";
+      } else {
+          url = "/item/update/" + id;
+          formData.append('_method', 'PUT');
+      }
+
+      $.ajax({
+          url: url,
+          type: "POST",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(response){
+              if(response.status == 200){
+                  toastr.success('Data berhasil disimpan!');
+                  $('#formItem')[0].reset();
+                  $('#TableItem').DataTable().ajax.reload(null, false);
+                  let modal = bootstrap.Modal.getInstance(document.getElementById('tambahModal'));
+                  modal.hide();
+              } else {
+                  toastr.error('Terjadi kesalahan, silakan coba lagi!');
+              }
+          },
+          error: function (xhr) {
+            if (xhr.status === 422) {
+                let errors = xhr.responseJSON.errors;
+                $.each(errors, function (key, value) {
+                    $('#' + key).addClass('is-invalid');
+                    $('#' + key + '-error').text(value[0]);
+                });
+            } else {
+                toastr.error('Gagal menyimpan data!');
+            }
+          }
+      });
+    });
+
+    $('#tambahModal').on('hidden.bs.modal', function () {
+        $('#formItem')[0].reset();
+        $('#id').val('');
+        $('#id_kategori').val(null).trigger('change');
+        $('#id_unit_berat').val(null).trigger('change');
+
+        $('#modal-judul').text('Tambah Item');
+        $('#formItem .form-control, #formItem .form-select').removeClass('is-invalid');
+        $('#formItem .text-danger.small').text('');
+    });
+
+    $(document).on('click', '.edit-record', function () {
+        let id = $(this).data('id');
+
+        $('#formItem .form-control, #formItem .form-select').removeClass('is-invalid');
+        $('#formItem .text-danger.small').text('');
 
         $.ajax({
-            url: url,
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response){
-                if(response.status == 200){
-                    toastr.success('Data berhasil disimpan!');
-                    $('#formItem')[0].reset();
-                    $('#TableItem').DataTable().ajax.reload(null, false);
-                    let modal = bootstrap.Modal.getInstance(document.getElementById('tambahModal'));
-                    modal.hide();
-                } else {
-                    toastr.error('Terjadi kesalahan, silakan coba lagi!');
+            url: '/item/edit/' + id,
+            type: 'GET',
+            success: function(response) {
+                if (response) {
+                    $('#modal-judul').text('Edit Item');
+                    $('#id').val(response.id);
+                    $('#id_unit_berat').val(response.id_unit_berat).trigger('change');
+                    $('#id_kategori').val(response.id_kategori).trigger('change');
+                    $('#nm_item').val(response.nm_item);
+                    $('#deskripsi').val(response.deskripsi);
+                    $('#tambahModal').modal('show');
                 }
             },
-            error: function(xhr){
-                if(xhr.status === 400) {
-                    let errors = xhr.responseJSON.errors;
-                    let errorMessage = "Harap periksa kembali inputan Anda!";
-
-                    $.each(errors, function(key, value){
-                        let inputField = $('[name="' + key + '"]');
-                        inputField.addClass('is-invalid');
-                        inputField.after('<span class="text-danger">' + value[0] + '</span>');
-                        toastr.error(value[0]);
-                    });
-
-                } else {
-                    toastr.error('Terjadi kesalahan, silakan coba lagi!');
-                }
+            error: function() {
+                toastr.error('Terjadi kesalahan saat mengambil data.');
             }
         });
     });
-
-    // Function untuk mengisi modal saat update
-    window.ViewData = function (id) {
-        $('#tambahModal').modal('show');
-
-        if (id === 0) {
-            // Mode Insert (Tambah Data)
-            $('#modal-judul').text('Tambah Item');
-            $('#formItem')[0].reset();
-            $('#btn-simpan').val('create');
-        } else {
-            // Mode Edit (Ambil data dari API)
-            $('#modal-judul').text('Edit Item');
-            $('#btn-simpan').val('update');
-
-            $.ajax({
-                url: '/item/edit/' + id,
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response) {
-                        $('#id').val(response.id);
-                        $('#id_satuan').val(response.id_satuan);
-                        $('#id_vendor').val(response.id_vendor);
-                        $('#nm_item').val(response.nm_item);
-                        $('#jenis_item').val(response.jenis_item);
-                        $('#tgl_masuk_item').val(response.tgl_masuk_item);
-                        $('#merk').val(response.merk);
-                        $('#stok').val(response.stok);
-                        $('#hrg_beli').val(formatRupiah(response.hrg_beli));
-                        $('#hrg_jual').val(formatRupiah(response.hrg_jual));
-                        $('#rak').val(response.rak);
-                        $('#deskripsi').val(response.deskripsi);
-                        $('#foto_item').val(response.foto_item).trigger('change');
-                    }
-                },
-                error: function() {
-                    alert('Gagal mengambil data!');
-                }
-            });
-        }
-    }
-
-    // Fungsi untuk format angka ke 900.000,00
-    function formatRupiah(angka) {
-        let number = parseFloat(angka).toFixed(2)
-            .replace(".", ",");
-
-        return number.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
 
     $(document).on('click', '.delete-record', function () {
         let id = $(this).data('id');
 
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: "Data role akan dihapus!",
+            text: "Data item akan dihapus!",
             icon: 'warning',
             customClass: {
                 confirmButton: 'btn btn-primary waves-effect waves-light ml-3',

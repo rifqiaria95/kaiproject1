@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Pelanggan;
-use App\Models\Kendaraan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Laravolt\Indonesia\Models\City;
@@ -24,7 +23,6 @@ class PelangganFactory extends Factory
     public function definition()
     {
         $provinsi  = Province::inRandomOrder()->first();
-        $kendaraan = Kendaraan::inRandomOrder()->first();
         $kota = $provinsi
             ? City::where('province_code', $provinsi->code)->inRandomOrder()->first()
             : null;
@@ -33,11 +31,9 @@ class PelangganFactory extends Factory
             'id'               => Str::uuid(),
             'nm_pelanggan'     => $this->faker->name,
             'alamat_pelanggan' => $this->faker->address,
-            'no_hp_pelanggan'  => $this->faker->numerify('08##########'),
-            'plat_nomor'       => strtoupper($this->faker->bothify('?? #### ??')),
+            'no_telp_pelanggan'  => $this->faker->numerify('08##########'),
             'deskripsi'        => $this->faker->optional()->sentence,
             'status'           => $this->faker->boolean,
-            'id_kendaraan'      => $kendaraan->id ?? 1,
             'id_provinsi'      => $provinsi->id_provinsi ?? 1,
             'id_kota'          => $kota->id_kota ?? 1,
             'created_at'       => now(),

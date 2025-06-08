@@ -1,7 +1,7 @@
 @extends('layouts.main')
 @section('css')
-<link rel="stylesheet" href="{{ asset('/assets/vendor/libs/select2/select2.css') }}" />
-<link rel="stylesheet" href="{{ asset('/assets/vendor/libs/@form-validation/form-validation.css') }}" />
+<link rel="stylesheet" href="{{ url('/assets/vendor/libs/select2/select2.css') }}" />
+<link rel="stylesheet" href="{{ url('/assets/vendor/libs/@form-validation/form-validation.css') }}" />
 @endsection
 @section('content')
     <!-- Content -->
@@ -176,12 +176,12 @@
 <script>
     window.userPermissions = @json(auth()->user()->getAllPermissions()->pluck('name'));
 </script>
-<script src="{{ asset('assets/vendor/libs/moment/moment.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/select2/select2.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/popular.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
-<script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
-<script src="{{ asset('assets/ajax/trash.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/moment/moment.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/select2/select2.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/@form-validation/popular.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/@form-validation/bootstrap5.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
+<script src="{{ url('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
+<script src="{{ url('assets/ajax/trash.js') }}"></script>
 @endsection

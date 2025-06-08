@@ -161,11 +161,11 @@
                                                             <label class="form-label" for="add-pelanggan-email">No Tlp</label>
                                                             <input
                                                                 type="tel"
-                                                                id="no_hp_pelanggan"
+                                                                id="no_telp-vendor"
                                                                 class="form-control"
                                                                 placeholder="+62"
                                                                 aria-label="john.doe@example.com"
-                                                                name="no_hp_pelanggan"
+                                                                name="no_telp-vendor"
                                                                 oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                                                         </div>
                                                         <div class="col-xl-6 mb-6">

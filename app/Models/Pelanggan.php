@@ -26,9 +26,18 @@ class Pelanggan extends Model
         });
     }
 
-    public function kendaraan()
+    public function salesOrder()
     {
-        return $this->belongsTo(Kendaraan::class, 'id_kendaraan');
+        return $this->hasMany(SalesOrder::class, 'id');
+    }
 
+    public function kota()
+    {
+        return $this->belongsTo(Kota::class, 'id_kota');
+    }
+
+    public function provinsi()
+    {
+        return $this->belongsTo(Provinsi::class, 'id_provinsi');
     }
 }

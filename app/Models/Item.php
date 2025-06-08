@@ -17,6 +17,7 @@ class Item extends Model
     protected $primaryKey   = 'id';
     protected $keyType      = 'string';
     protected $table        = 'item';
+    protected $guarded      = [];
 
     protected static function boot()
     {
@@ -26,17 +27,38 @@ class Item extends Model
         });
     }
 
-    protected $guarded = [];
-
-    public function satuan()
+    public function unit_berat()
     {
-        return $this->belongsTo(UnitBerat::class, 'id_satuan');
+        return $this->belongsTo(UnitBerat::class, 'id_unit_berat');
     }
 
-
-    public function vendor()
+    public function kategori()
     {
-        return $this->belongsTo(Vendor::class, 'id_vendor');
+        return $this->belongsTo(Kategori::class, 'id_kategori');
+    }
 
+    public function stok()
+    {
+        return $this->hasMany(Stok::class, 'id');
+    }
+
+    public function purchaseOrder()
+    {
+        return $this->hasMany(PurchaseOrder::class, 'id');
+    }
+
+    public function salesOrder()
+    {
+        return $this->hasMany(SalesOrder::class, 'id');
+    }
+
+    public function stockMasuk()
+    {
+        return $this->hasMany(StockMasuk::class, 'id');
+    }
+
+    public function stockKeluar()
+    {
+        return $this->hasMany(StockKeluar::class, 'id');
     }
 }

@@ -21,12 +21,11 @@ class MenuSeeder extends Seeder
 
         // Data Menu Groups
         $menuGroups = [
-            ['name' => 'Item', 'icon' => 'ti ti-brand-databricks', 'order' => 1, 'jenis_menu' => 1],
-            ['name' => 'Pegawai', 'icon' => 'ti ti-user-dollar', 'order' => 2, 'jenis_menu' => 1],
-            ['name' => 'Manajemen User', 'icon' => 'ti ti-user-heart', 'order' => 3, 'jenis_menu' => 1],
-            ['name' => 'Menu Group', 'icon' => 'ti ti-menu-deep', 'order' => 4, 'jenis_menu' => 3],
-            ['name' => 'Menu Detail', 'icon' => 'ti ti-menu-deep', 'order' => 5, 'jenis_menu' => 3],
-            ['name' => 'Recycle Bin', 'icon' => 'ti ti-recycle', 'order' => 6, 'jenis_menu' => 3],
+            ['name' => 'Master Data', 'icon' => 'ti ti-brand-databricks', 'order' => 1, 'jenis_menu' => 1],
+            ['name' => 'Transaksi', 'icon' => 'ti ti-transaction-dollar', 'order' => 2, 'jenis_menu' => 1],
+            ['name' => 'Laporan', 'icon' => 'ti ti-report', 'order' => 3, 'jenis_menu' => 1],
+            ['name' => 'Admin', 'icon' => 'ti ti-lock-heart', 'order' => 4, 'jenis_menu' => 3],
+            ['name' => 'Pengaturan', 'icon' => 'ti ti-settings', 'order' => 5, 'jenis_menu' => 3],
         ];
 
         foreach ($menuGroups as &$group) {
@@ -41,14 +40,18 @@ class MenuSeeder extends Seeder
 
         // Data Menu Details
         $menuDetails = [
-            ['menu_group_id' => $menuGroupIds['Pegawai'] ?? null, 'name' => 'Data Pegawai', 'status' => 1, 'route' => '/pegawai', 'order' => 1],
-            ['menu_group_id' => $menuGroupIds['Manajemen User'] ?? null, 'name' => 'Data User', 'status' => 1, 'route' => '/users', 'order' => 1],
-            ['menu_group_id' => $menuGroupIds['Manajemen User'] ?? null, 'name' => 'Role', 'status' => 1, 'route' => '/role', 'order' => 2],
-            ['menu_group_id' => $menuGroupIds['Manajemen User'] ?? null, 'name' => 'Permissions', 'status' => 1, 'route' => '/permission', 'order' => 3],
-            ['menu_group_id' => $menuGroupIds['Item'] ?? null, 'name' => 'Data Item', 'status' => 1, 'route' => '/item', 'order' => 1],
-            ['menu_group_id' => $menuGroupIds['Menu Group'] ?? null, 'name' => 'Data Menu Group', 'status' => 1, 'route' => '/menu-groups', 'order' => 1],
-            ['menu_group_id' => $menuGroupIds['Menu Detail'] ?? null, 'name' => 'Data Menu Detail', 'status' => 1, 'route' => '/menu-details', 'order' => 2],
-            ['menu_group_id' => $menuGroupIds['Recycle Bin'] ?? null, 'name' => 'Trash', 'status' => 1, 'route' => '/deleted/data', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Master Data'] ?? null, 'name' => 'Data Pegawai', 'status' => 1, 'route' => '/pegawai', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Master Data'] ?? null, 'name' => 'Data User', 'status' => 1, 'route' => '/users', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Admin'] ?? null, 'name' => 'Role', 'status' => 1, 'route' => '/role', 'order' => 2],
+            ['menu_group_id' => $menuGroupIds['Admin'] ?? null, 'name' => 'Permissions', 'status' => 1, 'route' => '/permission', 'order' => 3],
+            ['menu_group_id' => $menuGroupIds['Master Data'] ?? null, 'name' => 'Data Item', 'status' => 1, 'route' => '/item', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Admin'] ?? null, 'name' => 'Data Menu Group', 'status' => 1, 'route' => '/menu-groups', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Admin'] ?? null, 'name' => 'Data Menu Detail', 'status' => 1, 'route' => '/menu-details', 'order' => 2],
+            ['menu_group_id' => $menuGroupIds['Admin'] ?? null, 'name' => 'Trash', 'status' => 1, 'route' => '/deleted/data', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Master Data'] ?? null, 'name' => 'Data Kategori', 'status' => 1, 'route' => '/kategori', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Master Data'] ?? null, 'name' => 'Data Pelanggan', 'status' => 1, 'route' => '/pelanggan', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Master Data'] ?? null, 'name' => 'Data Vendor', 'status' => 1, 'route' => '/vendor', 'order' => 1],
+            ['menu_group_id' => $menuGroupIds['Master Data'] ?? null, 'name' => 'Data Satuan', 'status' => 1, 'route' => '/satuan', 'order' => 1],
         ];
 
         foreach ($menuDetails as &$detail) {

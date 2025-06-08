@@ -195,8 +195,8 @@ $('#TablePelanggan').DataTable({
             name: 'alamat_vendor'
         },
         {
-            data: 'no_hp_vendor',
-            name: 'no_hp_vendor'
+            data: 'no_telp_vendor',
+            name: 'no_telp_vendor'
         },
         {
             data: 'aksi',

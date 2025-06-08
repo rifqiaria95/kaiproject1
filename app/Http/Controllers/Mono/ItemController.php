@@ -10,7 +10,7 @@ use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use App\Models\Item;
 use App\Models\UnitBerat;
-use App\Models\Vendor;
+use App\Models\Kategori;
 
 
 class ItemController extends Controller
@@ -18,28 +18,28 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         // Ambil semua data yang diperlukan
-        $satuan = UnitBerat::all();
-        $vendor = Vendor::all();
+        $unit_berat = UnitBerat::all();
+        $kategori   = Kategori::all();
 
         if ($request->ajax()) {
-            return datatables()->of(Item::with(['satuan', 'vendor']))
+            return datatables()->of(Item::with(['unit_berat', 'kategori']))
                 ->addColumn('stok_satuan', function ($item) {
-                    return $item->stok . ' ' . ($item->satuan ? $item->satuan->nama : '');
+                    return $item->unit_berat ? $item->unit_berat->nama : '-';
                 })
-                ->addColumn('vendor', function ($item) {
-                    return $item->vendor ? $item->vendor->nama : '-';
+                ->addColumn('kategori', function ($item) {
+                    return $item->kategori ? $item->kategori->nama_kategori : '-';
                 })
                 ->addColumn('aksi', function ($data) {
                     $button = '';
                     return $button;
                 })
-                ->rawColumns(['aksi', 'stok_satuan', 'vendor'])
+                ->rawColumns(['aksi', 'stok_satuan', 'kategori'])
                 ->addIndexColumn()
                 ->make(true);
         }
 
         // Kirim data ke view
-        return view('item.index', compact('satuan', 'vendor'));
+        return view('item.index', compact('unit_berat', 'kategori'));
     }
 
     public function store(StoreItemRequest $request)
@@ -57,8 +57,6 @@ class ItemController extends Controller
             // Tambahkan kode ke request
             $request->merge([
                 'kd_item'  => $newCode,
-                'hrg_beli' => str_replace('.', '', $request->hrg_beli),
-                'hrg_jual' => str_replace('.', '', $request->hrg_jual),
             ]);
 
             // Simpan data item baru
@@ -89,7 +87,7 @@ class ItemController extends Controller
 
     public function edit($id)
     {
-        $item = Item::with('vendor')->with('satuan')->where('id', $id)->first();
+        $item = Item::with('kategori')->with('unit_berat')->where('id', $id)->first();
 
         return response()->json($item);
     }
@@ -100,8 +98,6 @@ class ItemController extends Controller
             $item = Item::findOrFail($id);
 
             $validatedData             = $request->validated();
-            $validatedData['hrg_beli'] = str_replace('.', '', $request->hrg_beli);
-            $validatedData['hrg_jual'] = str_replace('.', '', $request->hrg_jual);
 
             $item->update($validatedData);
 

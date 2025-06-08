@@ -30,7 +30,7 @@
                             <label class="form-label" for="password">Password</label>
                             <div class="input-group input-group-merge">
                                 <x-text-input id="password" class="form-control" type="password" name="password" required autocomplete="current-password" />
-                                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('password')" class="mt-2 text-danger" />
                                 <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
                             </div>
                         </div>

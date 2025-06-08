@@ -29,14 +29,13 @@ class VendorSeeder extends Seeder
 
         for ($i = 0; $i < 50; $i++) {
             DB::table('vendor')->insert([
-                'nm_vendor'     => $faker->company,
-                'alamat_vendor' => $faker->address,
-                'no_hp_vendor'  => $faker->phoneNumber,
-                'id_kota'       => $faker->randomElement($cityIds),
-                'id_provinsi'   => $faker->randomElement($provinceIds),
-                'permission'    => null,
-                'created_at'    => now(),
-                'updated_at'    => now(),
+                'nm_vendor'      => $faker->company,
+                'alamat_vendor'  => $faker->address,
+                'no_telp_vendor' => $faker->phoneNumber,
+                'id_kota'        => $faker->randomElement($cityIds),
+                'id_provinsi'    => $faker->randomElement($provinceIds),
+                'created_at'     => now(),
+                'updated_at'     => now(),
             ]);
         }
     }

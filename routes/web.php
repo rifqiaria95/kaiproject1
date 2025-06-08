@@ -6,13 +6,19 @@ use App\Http\Controllers\Mono\ItemController;
 use App\Http\Controllers\Mono\UnitController;
 use App\Http\Controllers\Mono\UserController;
 use App\Http\Controllers\Mono\AdminController;
+use App\Http\Controllers\Mono\DivisiController;
+use App\Http\Controllers\Mono\GudangController;
+use App\Http\Controllers\Mono\VendorController;
+use App\Http\Controllers\Mono\JabatanController;
 use App\Http\Controllers\Mono\PegawaiController;
+use App\Http\Controllers\Mono\KategoriController;
 use App\Http\Controllers\Mono\DashboardController;
 use App\Http\Controllers\Mono\MenuGroupController;
 use App\Http\Controllers\Mono\PelangganController;
-use App\Http\Controllers\Mono\VendorController;
+use App\Http\Controllers\Mono\DepartemenController;
 use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\PermissionController;
+use App\Http\Controllers\Mono\PerusahaanController;
 use App\Http\Controllers\Mono\RolePermissionController;
 
 Route::get('/', function () {
@@ -44,6 +50,52 @@ Route::middleware('auth')->group(function () {
         Route::get('/get-kota/{id_provinsi}', [PegawaiController::class, 'getKotaByProvinsi'])->name('pegawai.get-kota');
     });
 
+    // Route Jabatan
+    Route::prefix('jabatan')->name('jabatan.')->group(function () {
+        Route::get('/', [JabatanController::class, 'index'])->name('index');
+        Route::post('/store', [JabatanController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [JabatanController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [JabatanController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [JabatanController::class, 'destroy'])->name('destroy');
+    });
+
+    // Route Divisi
+    Route::prefix('divisi')->name('divisi.')->group(function () {
+        Route::get('/', [DivisiController::class, 'index'])->name('index');
+        Route::post('/store', [DivisiController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [DivisiController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [DivisiController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [DivisiController::class, 'destroy'])->name('destroy');
+    });
+
+    // Route Departemen
+    Route::prefix('departemen')->name('departemen.')->group(function () {
+        Route::get('/', [DepartemenController::class, 'index'])->name('index');
+        Route::post('/store', [DepartemenController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [DepartemenController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [DepartemenController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [DepartemenController::class, 'destroy'])->name('destroy');
+    });
+
+    // Route Perusahaan
+    Route::prefix('perusahaan')->name('perusahaan.')->group(function () {
+        Route::get('/', [PerusahaanController::class, 'index'])->name('index');
+        Route::post('/store', [PerusahaanController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [PerusahaanController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [PerusahaanController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [PerusahaanController::class, 'destroy'])->name('destroy');
+    });
+
+    // Route Cabang
+    Route::prefix('cabang')->name('cabang.')->group(function () {
+        Route::get('/', [CabangController::class, 'index'])->name('index');
+        Route::post('/store', [CabangController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [CabangController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [CabangController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [CabangController::class, 'destroy'])->name('destroy');
+        Route::get('/get-perusahaan', [CabangController::class, 'getPerusahaan'])->name('get.perusahaan');
+    });
+
     // Route Item
     Route::prefix('item')->name('item.')->group(function () {
         Route::get('/', [ItemController::class, 'index'])->name('index');
@@ -52,6 +104,24 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{id}', [ItemController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [ItemController::class, 'destroy'])->name('destroy');
         Route::get('/profile/{id}', [ItemController::class, 'profile'])->name('profile');
+    });
+
+    // Route Gudang
+    Route::prefix('gudang')->name('gudang.')->group(function () {
+        Route::get('/', [GudangController::class, 'index'])->name('index');
+        Route::post('/store', [GudangController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [GudangController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [GudangController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [GudangController::class, 'destroy'])->name('destroy');
+    });
+
+    // Route Kategori
+    Route::prefix('kategori')->name('kategori.')->group(function () {
+        Route::get('/', [KategoriController::class, 'index'])->name('index');
+        Route::post('/store', [KategoriController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [KategoriController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [KategoriController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [KategoriController::class, 'destroy'])->name('destroy');
     });
 
     // Route Pelanggan
@@ -136,7 +206,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     // Route Trash
     Route::get('/deleted/data', [AdminController::class, 'getDeletedRecords'])->name('deleted.data');
     Route::post('/deleted/restore', [AdminController::class, 'restoreRecord'])->name('deleted.restore');
-
+    Route::post('/deleted/delete', [AdminController::class, 'deleteRecord'])->name('deleted.delete');
 });
 
 require __DIR__.'/auth.php';
