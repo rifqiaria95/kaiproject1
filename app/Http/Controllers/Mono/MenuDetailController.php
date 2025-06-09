@@ -12,19 +12,19 @@ class MenuDetailController extends Controller
     public function index(Request $request)
     {
         // Menampilkan Data pegawai
-        $menuDetail = MenuDetail::with('menu_group');
+        $menuDetail = MenuDetail::with('menuGroup');
         $menuGroup  = MenuGroup::all();
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($menuDetail)
-                ->addColumn('menu_group', function ($data) {
-                    return $data->menu_group->name ?? '-';
+                ->addColumn('menu_group_id', function ($data) {
+                    return $data->menuGroup->name ?? '-';
                 })
                 ->addColumn('aksi', function ($data) {
                     $button = '';
                     return $button;
                 })
-                ->rawColumns(['menu_group', 'aksi'])
+                ->rawColumns(['menu_group_id', 'aksi'])
                 ->addIndexColumn()
                 ->toJson();
         }

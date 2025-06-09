@@ -64,6 +64,10 @@ $(document).ready(function () {
                 name: 'order'
             },
             {
+                data: 'menu_group_id',
+                name: 'menu_group_id'
+            },
+            {
                 data: 'status',
                 name: 'status',
                 render: function (data, type, full, meta) {

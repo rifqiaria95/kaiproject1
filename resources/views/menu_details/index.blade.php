@@ -107,6 +107,7 @@
                 <th>Nama Menu</th>
                 <th>Route</th>
                 <th>Posisi</th>
+                <th>Menu Group</th>
                 <th>Status</th>
                 <th>Aksi</th>
             </tr>
