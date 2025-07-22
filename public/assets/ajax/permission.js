@@ -172,7 +172,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true, //aktifkan server-side
         ajax: {
-            url: "/permission/",
+            url: "admin/permission/",
             type: 'GET'
         },
         columns: [
@@ -225,8 +225,8 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes('edit permission');
-                    let canDelete       = userPermissions.includes('delete permission');
+                    let canEdit         = userPermissions.includes('edit_permission');
+                    let canDelete       = userPermissions.includes('delete_permission');
 
                     let buttons = '<div class="d-flex align-items-center">';
 
@@ -279,7 +279,7 @@ $(document).ready(function () {
             $('#btn-simpan').val('update');
 
             $.ajax({
-                url: `/permission/edit/${id}/`,
+                url: `admin/permission/edit/${id}/`,
                 type: "GET",
                 success: function (response) {
                     console.log(response);
@@ -303,7 +303,7 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
 
-        let url    = ($("#id").val()) ? `/permission/update/${$("#id").val()}` : "/permission/store";
+        let url    = ($("#id").val()) ? `admin/permission/update/${$("#id").val()}` : "admin/permission/store";
         let method = ($("#id").val()) ? "POST" : "POST";
 
         if ($("#id").val()) {
@@ -362,7 +362,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/permission/delete/' + id,
+                    url: 'admin/permission/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',

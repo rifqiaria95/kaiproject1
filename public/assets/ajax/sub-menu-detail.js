@@ -1,4 +1,7 @@
 $(document).ready(function () {
+    $('.select2').select2({
+        dropdownParent: $('#offcanvasAddMenu')
+    });
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -8,7 +11,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $('#TableMGroup').DataTable({
+    $('#TableSubMenuDetails').DataTable({
         dom:
             '<"row me-2"' +
             '<"col-md-2"<"me-3"l>>' +
@@ -25,7 +28,6 @@ $(document).ready(function () {
         },
         buttons: [
             {
-                extend: 'collection',
                 text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Menu</span>',
                 className: 'add-new btn btn-primary waves-effect waves-light mx-4',
                 attr: {
@@ -38,7 +40,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "admin/menu-group/",
+            url: "admin/sub-menu-detail/",
             type: 'GET'
         },
         columns: [
@@ -54,33 +56,42 @@ $(document).ready(function () {
                 name: 'name'
             },
             {
-                data: 'jenis_menu',
-                name: 'jenis_menu',
+                data: 'route',
+                name: 'route',
                 render: function (data, type, full, meta) {
-                    if(full.jenis_menu == 1) {
-                        return '<span class="badge bg-label-primary">Master</span>'
-                    } else if (full.jenis_menu == 2) {
-                        return '<span class="badge bg-label-secondary">Transaksi</span>'
-                    } else {
-                        return '<span class="badge bg-label-info">Settings</span>'
-                    }
+                    return '<span class="badge bg-label-success">'+ data +'</span>'
                 }
-            },
-            {
-                data: 'icon',
-                name: 'icon'
             },
             {
                 data: 'order',
                 name: 'order'
             },
             {
+                data: 'menu_group_id',
+                name: 'menu_group_id'
+            },
+            {
+                data: 'menu_detail_id',
+                name: 'menu_detail_id'
+            },
+            {
+                data: 'status',
+                name: 'status',
+                render: function (data, type, full, meta) {
+                    if(full.status == 1) {
+                        return '<span class="badge bg-label-primary">Active</span>'
+                    } else {
+                        return '<span class="badge bg-label-danger">Inactive</span>'
+                    }
+                }
+            },
+            {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit_menu_group");
-                    let canDelete       = userPermissions.includes("delete_menu_group");
+                    let canEdit         = userPermissions.includes("edit_menu_detail");
+                    let canDelete       = userPermissions.includes("delete_menu_detail");
 
                     let buttons = '<div class="d-flex align-items-center">';
 
@@ -109,49 +120,58 @@ $(document).ready(function () {
 
     });
 
+    let selectedId = null;
+
     // Fungsi untuk menampilkan data ke dalam offcanvas (Edit)
     window.ViewData = function (id) {
-        $.ajax({
-            url: `admin/menu-group/edit/${id}/`, // Pastikan route ini benar
-            type: "GET",
-            success: function (response) {
-                if (response.success) {
-                    selectedId = id;
-                    $("#id").val(response.menu.id);
-                    $("#nama_menu").val(response.menu.name);
-                    $("#jenis_menu").val(response.menu.jenis_menu);
-                    $("#icon").val(response.menu.icon);
-                    $("#order").val(response.menu.order);
+        $('#tambahModal').modal('show');
 
-                    // Ubah tombol submit agar tahu ini update
-                    $(".data-submit").text("Update").attr("id", "updateMenu");
+        if (id === 0) {
+            // Mode Insert (Tambah Data)
+            $('#modal-judul').text('Tambah Item');
+            $('#formSubMenuDetails')[0].reset();
+            $('#btn-simpan').val('create');
+        } else {
+            // Mode Edit (Ambil data dari API)
+            $('#modal-judul').text('Edit Item');
+            $('#btn-simpan').val('update');
 
-                    $("#offcanvasAddMenu").offcanvas("show");
+            $.ajax({
+                url: `admin/sub-menu-detail/edit/${id}/`, // Pastikan route ini benar
+                type: "GET",
+                success: function (response) {
+                    if (response.success) {
+                        selectedId = id;
+                        $("#nama_menu").val(response.menuDetail.name);
+                        $("#menu_group_id").val(response.menuDetail.menu_group_id);
+                        $("#icon").val(response.menuDetail.icon);
+                        $("#route").val(response.menuDetail.route);
+                        $("#order").val(response.menuDetail.order);
+                        $("#status").val(response.menuDetail.status);
+
+                        // Ubah tombol submit agar tahu ini update
+                        $(".data-submit").text("Update").attr("id", "updateMenu");
+
+                        $("#offcanvasAddMenu").offcanvas("show");
+                    }
+                },
+                error: function () {
+                    toastr.error('Gagal mengambil data!');
                 }
-            },
-            error: function () {
-                toastr.error('Gagal mengambil data!');
-            }
-        });
+            });
+        }
     };
 
     // Submit Form: Tambah & Update
-    $("#formMenu").submit(function (e) {
+    $("#formSubMenuDetails").submit(function (e) {
         e.preventDefault();
 
         let formData = new FormData(this);
-        let id = $("#id").val();
-        let url = "admin/menu-group/store";
-        let method = "POST";
-
-        if (id) {
-            url = "admin/menu-group/update/" + id;
-            formData.append("_method", "PUT"); // Tambahkan method PUT untuk Laravel
-        }
+        let url      = selectedId ? `admin/sub-menu-detail/update/${selectedId}` : "admin/sub-menu-detail/store";
 
         $.ajax({
             url: url,
-            type: method,
+            type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
@@ -159,13 +179,11 @@ $(document).ready(function () {
                 if (response.success) {
                     toastr.success(response.message);
 
-                    $('#TableMGroup').DataTable().ajax.reload(null, false);
-                    $("#formMenu")[0].reset();
-                    $("#id").val(""); // Reset ID agar tidak salah update nanti
+                    $('#TableSubMenuDetails').DataTable().ajax.reload(null, false);
+                    $("#formSubMenuDetails")[0].reset();
+                    $("#offcanvasAddMenu").offcanvas("hide");
 
-                    let offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById("offcanvasAddMenu"));
-                    if (offcanvas) offcanvas.hide();
-
+                    // Reset tombol ke mode Tambah
                     $(".data-submit").text("Submit").removeAttr("id");
                     selectedId = null;
                 }
@@ -181,22 +199,17 @@ $(document).ready(function () {
 
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: "Data menu akan dihapus!",
+            text: "Data menu_details akan dihapus!",
             icon: 'warning',
-            customClass: {
-                confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
-                cancelButton: 'btn btn-label-secondary waves-effect waves-light'
-            },
             showCancelButton: true,
-            cancelButtonText: 'Batal',
-            buttonsStyling: false,
-            didRender: function () {
-                $('.swal2-actions').css('gap', '10px');
-            }
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: 'admin/menu-group/delete/' + id,
+                    url: 'admin/sub-menu-detail/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',
@@ -204,15 +217,12 @@ $(document).ready(function () {
                     },
                     success: function (response) {
                         if (response.status === 200) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted!',
-                                text: response.message,
-                                customClass: {
-                                  confirmButton: 'btn btn-success waves-effect waves-light'
-                                }
-                            });
-                            $('#TableMGroup').DataTable().ajax.reload();
+                            Swal.fire(
+                                'Deleted!',
+                                'Data Pegawai Berhasil Dihapus.',
+                                'success'
+                            );
+                            $('#datatable').DataTable().ajax.reload();
                         } else {
                             Swal.fire(
                                 'Error!',
@@ -232,5 +242,4 @@ $(document).ready(function () {
             }
         });
     });
-
 });

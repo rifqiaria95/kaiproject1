@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori', function (Blueprint $table) {
+        Schema::create('news_tag', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('slug');
+            $table->uuid('news_id');
+            $table->foreign('news_id')->references('id')->on('news');
+            $table->foreignId('tags_id')->constrained('tags');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kategori');
+        Schema::dropIfExists('news_tag');
     }
 };

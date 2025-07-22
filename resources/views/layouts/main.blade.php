@@ -52,6 +52,7 @@
 
     <link rel="stylesheet" href="{{ url('/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}" />
     <link rel="stylesheet" href="{{ url('/assets/vendor/libs/typeahead-js/typeahead.css') }}" />
+    <link rel="stylesheet" href="{{ url('/assets/vendor/libs/select2/select2.css') }}" />
     <link rel="stylesheet" href="{{ url('/assets/vendor/libs/apex-charts/apex-charts.css') }}" />
     <link rel="stylesheet" href="{{ url('/assets/vendor/libs/swiper/swiper.css') }}" />
     <link rel="stylesheet" href="{{ url('/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
@@ -99,7 +100,7 @@
     <script src="{{ url('/assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
     <script src="{{ url('/assets/vendor/libs/swiper/swiper.js') }}"></script>
     <script src="{{ url('/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
-
+    <script src="{{ url('/assets/vendor/libs/select2/select2.js') }}"></script>
     <!-- Main JS -->
     <script src="{{ url('/assets/js/main.js') }}"></script>
 

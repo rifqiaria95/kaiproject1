@@ -20,6 +20,9 @@ use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\PermissionController;
 use App\Http\Controllers\Mono\PerusahaanController;
 use App\Http\Controllers\Mono\RolePermissionController;
+use App\Http\Controllers\Mono\SubMenuDetailController;
+use App\Http\Controllers\Mono\NewsController;
+use App\Http\Controllers\Mono\TagController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -124,6 +127,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/delete/{id}', [KategoriController::class, 'destroy'])->name('destroy');
     });
 
+    // Route Tag
+    Route::prefix('tag')->name('tag.')->group(function () {
+        Route::get('/', [TagController::class, 'index'])->name('index');
+        Route::post('/store', [TagController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [TagController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [TagController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [TagController::class, 'destroy'])->name('destroy');
+    });
+
     // Route Pelanggan
     Route::prefix('pelanggan')->name('pelanggan.')->group(function () {
         Route::get('/', [PelangganController::class, 'index'])->name('index');
@@ -144,6 +156,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/delete/{id}', [VendorController::class, 'destroy'])->name('destroy');
         Route::get('/get-kota/{id_provinsi}', [VendorController::class, 'getKotaByProvinsi'])->name('vendor.get-kota');
         Route::get('/profile/{id}', [VendorController::class, 'profile'])->name('profile');
+    });
+
+    // Route News
+    Route::prefix('portfolio/news')->name('news.')->group(function () {
+        Route::get('/', [NewsController::class, 'index'])->name('index');
+        Route::post('/store', [NewsController::class, 'store'])->name('store');
+        Route::get('/edit/{id:uuid}', [NewsController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [NewsController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [NewsController::class, 'destroy'])->name('destroy');
     });
 });
 
@@ -201,6 +222,15 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::get('/edit/{id}', [MenuDetailController::class, 'edit'])->name('edit');
         Route::post('/update/{id}', [MenuDetailController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [MenuDetailController::class, 'destroy'])->name('destroy');
+    });
+
+    // Route Sub Menu Details
+    Route::prefix('admin/sub-menu-detail')->name('sub-menu-detail.')->group(function () {
+        Route::get('/', [SubMenuDetailController::class, 'index'])->name('index');
+        Route::post('/store', [SubMenuDetailController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [SubMenuDetailController::class, 'edit'])->name('edit');
+        Route::post('/update/{id}', [SubMenuDetailController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [SubMenuDetailController::class, 'destroy'])->name('destroy');
     });
 
     // Route Trash

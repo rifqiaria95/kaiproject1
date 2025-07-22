@@ -100,11 +100,11 @@
         </div>
         </div>
         <div class="card-datatable table-responsive">
-        <table id="Tablekategori" class="datatables-users table">
+        <table id="Tabletag" class="datatables-users table">
             <thead class="border-top">
             <tr>
                 <th>#</th>
-                <th>Nama Kategori</th>
+                <th>Nama Tag</th>
                 <th>Slug</th>
                 <th>Aksi</th>
             </tr>
@@ -115,10 +115,10 @@
         <div
         class="offcanvas offcanvas-end"
         tabindex="-1"
-        id="offcanvasAddkategori"
+        id="offcanvasAddtag"
         aria-labelledby="offcanvasAddUserLabel">
             <div class="offcanvas-header border-bottom">
-                <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Tambah Kategori</h5>
+                <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Tambah Tag</h5>
                 <button
                 type="button"
                 class="btn-close text-reset"
@@ -126,12 +126,12 @@
                 aria-label="Close"></button>
             </div>
             <div class="offcanvas-body mx-0 flex-grow-0 p-6 h-100">
-                <form id="formkategori" name="formkategori" enctype="multipart/form-data">
+                <form id="formTag" name="formTag" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="id" id="id">
                     <div class="mb-6">
-                        <label class="form-label" for="name">Nama Kategori</label>
-                        <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama kategori">
+                        <label class="form-label" for="name">Nama Tag</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama tag">
                         <div id="name-error" class="text-danger small"></div>
                     </div>
                     <div class="mb-6">
@@ -153,6 +153,6 @@
 <script>
     window.userPermissions = @json(auth()->user()->getAllPermissions()->pluck('name'));
 </script>
-<script src="{{ asset('assets/ajax/kategori.js') }}"></script>
+<script src="{{ asset('assets/ajax/tag.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 @endsection

@@ -172,7 +172,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true, //aktifkan server-side
         ajax: {
-            url: "/role/",
+            url: "admin/role/",
             type: 'GET'
         },
         columns: [
@@ -195,8 +195,8 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit role");
-                    let canDelete       = userPermissions.includes("delete role");
+                    let canEdit         = userPermissions.includes("edit_role");
+                    let canDelete       = userPermissions.includes("delete_role");
 
                     let buttons = '<div class="d-flex align-items-center">';
 
@@ -273,7 +273,7 @@ $(document).ready(function () {
             $('#btn-update').val('update');
 
             $.ajax({
-                url: `/role/edit/${id}/`,
+                url: `admin/role/edit/${id}/`,
                 type: "GET",
                 success: function (response) {
 
@@ -309,7 +309,7 @@ $(document).ready(function () {
 
             let formData = new FormData(this);
             let id = $("#id").val();
-            let url = id ? `/role/update/${id}` : "/role/store";
+            let url = id ? `admin/role/update/${id}` : "admin/role/store";
             let method = id ? "POST" : "POST"; // Laravel butuh _method untuk PUT
 
             if (id) {
@@ -362,7 +362,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/role/delete/' + id,
+                    url: 'admin/role/delete/' + id,
                     type: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

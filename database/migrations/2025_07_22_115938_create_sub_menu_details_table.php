@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori', function (Blueprint $table) {
+        Schema::create('sub_menu_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('menu_group_id')->constrained('menu_groups')->onDelete('cascade');
+            $table->foreignId('menu_detail_id')->constrained('menu_details')->onDelete('cascade');
             $table->string('name');
-            $table->string('slug');
+            $table->tinyInteger('status');
+            $table->string('route')->nullable();
+            $table->tinyInteger('order');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kategori');
+        Schema::dropIfExists('sub_menu_details');
     }
 };

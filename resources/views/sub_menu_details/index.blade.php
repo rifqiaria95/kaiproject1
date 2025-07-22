@@ -100,12 +100,16 @@
         </div>
         </div>
         <div class="card-datatable table-responsive">
-        <table id="Tablekategori" class="datatables-users table">
+        <table id="TableSubMenuDetails" class="datatables-users table">
             <thead class="border-top">
             <tr>
                 <th>#</th>
-                <th>Nama Kategori</th>
-                <th>Slug</th>
+                <th>Nama Menu</th>
+                <th>Route</th>
+                <th>Posisi</th>
+                <th>Menu Group</th>
+                <th>Menu Detail</th>
+                <th>Status</th>
                 <th>Aksi</th>
             </tr>
             </thead>
@@ -115,10 +119,10 @@
         <div
         class="offcanvas offcanvas-end"
         tabindex="-1"
-        id="offcanvasAddkategori"
+        id="offcanvasAddMenu"
         aria-labelledby="offcanvasAddUserLabel">
             <div class="offcanvas-header border-bottom">
-                <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Tambah Kategori</h5>
+                <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Add Menu</h5>
                 <button
                 type="button"
                 class="btn-close text-reset"
@@ -126,18 +130,47 @@
                 aria-label="Close"></button>
             </div>
             <div class="offcanvas-body mx-0 flex-grow-0 p-6 h-100">
-                <form id="formkategori" name="formkategori" enctype="multipart/form-data">
+                <form id="formSubMenuDetails" name="formSubMenuDetails" enctype="multipart/form-data">
                     @csrf
-                    <input type="hidden" name="id" id="id">
                     <div class="mb-6">
-                        <label class="form-label" for="name">Nama Kategori</label>
-                        <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama kategori">
-                        <div id="name-error" class="text-danger small"></div>
+                        <label class="form-label" for="nama_menu">Nama Menu</label>
+                        <input type="text" class="form-control" id="nama_menu" name="name" placeholder="Masukkan nama menu" required>
                     </div>
                     <div class="mb-6">
-                        <label class="form-label" for="slug">Slug</label>
-                        <input type="text" class="form-control" id="slug" name="slug" placeholder="Masukkan slug">
-                        <div id="slug-error" class="text-danger small"></div>
+                        <label class="form-label" for="menu_group_id">Menu Group</label>
+                        <select id="menu_group_id" class="select2 form-select" name="menu_group_id">
+                            <option selected disabled>Pilih Menu Group</option>
+                            @foreach ($menuGroup as $mg)
+                                <option value="{{ $mg->id }}">{{ $mg->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-6">
+                        <label class="form-label" for="menu_detail_id">Menu Detail</label>
+                        <select id="menu_detail_id" class="select2 form-select" name="menu_detail_id">
+                            <option selected disabled>Pilih Menu Detail</option>
+                            @foreach ($menuDetail as $md)
+                                <option value="{{ $md->id }}">{{ $md->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-6">
+                        <label class="form-label" for="route">Route</label>
+                        <input type="text" id="route" class="form-control" name="route" placeholder="Route Menu">
+                    </div>
+                    <div class="mb-6">
+                        <label class="form-label" for="order">Posisi</label>
+                        <input type="number" id="order" class="form-control" name="order" placeholder="Posisi Menu">
+                    </div>
+                    <div class="mb-6">
+                        <fieldset class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="select form-select" name="status" id="status" required>
+                                <option>Pilih Status</option>
+                                <option value="0">Inactive</option>
+                                <option value="1">Active</option>
+                            </select>
+                        </fieldset>
                     </div>
                     <button type="submit" class="btn btn-primary me-3 data-submit">Submit</button>
                     <button type="button" class="btn btn-danger" data-bs-dismiss="offcanvas">Cancel</button>
@@ -153,6 +186,6 @@
 <script>
     window.userPermissions = @json(auth()->user()->getAllPermissions()->pluck('name'));
 </script>
-<script src="{{ asset('assets/ajax/kategori.js') }}"></script>
+<script src="{{ asset('assets/ajax/sub-menu-detail.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 @endsection

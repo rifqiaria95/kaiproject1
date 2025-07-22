@@ -8,7 +8,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $('#Tablekategori').DataTable({
+    $('#Tabletag').DataTable({
         dom:
             '<"row me-2"' +
             '<"col-md-2"<"me-3"l>>' +
@@ -165,11 +165,11 @@ $(document).ready(function () {
                 ]
             },
             {
-                text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah kategori</span>',
+                text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah tag</span>',
                 className: 'add-new btn btn-primary waves-effect waves-light',
                 attr: {
                     'data-bs-toggle': 'offcanvas',
-                    'data-bs-target': '#offcanvasAddkategori',
+                    'data-bs-target': '#offcanvasAddtag',
 
                 }
             }
@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/kategori/",
+            url: "/tag/",
             type: 'GET'
         },
         columns: [
@@ -207,8 +207,8 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit kategori");
-                    let canDelete       = userPermissions.includes("delete kategori");
+                    let canEdit         = userPermissions.includes("edit tag");
+                    let canDelete       = userPermissions.includes("delete tag");
 
                     let buttons = '<div class="d-flex align-items-center">';
 
@@ -237,11 +237,11 @@ $(document).ready(function () {
 
     });
 
-    // Reset form when add new kategori button is clicked
+    // Reset form when add new tag button is clicked
     $('.card').on('click', '.dt-action-buttons .add-new', function() {
         $('#id').val('');
-        $('#formkategori')[0].reset();
-        $('#offcanvasAddkategoriLabel').text('Tambah Kategori');
+        $('#formTag')[0].reset();
+        $('#offcanvasAddtagLabel').text('Tambah Tag');
         $('.data-submit').text('Submit');
         $('.form-control, .form-select').removeClass('is-invalid');
         $('.text-danger').text('');
@@ -254,19 +254,19 @@ $(document).ready(function () {
         $('.text-danger').text('');
 
         $.ajax({
-            url: `/kategori/edit/${id}/`,
+            url: `/tag/edit/${id}/`,
             type: "GET",
             success: function (response) {
                 if (response.success) {
                     selectedId = id;
-                    $("#id").val(response.kategori.id);
-                    $("#name").val(response.kategori.name);
-                    $("#slug").val(response.kategori.slug);
-                    $('#offcanvasAddkategoriLabel').text('Edit Kategori');
+                    $("#id").val(response.tag.id);
+                    $("#name").val(response.tag.name);
+                    $("#slug").val(response.tag.slug);
+                    $('#offcanvasAddtagLabel').text('Edit Tag');
                     // Ubah tombol submit agar tahu ini update
                     $(".data-submit").text("Update").attr("id", "updateMenu");
 
-                    $("#offcanvasAddkategori").offcanvas("show");
+                    $("#offcanvasAddtag").offcanvas("show");
                 }
             },
             error: function () {
@@ -276,7 +276,7 @@ $(document).ready(function () {
     }
 
     // Submit Form: Tambah & Update
-    $("#formkategori").submit(function (e) {
+    $("#formTag").submit(function (e) {
         e.preventDefault();
 
         $('.form-control, .form-select').removeClass('is-invalid');
@@ -284,11 +284,11 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
         let id       = $("#id").val();
-        let url      = "/kategori/store";
+        let url      = "/tag/store";
         let method   = "POST";
 
         if (id) {
-            url = "/kategori/update/" + id;
+            url = "/tag/update/" + id;
             formData.append("_method", "PUT");
         }
 
@@ -302,11 +302,11 @@ $(document).ready(function () {
                 if (response.success) {
                     toastr.success(response.message);
 
-                    $('#Tablekategori').DataTable().ajax.reload(null, false);
-                    $("#formkategori")[0].reset();
+                    $('#Tabletag').DataTable().ajax.reload(null, false);
+                    $("#formTag")[0].reset();
                     $("#id").val(""); // Reset ID agar tidak salah update nanti
 
-                    $("#offcanvasAddkategori").offcanvas("hide");
+                    $("#offcanvasAddtag").offcanvas("hide");
 
                     $(".data-submit").text("Submit").removeAttr("id");
                     selectedId = null;
@@ -331,7 +331,7 @@ $(document).ready(function () {
 
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: "Data kategori akan dihapus!",
+            text: "Data tag akan dihapus!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -341,7 +341,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/kategori/delete/' + id,
+                    url: '/tag/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',
@@ -351,10 +351,10 @@ $(document).ready(function () {
                         if (response.status === 200) {
                             Swal.fire(
                                 'Deleted!',
-                                'Data Kategori Berhasil Dihapus.',
+                                'Data Tag Berhasil Dihapus.',
                                 'success'
                             );
-                            $('#Tablekategori').DataTable().ajax.reload(null, false);
+                            $('#Tabletag').DataTable().ajax.reload(null, false);
                         } else {
                             Swal.fire(
                                 'Error!',

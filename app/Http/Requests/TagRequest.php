@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class KategoriRequest extends FormRequest
+class TagRequest extends FormRequest
 {
     /**
      * Menentukan apakah user diizinkan melakukan request ini.
@@ -25,14 +25,14 @@ class KategoriRequest extends FormRequest
         if ($this->isMethod('post')) {
             // Validasi untuk insert data baru
             return [
-                'name' => 'required|string|max:255|unique:kategori,name',
+                'name' => 'required|string|max:255|unique:tags,name',
                 'slug'     => 'nullable|string',
             ];
         } elseif ($this->isMethod('put') || $this->isMethod('patch')) {
             // Validasi untuk update data
             $id = $this->route('id');
             return [
-                'name' => 'required|string|max:255|unique:kategori,name,' . $id,
+                'name' => 'required|string|max:255|unique:tags,name,' . $id,
                 'slug'     => 'nullable|string',
             ];
         }

@@ -37,7 +37,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/menu-details/",
+            url: "admin/menu-detail/",
             type: 'GET'
         },
         columns: [
@@ -83,8 +83,8 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit menu detail");
-                    let canDelete       = userPermissions.includes("delete menu detail");
+                    let canEdit         = userPermissions.includes("edit_menu_detail");
+                    let canDelete       = userPermissions.includes("delete_menu_detail");
 
                     let buttons = '<div class="d-flex align-items-center">';
 
@@ -130,7 +130,7 @@ $(document).ready(function () {
             $('#btn-simpan').val('update');
 
             $.ajax({
-                url: `menu-details/edit/${id}/`, // Pastikan route ini benar
+                url: `admin/menu-detail/edit/${id}/`, // Pastikan route ini benar
                 type: "GET",
                 success: function (response) {
                     if (response.success) {
@@ -160,7 +160,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         let formData = new FormData(this);
-        let url      = selectedId ? `menu-details/update/${selectedId}` : "menu-details/store";
+        let url      = selectedId ? `admin/menu-detail/update/${selectedId}` : "admin/menu-detail/store";
 
         $.ajax({
             url: url,
@@ -202,7 +202,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/menu-details/delete/' + id,
+                    url: 'admin/menu-detail/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',

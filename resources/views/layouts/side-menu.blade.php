@@ -238,23 +238,28 @@
                         @foreach ($menuGroups as $menuGroup)
                             @if ($menuGroup->jenis_menu == 8)
                                 <li class="menu-item">
-                                    <a href="javascript:void(0);"
-                                        class="menu-link {{ $menuGroup->menuDetails->isNotEmpty() ? 'menu-toggle' : '' }}">
+                                    <a href="javascript:void(0);" class="menu-link menu-toggle">
                                         <i class="menu-icon tf-icons ti ti-{{ $menuGroup->icon }}"></i>
                                         <div data-i18n="{{ $menuGroup->name }}">{{ $menuGroup->name }}</div>
-                                        @if ($menuGroup->menuDetails->isNotEmpty())
-                                            <span class="menu-arrow"></span>
-                                        @endif
                                     </a>
-
                                     @if ($menuGroup->menuDetails->isNotEmpty())
                                         <ul class="menu-sub">
                                             @foreach ($menuGroup->menuDetails as $menuDetail)
                                                 <li class="menu-item">
-                                                    <a href="{{ $menuDetail->route }}" class="menu-link">
-                                                        <div data-i18n="{{ $menuDetail->name }}">{{ $menuDetail->name }}
-                                                        </div>
+                                                    <a href="{{ $menuDetail->route }}" class="menu-link{{ $menuDetail->subMenuDetails->isNotEmpty() ? ' menu-toggle' : '' }}">
+                                                        <div data-i18n="{{ $menuDetail->name }}">{{ $menuDetail->name }}</div>
                                                     </a>
+                                                    @if ($menuDetail->subMenuDetails->isNotEmpty())
+                                                        <ul class="menu-sub">
+                                                            @foreach ($menuDetail->subMenuDetails as $subMenuDetail)
+                                                                <li class="menu-item">
+                                                                    <a href="{{ $subMenuDetail->route }}" class="menu-link">
+                                                                        <div data-i18n="{{ $subMenuDetail->name }}">{{ $subMenuDetail->name }}</div>
+                                                                    </a>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @endif
                                                 </li>
                                             @endforeach
                                         </ul>
@@ -264,7 +269,7 @@
                         @endforeach
                     @else
                         <li class="menu-header small">
-                            <span class="menu-header-text">No menu available</span>
+                            <span class="menu-header-text">Tidak ada menu tersedia</span>
                         </li>
                     @endif
 

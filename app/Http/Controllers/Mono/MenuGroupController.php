@@ -11,7 +11,7 @@ class MenuGroupController extends Controller
     public function index(Request $request)
     {
         // Menampilkan Data pegawai
-        $menuGroups = MenuGroup::with('menuDetails')->get();
+        $menuGroups = MenuGroup::with('menuDetails.subMenuDetails')->get();
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($menuGroups)

@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
         // Cek apakah tabel 'menu_groups' sudah ada sebelum mengambil data
         if (Schema::hasTable('menu_groups')) {
             $menuGroups = MenuGroup::with(['menuDetails' => function ($query) {
-                $query->orderBy('order', 'asc');
+                $query->orderBy('order', 'asc')->with('subMenuDetails');
             }])->orderBy('order', 'asc')->get();
 
             // Bagikan data ke semua view

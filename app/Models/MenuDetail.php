@@ -26,6 +26,11 @@ class MenuDetail extends Model
         return $this->belongsTo(MenuGroup::class, 'menu_group_id');
     }
 
+    public function subMenuDetails()
+    {
+        return $this->hasMany(SubMenuDetail::class, 'menu_detail_id', 'id');
+    }
+
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'menu_detail_permission', 'menu_detail_id', 'permission_id')->withTimestamps();

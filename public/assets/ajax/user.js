@@ -165,7 +165,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true, //aktifkan server-side
         ajax: {
-            url: "/users/",
+            url: "admin/users/",
             type: 'GET'
         },
         columns: [
@@ -225,7 +225,7 @@ $(document).ready(function () {
     // Fungsi untuk menampilkan data user di modal edit
     window.ViewData = function (id) {
         $.ajax({
-            url: "/users/edit/" + id,
+            url: "admin/users/edit/" + id,
             type: "GET",
             success: function (res) {
                 console.log(res);
@@ -259,7 +259,7 @@ $(document).ready(function () {
         var id = $('#id').val();
 
         $.ajax({
-            url: "/users/update/" + id,
+            url: "admin/users/update/" + id,
             type: "POST",
             data: formData,
             contentType: false,
@@ -314,7 +314,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/users/delete/' + id,
+                    url: 'admin/users/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',
