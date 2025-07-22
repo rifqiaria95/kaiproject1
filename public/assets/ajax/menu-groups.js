@@ -38,7 +38,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/menu-groups/",
+            url: "admin/menu-group/",
             type: 'GET'
         },
         columns: [
@@ -112,7 +112,7 @@ $(document).ready(function () {
     // Fungsi untuk menampilkan data ke dalam offcanvas (Edit)
     window.ViewData = function (id) {
         $.ajax({
-            url: `/menu-groups/edit/${id}/`, // Pastikan route ini benar
+            url: `admin/menu-group/edit/${id}/`, // Pastikan route ini benar
             type: "GET",
             success: function (response) {
                 if (response.success) {
@@ -141,11 +141,11 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
         let id = $("#id").val();
-        let url = "/menu-groups/store";
+        let url = "admin/menu-group/store";
         let method = "POST";
 
         if (id) {
-            url = "/menu-groups/update/" + id;
+            url = "admin/menu-group/update/" + id;
             formData.append("_method", "PUT"); // Tambahkan method PUT untuk Laravel
         }
 
@@ -196,7 +196,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/menu-groups/delete/' + id,
+                    url: 'admin/menu-group/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',

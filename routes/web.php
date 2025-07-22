@@ -151,7 +151,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
 
     // Route User
-    Route::prefix('users')->name('users.')->group(function () {
+    Route::prefix('admin/users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('/edit/{id}', [UserController::class, 'edit'])->name('edit');
         Route::get('/getPermission/{id}', [UserController::class, 'getPermission'])->name('getPermission');
@@ -161,7 +161,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     });
 
     // Route Role
-    Route::prefix('role')->name('role.')->group(function () {
+    Route::prefix('admin/role')->name('role.')->group(function () {
         Route::get('/', [RolePermissionController::class, 'index'])->name('index');
         Route::post('/store', [RolePermissionController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [RolePermissionController::class, 'edit'])->name('edit');
@@ -172,7 +172,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     });
 
     // Route Permission
-    Route::prefix('permission')->name('permission.')->group(function () {
+    Route::prefix('admin/permission')->name('permission.')->group(function () {
         Route::get('/', [PermissionController::class, 'index'])->name('index');
         Route::post('/store', [PermissionController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [PermissionController::class, 'edit'])->name('edit');
@@ -186,7 +186,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     });
 
     // Route Menu Group
-    Route::prefix('menu-groups')->name('menu-groups.')->group(function () {
+    Route::prefix('admin/menu-group')->name('menu-group.')->group(function () {
         Route::get('/', [MenuGroupController::class, 'index'])->name('index');
         Route::post('/store', [MenuGroupController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [MenuGroupController::class, 'edit'])->name('edit');
@@ -195,7 +195,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     });
 
     // Route Menu Details
-    Route::prefix('menu-details')->name('menu-details.')->group(function () {
+    Route::prefix('admin/menu-detail')->name('menu-detail.')->group(function () {
         Route::get('/', [MenuDetailController::class, 'index'])->name('index');
         Route::post('/store', [MenuDetailController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [MenuDetailController::class, 'edit'])->name('edit');
