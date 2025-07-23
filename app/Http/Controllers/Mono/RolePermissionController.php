@@ -35,7 +35,7 @@ class RolePermissionController extends Controller
                 ->toJson();
         }
 
-        return view('role.index', compact(['role', 'permissions', 'menuGroups', 'menuDetails']));
+        return view('internal/role.index', compact(['role', 'permissions', 'menuGroups', 'menuDetails']));
     }
 
     public function store(Request $request)

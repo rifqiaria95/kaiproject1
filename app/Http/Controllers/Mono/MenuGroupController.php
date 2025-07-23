@@ -24,7 +24,7 @@ class MenuGroupController extends Controller
                 ->toJson();
         }
 
-        return view('menu_groups.index', compact(['menuGroups']));
+        return view('internal/menu_groups.index', compact(['menuGroups']));
     }
 
     public function store(Request $request)

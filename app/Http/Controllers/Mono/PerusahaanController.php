@@ -26,7 +26,7 @@ class PerusahaanController extends Controller
                 ->toJson();
         }
 
-        return view('perusahaan.index', compact(['perusahaan']));
+        return view('internal/perusahaan.index', compact(['perusahaan']));
     }
 
     public function store(PerusahaanRequest $request)

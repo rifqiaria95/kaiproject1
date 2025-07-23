@@ -38,7 +38,7 @@ class UserController extends Controller
                 ->toJson();
         }
 
-        return view('user.index', compact('users'));
+        return view('internal/user.index', compact('users'));
     }
 
     public function edit($id)

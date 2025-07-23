@@ -24,7 +24,7 @@ class UnitController extends Controller
                 ->toJson();
         }
 
-        return view('satuan.index', compact(['satuan']));
+        return view('internal/satuan.index', compact(['satuan']));
     }
 
     public function store(Request $request)

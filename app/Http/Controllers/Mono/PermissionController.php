@@ -30,7 +30,7 @@ class PermissionController extends Controller
                 ->toJson();
         }
 
-        return view('permission.index', compact('permissions', 'menuGroups', 'menuDetails'));
+        return view('internal/permission.index', compact('permissions', 'menuGroups', 'menuDetails'));
     }
 
     public function store(Request $request)

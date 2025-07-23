@@ -32,7 +32,7 @@ class PelangganController extends Controller
                 ->toJson();
         }
 
-        return view('pelanggan.index', compact(['pelanggan', 'provinsi', 'kendaraan']));
+        return view('internal/pelanggan.index', compact(['pelanggan', 'provinsi', 'kendaraan']));
     }
 
     public function store(StorePelangganRequest $request)

@@ -3,6 +3,54 @@
     <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/select2/select2.css') }}" />
     <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/@form-validation/form-validation.css') }}" />
     <link rel="stylesheet" href="{{ asset('/assets/vendor/libs/sweetalert2/sweetalert2.css') }}" />
+    
+    <style>
+        .permission-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px 8px;
+            align-items: start;
+        }
+        
+        .permission-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+        
+        .permission-item .form-check-input {
+            margin-top: 0;
+            margin-right: 6px;
+        }
+        
+        .permission-item .form-check-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #566a7f;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .permission-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px 4px;
+            }
+            
+            .permission-item {
+                min-width: 100px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .permission-grid {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+        }
+    </style>
 @endsection
 @section('content')
     <!-- Content -->
@@ -116,7 +164,7 @@
             </div>
             <!-- Add Role Modal -->
             <div class="modal fade" id="tambahModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-simple modal-dialog-centered modal-add-new-role">
+                <div class="modal-dialog modal-xl modal-simple modal-dialog-centered modal-add-new-role">
                     <div class="modal-content">
                         <div class="modal-body">
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -139,35 +187,40 @@
                                         @php
                                             // Mapping nama permission menjadi label singkat
                                             $permissionLabels = [
-                                                'view_' => 'View',
-                                                'create_' => 'Create',
-                                                'edit_' => 'Edit',
-                                                'delete_' => 'Delete',
+                                                'view_'    => 'View',
+                                                'create_'  => 'Create',
+                                                'edit_'    => 'Edit',
+                                                'delete_'  => 'Delete',
+                                                'show_'    => 'Show',
+                                                'approve_' => 'Approve',
+                                                'reject_'  => 'Reject',
                                             ];
                                         @endphp
 
-                                        <table class="table table-flush-spacing">
-                                            <tbody>
-                                                <!-- Header -->
-                                                <tr>
-                                                    <td class="text-nowrap fw-medium text-heading">
-                                                        Superadmin Access
-                                                        <i class="ti ti-info-circle" data-bs-toggle="tooltip"
-                                                            data-bs-placement="top"
-                                                            title="Allows a full access to the system"></i>
-                                                    </td>
-                                                    <td colspan="3">
-                                                        <div class="d-flex justify-content-end">
-                                                            <div class="form-check mb-0">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                    id="selectAll" />
-                                                                <label class="form-check-label" for="selectAll"> Select
-                                                                    All </label>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                        <!-- Select All Section -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+                                            <div class="d-flex align-items-center">
+                                                <span class="text-nowrap fw-medium text-heading me-2">
+                                                    Superadmin Access
+                                                    <i class="ti ti-info-circle ms-1" data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="Allows a full access to the system"></i>
+                                                </span>
+                                            </div>
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" id="selectAll" />
+                                                <label class="form-check-label fw-medium" for="selectAll">Select All</label>
+                                            </div>
+                                        </div>
 
+                                        <table id="permissionsTable" class="table table-bordered dt-responsive nowrap w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th width="30%">Menu Group</th>
+                                                    <th width="70%">Permissions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
                                                 @php
                                                     $groupedPermissions = $permissions->groupBy(function ($permission) {
                                                         return optional($permission->menuDetails->first())->id .
@@ -188,8 +241,8 @@
                                                         </td>
 
                                                         <!-- Menampilkan Permissions dengan Label Singkat -->
-                                                        <td class="d-flex gap-3">
-                                                            <div class="d-flex justify-content-end">
+                                                        <td>
+                                                            <div class="permission-grid">
                                                                 @foreach ($permissionGroup as $permission)
                                                                     @php
                                                                         // Ambil nama permission (misalnya "view item", "create item")
@@ -210,7 +263,7 @@
                                                                         // Jika tidak cocok, gunakan nama asli
                                                                         $label = $label ?? ucfirst($permission->name);
                                                                     @endphp
-                                                                    <div class="form-check mb-0 me-4 me-lg-12">
+                                                                    <div class="form-check permission-item">
                                                                         <input
                                                                             id="permission-checkbox-{{ $permission->id }}"
                                                                             class="form-check-input permission-checkbox"

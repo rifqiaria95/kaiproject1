@@ -25,7 +25,7 @@ class JabatanController extends Controller
                 ->toJson();
         }
 
-        return view('jabatan.index', compact(['jabatan']));
+        return view('internal/jabatan.index', compact(['jabatan']));
     }
 
     public function store(JabatanRequest $request)

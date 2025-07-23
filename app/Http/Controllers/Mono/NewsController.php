@@ -44,7 +44,7 @@ class NewsController extends Controller
                 ->toJson();
         }
 
-        return view('news.index', compact(['news', 'kategori', 'tags', 'users']));
+        return view('internal/news.index', compact(['news', 'kategori', 'tags', 'users']));
     }
 
     public function store(NewsRequest $request)

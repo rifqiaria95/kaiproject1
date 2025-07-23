@@ -39,7 +39,7 @@ class ItemController extends Controller
         }
 
         // Kirim data ke view
-        return view('item.index', compact('unit_berat', 'kategori'));
+        return view('internal/item.index', compact('unit_berat', 'kategori'));
     }
 
     public function store(StoreItemRequest $request)

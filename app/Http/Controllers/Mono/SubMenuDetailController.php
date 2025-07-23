@@ -34,7 +34,7 @@ class SubMenuDetailController extends Controller
                 ->toJson();
         }
 
-        return view('sub_menu_details.index', compact(['subMenuDetail', 'menuGroup', 'menuDetail']));
+        return view('internal/sub_menu_details.index', compact(['subMenuDetail', 'menuGroup', 'menuDetail']));
     }
 
     public function store(Request $request)

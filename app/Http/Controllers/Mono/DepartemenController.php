@@ -30,7 +30,7 @@ class DepartemenController extends Controller
                 ->toJson();
         }
 
-        return view('departemen.index', compact(['departemen', 'divisi']));
+        return view('internal/departemen.index', compact(['departemen', 'divisi']));
     }
 
     public function store(DepartemenRequest $request)

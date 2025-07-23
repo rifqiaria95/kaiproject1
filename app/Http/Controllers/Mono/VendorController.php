@@ -28,6 +28,6 @@ class VendorController extends Controller
                 ->toJson();
         }
 
-        return view('vendor.index', compact(['vendor', 'provinsi']));
+        return view('internal/vendor.index', compact(['vendor', 'provinsi']));
     }
 }

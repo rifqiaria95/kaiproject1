@@ -23,6 +23,8 @@ use App\Http\Controllers\Mono\RolePermissionController;
 use App\Http\Controllers\Mono\SubMenuDetailController;
 use App\Http\Controllers\Mono\NewsController;
 use App\Http\Controllers\Mono\TagController;
+use App\Http\Controllers\Mono\AboutController;
+use App\Http\Controllers\Mono\CabangController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -165,6 +167,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/edit/{id:uuid}', [NewsController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [NewsController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [NewsController::class, 'destroy'])->name('destroy');
+    });
+
+    // Route About
+    Route::prefix('portfolio/about')->name('about.')->group(function () {
+        Route::get('/', [AboutController::class, 'index'])->name('index');
+        Route::post('/store', [AboutController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [AboutController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [AboutController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [AboutController::class, 'destroy'])->name('destroy');
     });
 });
 

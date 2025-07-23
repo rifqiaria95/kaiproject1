@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Mono;
 use App\Http\Controllers\Controller;
 use App\Models\MenuDetail;
 use App\Models\MenuGroup;
+use App\Models\Permission;
 use Illuminate\Http\Request;
 
 class MenuDetailController extends Controller
@@ -40,13 +41,63 @@ class MenuDetailController extends Controller
             'order' => 'nullable|integer'
         ]);
 
+        // Buat menu detail baru
         $menu = MenuDetail::create($request->all());
+
+        // Auto create permissions berdasarkan nama menu
+        $this->createMenuPermissions($menu);
 
         return response()->json([
             'success' => true,
-            'message' => 'Menu berhasil ditambahkan!',
+            'message' => 'Menu berhasil ditambahkan beserta permissions!',
             'menu'    => $menu
         ]);
+    }
+
+    /**
+     * Membuat permissions otomatis berdasarkan nama menu detail
+     */
+    private function createMenuPermissions(MenuDetail $menuDetail)
+    {
+        // Ubah nama menu menjadi lowercase dan replace spasi dengan underscore
+        $menuName = strtolower(str_replace(' ', '_', $menuDetail->name));
+        
+        // Daftar permission yang akan dibuat
+        $permissionTypes = [
+            'view_' . $menuName,
+            'create_' . $menuName,
+            'edit_' . $menuName,
+            'show_' . $menuName,
+            'delete_' . $menuName,
+            'approve_' . $menuName,
+            'reject_' . $menuName
+        ];
+
+        $createdPermissions = [];
+
+        foreach ($permissionTypes as $permissionName) {
+            // Cek apakah permission sudah ada
+            $existingPermission = Permission::where('name', $permissionName)->first();
+            
+            if (!$existingPermission) {
+                // Buat permission baru
+                $permission = Permission::create([
+                    'name' => $permissionName,
+                    'guard_name' => 'web'
+                ]);
+                
+                // Hubungkan permission dengan menu detail
+                $permission->menuDetails()->attach($menuDetail->id);
+                
+                $createdPermissions[] = $permission;
+            } else {
+                // Jika permission sudah ada, hubungkan dengan menu detail ini juga
+                $existingPermission->menuDetails()->syncWithoutDetaching($menuDetail->id);
+                $createdPermissions[] = $existingPermission;
+            }
+        }
+
+        return $createdPermissions;
     }
 
     public function edit($id)
@@ -74,12 +125,59 @@ class MenuDetailController extends Controller
         ]);
 
         $menuDetail = MenuDetail::findOrFail($id);
+        $oldName = $menuDetail->name;
+        
+        // Update menu detail
         $menuDetail->update($request->all());
+
+        // Jika nama berubah, perbarui permissions
+        if ($oldName !== $request->name) {
+            $this->updateMenuPermissions($menuDetail, $oldName);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Menu berhasil diperbarui!'
         ]);
+    }
+
+    /**
+     * Update permissions ketika nama menu detail berubah
+     */
+    private function updateMenuPermissions(MenuDetail $menuDetail, $oldName)
+    {
+        $oldMenuName = strtolower(str_replace(' ', '_', $oldName));
+        $newMenuName = strtolower(str_replace(' ', '_', $menuDetail->name));
+        
+        // Daftar permission yang akan diupdate
+        $permissionTypes = ['view_', 'create_', 'edit_', 'show_', 'delete_', 'approve_', 'reject_'];
+        
+        foreach ($permissionTypes as $type) {
+            $oldPermissionName = $type . $oldMenuName;
+            $newPermissionName = $type . $newMenuName;
+            
+            // Cari permission lama
+            $oldPermission = Permission::where('name', $oldPermissionName)->first();
+            
+            if ($oldPermission) {
+                // Cek apakah permission baru sudah ada
+                $existingNewPermission = Permission::where('name', $newPermissionName)->first();
+                
+                if (!$existingNewPermission) {
+                    // Update nama permission
+                    $oldPermission->update(['name' => $newPermissionName]);
+                } else {
+                    // Jika permission baru sudah ada, pindahkan relasi ke permission yang sudah ada
+                    $existingNewPermission->menuDetails()->syncWithoutDetaching($menuDetail->id);
+                    $oldPermission->menuDetails()->detach($menuDetail->id);
+                    
+                    // Hapus permission lama jika tidak memiliki relasi lain
+                    if ($oldPermission->menuDetails()->count() === 0) {
+                        $oldPermission->delete();
+                    }
+                }
+            }
+        }
     }
 
     public function updateOrder(Request $request)
@@ -100,16 +198,56 @@ class MenuDetailController extends Controller
         // \ActivityLog::addToLog('Menghapus data menu_detail');
 
         if ($menu_detail) {
+            // Hapus relasi permissions dengan menu detail ini
+            $this->cleanupMenuPermissions($menu_detail);
+            
+            // Hapus menu detail
             $menu_detail->delete();
+            
             return response()->json([
                 'status'    => 200,
-                'message'   => 'Sukses! Data menu_detail berhasil dihapus'
+                'message'   => 'Sukses! Data menu_detail dan permissions terkait berhasil dihapus'
             ]);
         } else {
             return response()->json([
                 'status'    => 404,
                 'errors'    => 'Error! Data menu_detail tidak ditemukan'
             ]);
+        }
+    }
+
+    /**
+     * Membersihkan permissions yang terkait dengan menu detail
+     */
+    private function cleanupMenuPermissions(MenuDetail $menuDetail)
+    {
+        $menuName = strtolower(str_replace(' ', '_', $menuDetail->name));
+        
+        // Daftar permission yang akan dibersihkan
+        $permissionTypes = [
+            'view_' . $menuName,
+            'create_' . $menuName,
+            'edit_' . $menuName,
+            'show_' . $menuName,
+            'delete_' . $menuName,
+            'approve_' . $menuName,
+            'reject_' . $menuName
+        ];
+
+        foreach ($permissionTypes as $permissionName) {
+            $permission = Permission::where('name', $permissionName)->first();
+            
+            if ($permission) {
+                // Hapus relasi dengan menu detail ini
+                $permission->menuDetails()->detach($menuDetail->id);
+                
+                // Jika permission tidak memiliki relasi dengan menu detail lain, hapus permission
+                if ($permission->menuDetails()->count() === 0 && $permission->menuGroups()->count() === 0) {
+                    // Hapus juga relasi dengan roles jika ada
+                    $permission->roles()->detach();
+                    $permission->delete();
+                }
+            }
         }
     }
 

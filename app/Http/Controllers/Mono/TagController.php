@@ -25,7 +25,7 @@ class TagController extends Controller
                 ->toJson();
         }
 
-        return view('tag.index', compact(['tag']));
+        return view('internal/tag.index', compact(['tag']));
     }
 
     public function store(TagRequest $request)

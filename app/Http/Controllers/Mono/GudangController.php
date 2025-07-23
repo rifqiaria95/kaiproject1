@@ -26,7 +26,7 @@ class GudangController extends Controller
                 ->toJson();
         }
 
-        return view('gudang.index', compact(['gudang']));
+        return view('internal/gudang.index', compact(['gudang']));
     }
 
     public function store(GudangRequest $request)

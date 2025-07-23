@@ -228,6 +228,81 @@ $(document).ready(function () {
     $("#tambahModal").on("show.bs.modal", function () {
         $("#id").val("");
         $("#formRole")[0].reset();
+        
+        // Initialize DataTable untuk permissions
+        if ($.fn.DataTable.isDataTable('#permissionsTable')) {
+            $('#permissionsTable').DataTable().destroy();
+        }
+        
+        $('#permissionsTable').DataTable({
+            "pageLength": 5,
+            "lengthMenu": [[5, 10, 25, 50], [5, 10, 25, 50]],
+            "searching": true,
+            "paging": true,
+            "info": true,
+            "responsive": true,
+            "order": [[0, 'asc']],
+            "language": {
+                "search": "Cari:",
+                "lengthMenu": "Tampilkan _MENU_ entries",
+                "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entries",
+                "infoEmpty": "Menampilkan 0 sampai 0 dari 0 entries",
+                "infoFiltered": "(filtered dari _MAX_ total entries)",
+                "paginate": {
+                    "first": "Pertama",
+                    "last": "Terakhir",
+                    "next": "Selanjutnya",
+                    "previous": "Sebelumnya"
+                },
+                "emptyTable": "Tidak ada data yang tersedia"
+            },
+            "dom": '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                   '<"row"<"col-sm-12"tr>>' +
+                   '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            "drawCallback": function() {
+                // Restore state checkbox setelah DataTable di-draw ulang
+                restoreCheckboxState();
+                // Update Select All state setelah DataTable di-draw ulang
+                updateSelectAllState();
+            }
+        });
+        
+        // Event listener untuk perubahan halaman DataTable
+        $('#permissionsTable').on('page.dt', function () {
+            setTimeout(function() {
+                restoreCheckboxState();
+                updateSelectAllState();
+            }, 100);
+        });
+        
+        // Event listener untuk pencarian DataTable  
+        $('#permissionsTable').on('search.dt', function () {
+            setTimeout(function() {
+                restoreCheckboxState();
+                updateSelectAllState();
+            }, 100);
+        });
+        
+        // Reset Select All checkbox saat modal dibuka
+        setTimeout(function() {
+            updateSelectAllState();
+        }, 100);
+    });
+
+    // Event listener saat modal ditutup
+    $("#tambahModal").on("hide.bs.modal", function () {
+        // Cleanup DataTable jika ada
+        if ($.fn.DataTable.isDataTable('#permissionsTable')) {
+            $('#permissionsTable').off('page.dt search.dt');
+            $('#permissionsTable').DataTable().destroy();
+        }
+        
+        // Reset selectedPermissions Set
+        selectedPermissions.clear();
+        
+        // Reset semua checkbox
+        $(".permission-checkbox").prop("checked", false);
+        $('#selectAll').prop('checked', false).prop('indeterminate', false);
     });
 
     $(document).on("click", ".dropdown-edit", function () {
@@ -239,22 +314,83 @@ $(document).ready(function () {
         ViewData(0);
     });
 
-    $('#selectAll').change(function () {
+    // Variable untuk menyimpan state checkbox permissions
+    var selectedPermissions = new Set();
 
+    // Fungsi Select All untuk Permission Checkboxes
+    $(document).on('change', '#selectAll', function () {
         var isChecked = $(this).prop('checked');
-
-        $('.permission-checkbox').prop('checked', isChecked);
-    });
-
-
-    $('.permission-checkbox').change(function () {
-
-        if ($('.permission-checkbox:checked').length === $('.permission-checkbox').length) {
-            $('#selectAll').prop('checked', true);
+        
+        // Cek apakah DataTable sudah diinisialisasi
+        if ($.fn.DataTable.isDataTable('#permissionsTable')) {
+            // Pengaruhi semua checkbox, tidak hanya yang terlihat
+            $('.permission-checkbox').each(function() {
+                var permissionId = $(this).val();
+                if (isChecked) {
+                    selectedPermissions.add(permissionId);
+                    $(this).prop('checked', true);
+                } else {
+                    selectedPermissions.delete(permissionId);
+                    $(this).prop('checked', false);
+                }
+            });
         } else {
-            $('#selectAll').prop('checked', false);
+            // Fallback untuk tabel biasa
+            $('.permission-checkbox').each(function() {
+                var permissionId = $(this).val();
+                if (isChecked) {
+                    selectedPermissions.add(permissionId);
+                } else {
+                    selectedPermissions.delete(permissionId);
+                }
+                $(this).prop('checked', isChecked);
+            });
         }
+        
+        // Update visual feedback
+        updateSelectAllState();
     });
+
+    // Event listener untuk individual permission checkboxes
+    $(document).on('change', '.permission-checkbox', function () {
+        var permissionId = $(this).val();
+        var isChecked = $(this).prop('checked');
+        
+        // Update selectedPermissions Set
+        if (isChecked) {
+            selectedPermissions.add(permissionId);
+        } else {
+            selectedPermissions.delete(permissionId);
+        }
+        
+        updateSelectAllState();
+    });
+
+    // Fungsi untuk restore state checkbox berdasarkan selectedPermissions
+    function restoreCheckboxState() {
+        $('.permission-checkbox').each(function() {
+            var permissionId = $(this).val();
+            var shouldBeChecked = selectedPermissions.has(permissionId);
+            $(this).prop('checked', shouldBeChecked);
+        });
+    }
+
+    // Fungsi untuk mengupdate state Select All berdasarkan individual checkboxes
+    function updateSelectAllState() {
+        var totalCheckboxes = $('.permission-checkbox').length;
+        var checkedCount = selectedPermissions.size;
+        
+        if (checkedCount === 0) {
+            // Tidak ada yang di-check
+            $('#selectAll').prop('checked', false).prop('indeterminate', false);
+        } else if (checkedCount === totalCheckboxes) {
+            // Semua di-check
+            $('#selectAll').prop('checked', true).prop('indeterminate', false);
+        } else {
+            // Sebagian di-check (indeterminate state)
+            $('#selectAll').prop('checked', false).prop('indeterminate', true);
+        }
+    }
 
     // Fungsi untuk menampilkan data ke dalam modal (Tambah/Edit)
     window.ViewData = function (id) {
@@ -265,7 +401,13 @@ $(document).ready(function () {
             $('#modal-judul').text('Tambah Role');
             $('#formRole')[0].reset();
             $('#btn-update').val('create');
+            
+            // Reset selectedPermissions Set
+            selectedPermissions.clear();
             $(".permission-checkbox").prop("checked", false);
+            
+            // Reset Select All checkbox
+            $('#selectAll').prop('checked', false).prop('indeterminate', false);
 
         } else {
             // Mode Edit
@@ -286,13 +428,31 @@ $(document).ready(function () {
                     $("#id").val(response.role.id);
                     $("#name").val(response.role.name);
 
+                    // Reset selectedPermissions Set
+                    selectedPermissions.clear();
+
                     // Uncheck semua checkbox dulu
                     $(".permission-checkbox").prop("checked", false);
 
                     // Centang checkbox sesuai permission yang dimiliki role
                     response.rolePermissions.forEach(function(permissionId) {
+                        // Tambahkan ke selectedPermissions Set
+                        selectedPermissions.add(permissionId.toString());
                         $("input.permission-checkbox[value='" + permissionId + "']").prop("checked", true);
                     });
+
+                    // Jika DataTable sudah diinisialisasi, refresh dan restore state
+                    if ($.fn.DataTable.isDataTable('#permissionsTable')) {
+                        $('#permissionsTable').DataTable().draw(false);
+                    } else {
+                        // Jika belum ada DataTable, restore state secara manual
+                        restoreCheckboxState();
+                    }
+
+                    // Update Select All checkbox berdasarkan permission yang dipilih  
+                    setTimeout(function() {
+                        updateSelectAllState();
+                    }, 200);
 
                 },
                 error: function (xhr) {
@@ -307,8 +467,24 @@ $(document).ready(function () {
         $("#formRole").on("submit", function (e) {
             e.preventDefault();
 
-            let formData = new FormData(this);
+            let formData = new FormData();
+            
+            // Tambahkan field form biasa
+            formData.append("name", $("#name").val());
+            
             let id = $("#id").val();
+            if (id) {
+                formData.append("id", id);
+            }
+            
+            // Tambahkan CSRF token
+            formData.append("_token", $('meta[name="csrf-token"]').attr('content'));
+            
+            // Tambahkan semua permission yang dipilih dari selectedPermissions Set
+            selectedPermissions.forEach(function(permissionId) {
+                formData.append("permissions[]", permissionId);
+            });
+            
             let url = id ? `admin/role/update/${id}` : "admin/role/store";
             let method = id ? "POST" : "POST"; // Laravel butuh _method untuk PUT
 
@@ -326,6 +502,14 @@ $(document).ready(function () {
                     if (response.success) {
                         $("#tambahModal").modal("hide");
                         $("#formRole")[0].reset();
+                        
+                        // Reset selectedPermissions Set
+                        selectedPermissions.clear();
+                        
+                        // Reset semua checkbox termasuk Select All
+                        $(".permission-checkbox").prop("checked", false);
+                        $('#selectAll').prop('checked', false).prop('indeterminate', false);
+                        
                         toastr.success(response.message);
                         $("#TableRole").DataTable().ajax.reload(null, false);
                     } else {

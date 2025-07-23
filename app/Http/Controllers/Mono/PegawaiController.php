@@ -37,7 +37,7 @@ class PegawaiController extends Controller
                 ->toJson();
         }
 
-        return view('pegawai.index', compact(['pegawai', 'provinsi']));
+        return view('internal/pegawai.index', compact(['pegawai', 'provinsi']));
     }
 
     public function store(StorePegawaiRequest $request)

@@ -25,7 +25,7 @@ class DivisiController extends Controller
                 ->toJson();
         }
 
-        return view('divisi.index', compact(['divisi']));
+        return view('internal/divisi.index', compact(['divisi']));
     }
 
     public function store(DivisiRequest $request)

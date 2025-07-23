@@ -25,7 +25,7 @@ class KategoriController extends Controller
                 ->toJson();
         }
 
-        return view('kategori.index', compact(['kategori']));
+        return view('internal/kategori.index', compact(['kategori']));
     }
 
     public function store(KategoriRequest $request)
