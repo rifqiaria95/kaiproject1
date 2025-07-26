@@ -14,14 +14,22 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Perusahaan;
+use App\Models\Divisi;
+use App\Models\Cabang;
+use App\Models\Departemen;
+use App\Models\Jabatan;
 
 class PegawaiController extends Controller
 {
     public function index(Request $request)
     {
         // Menampilkan Data pegawai
-        $pegawai  = Pegawai::withoutTrashed()->with('user');
-        $provinsi = Province::all();
+        $pegawai    = Pegawai::withoutTrashed()->with('user', 'jabatan', 'departemen', 'cabang', 'divisi', 'perusahaan');
+        $provinsi   = Province::all();
+        $perusahaan = Perusahaan::all();
+        $divisi     = Divisi::all();
+        $jabatan    = Jabatan::all();
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($pegawai)
@@ -37,7 +45,7 @@ class PegawaiController extends Controller
                 ->toJson();
         }
 
-        return view('internal/pegawai.index', compact(['pegawai', 'provinsi']));
+        return view('internal/pegawai.index', compact(['pegawai', 'provinsi', 'perusahaan', 'divisi', 'jabatan']));
     }
 
     public function store(StorePegawaiRequest $request)
@@ -47,7 +55,7 @@ class PegawaiController extends Controller
         try {
             // Insert ke tabel User
             $user = new User();
-            $user->assignRole('user');
+            $user->assignRole('guest');
             $user->active            = 1;
             $user->name              = $request->nm_pegawai;
             $user->email             = $request->email;
@@ -183,6 +191,28 @@ class PegawaiController extends Controller
         $kota = City::where('province_code', $provinsi->code)->get();
 
         return response()->json($kota);
+    }
+
+    public function getCabangByPerusahaan($id_perusahaan)
+    {
+        $cabang = Cabang::where('id_perusahaan', $id_perusahaan)->get();
+        return response()->json($cabang);
+    }
+
+    public function getDepartemenByDivisi($id_divisi)
+    {
+        $departemen = Departemen::where('id_divisi', $id_divisi)->get();
+        return response()->json($departemen);
+    }
+
+    public function formExample()
+    {
+        $provinsi = Province::all();
+        $perusahaan = Perusahaan::all();
+        $divisi = Divisi::all();
+        $jabatan = Jabatan::all();
+        
+        return view('internal.pegawai.form-example', compact(['provinsi', 'perusahaan', 'divisi', 'jabatan']));
     }
 
 

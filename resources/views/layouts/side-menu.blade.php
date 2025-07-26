@@ -26,11 +26,44 @@
                         <div data-i18n="Dashboard">Dashboard</div>
                     </a>
                 </li>
-                @can('view_menu_group')
-                    @if (isset($menuGroups) && $menuGroups->isNotEmpty())
+                @if (isset($menuGroups) && $menuGroups->isNotEmpty())
                         <li class="menu-header small">
                             <span class="menu-header-text" data-i18n="Apps & Pages">Apps & Pages</span>
                         </li>
+                        @foreach ($menuGroups as $menuGroup)
+                            @if ($menuGroup->jenis_menu == 9)
+                                <li class="menu-item">
+                                    <a href="javascript:void(0);"
+                                        class="menu-link {{ $menuGroup->menuDetails->isNotEmpty() ? 'menu-toggle' : '' }}">
+                                        <i class="menu-icon tf-icons ti ti-{{ $menuGroup->icon }}"></i>
+                                        <div data-i18n="{{ $menuGroup->name }}">{{ $menuGroup->name }}</div>
+                                        @if ($menuGroup->menuDetails->isNotEmpty())
+                                            <span class="menu-arrow"></span>
+                                        @endif
+                                    </a>
+
+                                    @if ($menuGroup->menuDetails->isNotEmpty())
+                                        <ul class="menu-sub">
+                                            @foreach ($menuGroup->menuDetails as $menuDetail)
+                                                <li class="menu-item">
+                                                    <a href="{{ $menuDetail->route }}" class="menu-link">
+                                                        <div data-i18n="{{ $menuDetail->name }}">{{ $menuDetail->name }}
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </li>
+                            @endif
+                        @endforeach
+                    @else
+                        <li class="menu-header small">
+                            <span class="menu-header-text">No menu available</span>
+                        </li>
+                    @endif
+
+                    @if (isset($menuGroups) && $menuGroups->isNotEmpty())
                         @foreach ($menuGroups as $menuGroup)
                             @if ($menuGroup->jenis_menu == 1)
                                 <li class="menu-item">
@@ -274,9 +307,8 @@
                     @endif
 
                     @if (isset($menuGroups) && $menuGroups->isNotEmpty())
-                        @role('superadmin')
-                            @foreach ($menuGroups as $menuGroup)
-                                @if ($menuGroup->jenis_menu == 7)
+                        @foreach ($menuGroups as $menuGroup)
+                            @if ($menuGroup->jenis_menu == 7)
                                     <li class="menu-item">
                                         <a href="javascript:void(0);"
                                             class="menu-link {{ $menuGroup->menuDetails->isNotEmpty() ? 'menu-toggle' : '' }}">
@@ -300,15 +332,13 @@
                                             </ul>
                                         @endif
                                     </li>
-                                @endif
-                            @endforeach
-                        @endrole
+                            @endif
+                        @endforeach
                     @else
                         <li class="menu-header small">
                             <span class="menu-header-text">No menu available</span>
                         </li>
                     @endif
-                @endcan
             </ul>
         </aside>
         <!-- / Menu -->

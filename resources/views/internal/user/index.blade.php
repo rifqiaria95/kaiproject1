@@ -149,11 +149,20 @@
                                         <fieldset class="form-group">
                                             <label class="form-label">Status</label>
                                             <select class="select2 form-select" name="active" id="active" required>
-                                                <option>Pilih Role</option>
+                                                <option>Pilih Status</option>
                                                 <option value="0">Inactive</option>
                                                 <option value="1">Active</option>
                                             </select>
                                         </fieldset>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Password Baru</label>
+                                        <input type="password" id="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin mengubah password">
+                                        <small class="text-muted">Minimal 8 karakter. Kosongkan jika tidak ingin mengubah password.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Konfirmasi Password</label>
+                                        <input type="password" id="password_confirmation" name="password_confirmation" class="form-control" placeholder="Ulangi password baru">
                                     </div>
                                     <div class="col-lg-12 mb-3">
                                         <label for="exampleInputPassword1" class="form-label">Avatar</label>

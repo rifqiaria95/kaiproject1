@@ -316,10 +316,12 @@ $(document).ready(function () {
 
     // Variable untuk menyimpan state checkbox permissions
     var selectedPermissions = new Set();
+    var isUpdatingSelectAll = false; // Flag untuk mencegah infinite loop
 
     // Fungsi Select All untuk Permission Checkboxes
     $(document).on('change', '#selectAll', function () {
         var isChecked = $(this).prop('checked');
+        isUpdatingSelectAll = true; // Set flag untuk mencegah updateSelectAllState dipanggil
         
         // Cek apakah DataTable sudah diinisialisasi
         if ($.fn.DataTable.isDataTable('#permissionsTable')) {
@@ -347,8 +349,7 @@ $(document).ready(function () {
             });
         }
         
-        // Update visual feedback
-        updateSelectAllState();
+        isUpdatingSelectAll = false; // Reset flag
     });
 
     // Event listener untuk individual permission checkboxes
@@ -363,7 +364,10 @@ $(document).ready(function () {
             selectedPermissions.delete(permissionId);
         }
         
-        updateSelectAllState();
+        // Hanya update Select All state jika tidak sedang melakukan bulk update
+        if (!isUpdatingSelectAll) {
+            updateSelectAllState();
+        }
     });
 
     // Fungsi untuk restore state checkbox berdasarkan selectedPermissions
@@ -377,6 +381,11 @@ $(document).ready(function () {
 
     // Fungsi untuk mengupdate state Select All berdasarkan individual checkboxes
     function updateSelectAllState() {
+        // Jangan update jika sedang dalam proses bulk update dari Select All
+        if (isUpdatingSelectAll) {
+            return;
+        }
+        
         var totalCheckboxes = $('.permission-checkbox').length;
         var checkedCount = selectedPermissions.size;
         

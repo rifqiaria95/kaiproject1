@@ -9,7 +9,6 @@ use App\Models\MenuGroup;
 use App\Models\Vendor;
 use App\Models\Kendaraan;
 use App\Models\Pelanggan;
-use App\Models\Kategori;
 use Illuminate\Database\Seeder;
 use Laravolt\Indonesia\Seeds\CitiesSeeder;
 use Laravolt\Indonesia\Seeds\VillagesSeeder;
@@ -33,7 +32,6 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             VendorSeeder::class,
             UserSeeder::class,
-            KategoriSeeder::class,
         ]);
 
         Pelanggan::factory(10)->create();

@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/pegawai/",
+            url: "/hrd/pegawai/",
             type: 'GET'
         },
         columns: [{
@@ -207,22 +207,22 @@ $(document).ready(function () {
                 name: 'email'
             },
             {
-                data: 'jabatan_pegawai',
-                name: 'jabatan_pegawai'
+                data: 'perusahaan.nama_perusahaan',
+                name: 'perusahaan.nama_perusahaan'
             },
             {
                 data: 'no_telp_pegawai',
                 name: 'no_telp_pegawai'
             },
             {
-                data: 'active',
-                name: 'active',
+                data: 'status',
+                name: 'status',
                 render: function (data, type, full, meta) {
                     var $inactive = '<span class="badge bg-label-danger">Inactive</span>';
                     var $aktif = '<span class="badge bg-label-success">Active</span>';
-                    if (data == 0) {
+                    if (data == 'inactive') {
                         return $inactive;
-                    } else if (data == 1) {
+                    } else if (data == 'active') {
                         return $aktif;
                     }
                     return '';
@@ -233,21 +233,22 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit menu detail");
-                    let canDelete       = userPermissions.includes("delete menu detail");
+                    let canEdit         = userPermissions.includes("edit_pegawai");
+                    let canDelete       = userPermissions.includes("delete_pegawai");
+                    let canShow         = userPermissions.includes("show_pegawai");
 
                     let buttons = '<div class="d-flex align-items-center">';
-
-                    if (canDelete) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
-                    }
-
-                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
 
                     if (canEdit) {
                         buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                         buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
+                        if (canShow) {
+                          buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i>Lihat Detail</a>';
+                        }
+                        if (canDelete) {
+                            buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                        }
+                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                         buttons += '</div>';
                     }
 
@@ -273,7 +274,7 @@ $(document).ready(function () {
         $('#pegawai-kota').empty().append('<option selected disabled>Loading...</option>');
 
         $.ajax({
-            url: "/pegawai/get-kota/" + id_provinsi,
+            url: "/hrd/pegawai/get-kota/" + id_provinsi,
             type: "GET",
             xhrFields: { withCredentials: true },
             success: function (response) {
@@ -299,9 +300,9 @@ $(document).ready(function () {
             let url = '';
 
             if(id == "" || id == 0){
-                url = "/pegawai/store";
+                url = "/hrd/pegawai/store";
             } else {
-                url = "/pegawai/update/" + id;
+                url = "/hrd/pegawai/update/" + id;
                 formData.append('_method', 'PUT');
             }
 
@@ -354,13 +355,17 @@ $(document).ready(function () {
                 $('#modal-judul').text('Tambah Pegawai');
                 $('#formPegawai')[0].reset();
                 $('#btn-simpan').val('create');
+                
+                // Reset hierarki dropdowns
+                $('#pegawai-cabang').empty().append('<option value="" selected disabled>Pilih Cabang</option>');
+                $('#pegawai-departemen').empty().append('<option value="" selected disabled>Pilih Departemen</option>');
             } else {
                 // Mode Edit (Ambil data dari API)
                 $('#modal-judul').text('Edit Pegawai');
                 $('#btn-simpan').val('update');
 
                 $.ajax({
-                    url: '/pegawai/edit/' + id,
+                    url: '/hrd/pegawai/edit/' + id,
                     type: 'GET',
                     dataType: 'json',
                     success: function(response) {
@@ -374,13 +379,50 @@ $(document).ready(function () {
                             $('#email').val(response.user.email);
                             $('#no_telp_pegawai').val(response.no_telp_pegawai);
                             $('#no_ktp_pegawai').val(response.no_ktp_pegawai);
+                            $('#pegawai-perusahaan').val(response.id_perusahaan).trigger('change');
+                            $('#pegawai-divisi').val(response.id_divisi).trigger('change');
+                            
+                            // Populate cabang dropdown
+                            if (response.id_perusahaan) {
+                                $.ajax({
+                                    url: `/hrd/pegawai/get-cabang/${response.id_perusahaan}`,
+                                    type: 'GET',
+                                    success: function(cabangResponse) {
+                                        $('#pegawai-cabang').empty().append('<option value="" selected disabled>Pilih Cabang</option>');
+                                        if (cabangResponse.length > 0) {
+                                            cabangResponse.forEach(function(cabang) {
+                                                $('#pegawai-cabang').append(`<option value="${cabang.id}">${cabang.nama_cabang}</option>`);
+                                            });
+                                            $('#pegawai-cabang').val(response.id_cabang);
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            // Populate departemen dropdown
+                            if (response.id_divisi) {
+                                $.ajax({
+                                    url: `/hrd/pegawai/get-departemen/${response.id_divisi}`,
+                                    type: 'GET',
+                                    success: function(departemenResponse) {
+                                        $('#pegawai-departemen').empty().append('<option value="" selected disabled>Pilih Departemen</option>');
+                                        if (departemenResponse.length > 0) {
+                                            departemenResponse.forEach(function(departemen) {
+                                                $('#pegawai-departemen').append(`<option value="${departemen.id}">${departemen.nama_departemen}</option>`);
+                                            });
+                                            $('#pegawai-departemen').val(response.id_departemen);
+                                        }
+                                    }
+                                });
+                            }
+                            $('#pegawai-jabatan').val(response.id_jabatan);
                             $('#no_sim_pegawai').val(response.no_sim_pegawai);
                             $('#no_npwp_pegawai').val(response.no_npwp_pegawai);
-                            $('#active').val(response.active);
+                            $('#active').val(response.status);
                             $('#alamat_pegawai').val(response.alamat_pegawai);
                             $('#pegawai-provinsi').val(response.id_provinsi).trigger('change');
                             $.ajax({
-                                url: "/pegawai/get-kota/" + response.id_provinsi,
+                                url: "/hrd/pegawai/get-kota/" + response.id_provinsi,
                                 type: "GET",
                                 success: function(kotaResponse) {
                                     $('#pegawai-kota').empty().append('<option selected disabled>Pilih Kota</option>');
@@ -427,7 +469,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/pegawai/delete/' + id,
+                    url: '/hrd/pegawai/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',
@@ -459,6 +501,15 @@ $(document).ready(function () {
                 });
             }
         });
+    });
+
+    // Reset hierarki dropdowns when modal is closed
+    $('#tambahModal').on('hidden.bs.modal', function() {
+        // Reset cabang dropdown
+        $('#pegawai-cabang').empty().append('<option value="" selected disabled>Pilih Cabang</option>');
+        
+        // Reset departemen dropdown
+        $('#pegawai-departemen').empty().append('<option value="" selected disabled>Pilih Departemen</option>');
     });
 
 });

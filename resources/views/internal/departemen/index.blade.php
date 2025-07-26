@@ -94,7 +94,15 @@
         <div class="card-header border-bottom">
         <h5 class="card-title mb-0">Filters</h5>
         <div class="d-flex justify-content-between align-items-center row pt-4 gap-4 gap-md-0">
-            <div class="col-md-4 user_role"></div>
+            <div class="col-md-4">
+                <label class="form-label" for="filter_divisi">Filter by Divisi</label>
+                <select id="filter_divisi" class="form-select">
+                    <option value="">Semua Divisi</option>
+                    @foreach ($divisi as $d)
+                        <option value="{{ $d->id }}">{{ $d->nama_divisi }}</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="col-md-4 user_plan"></div>
             <div class="col-md-4 user_status"></div>
         </div>

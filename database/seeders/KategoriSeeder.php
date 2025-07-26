@@ -14,12 +14,12 @@ class KategoriSeeder extends Seeder
     public function run(): void
     {
         $kategori = [
-            ['nama_kategori' => 'Oli'],
-            ['nama_kategori' => 'Sparepart'],
-            ['nama_kategori' => 'Rem'],
-            ['nama_kategori' => 'Filter'],
-            ['nama_kategori' => 'Bahan Bakar'],
-            ['nama_kategori' => 'Lainnya'],
+            ['name' => 'Oli'],
+            ['name' => 'Sparepart'],
+            ['name' => 'Rem'],
+            ['name' => 'Filter'],
+            ['name' => 'Bahan Bakar'],
+            ['name' => 'Lainnya'],
         ];
 
         foreach ($kategori as $k) {

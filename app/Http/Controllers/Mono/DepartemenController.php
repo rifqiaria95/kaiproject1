@@ -96,4 +96,10 @@ class DepartemenController extends Controller
             ]);
         }
     }
+
+    public function getByDivisi($id_divisi)
+    {
+        $departemen = Departemen::where('id_divisi', $id_divisi)->get();
+        return response()->json($departemen);
+    }
 }

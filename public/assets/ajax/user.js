@@ -196,18 +196,22 @@ $(document).ready(function () {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
+                    let userPermissions = window.userPermissions || [];
+                    let canEdit         = userPermissions.includes("edit_user_management");
+                    let canShow         = userPermissions.includes("show_user_management");
+                    let canDelete       = userPermissions.includes("delete_user_management");
+
                     return (
                         '<div class="d-flex align-items-center">' +
-                        '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>' +
-                        '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>' +
-                        '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>' +
+                        (canDelete ? '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>' : '') +
+                        (canShow ? '<a href="/admin/users/profile/' + full.id + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>' : '') +
+                        (canEdit ? '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>' +
                         '<div class="dropdown-menu dropdown-menu-end m-0">' +
                         '<a href="javascript:;" class="dropdown-item dropdown-edit" onclick="ViewData(' + full.id + ')">Edit</a>' +
-                        '</div>' +
+                        '</div>' : '') +
                         '</div>'
                     );
                 }
-
             },
         ],
         order: [
@@ -234,6 +238,10 @@ $(document).ready(function () {
                     $('#name').val(res.user.name);
                     $('#email').val(res.user.email);
                     $('#active').val(res.user.active);
+                    
+                    // Reset password fields
+                    $('#password').val('');
+                    $('#password_confirmation').val('');
 
                     // Kosongkan dropdown dan isi dengan data role dari server
                     $('#role').empty();
@@ -272,15 +280,27 @@ $(document).ready(function () {
                     toastr.success('Data berhasil disimpan!');
                     $('#editModal').modal('hide');
                     $('#formEdit')[0].reset();
+                    
+                    // Clear error messages
+                    $('.text-danger').remove();
+                    $('.is-invalid').removeClass('is-invalid');
+                    
+                    // Reset select2 dropdowns
+                    $('#role').val('').trigger('change');
+                    $('#active').val('').trigger('change');
+                    
                     $('#TableUser').DataTable().ajax.reload(null, false);
                 } else {
                     alert(res.errors);
                 }
             },
             error: function (xhr) {
-                if(xhr.status === 400) {
+                if(xhr.status === 400 || xhr.status === 422) {
                     let errors = xhr.responseJSON.errors;
-                    let errorMessage = "Harap periksa kembali inputan Anda!";
+                    
+                    // Clear previous error messages
+                    $('.text-danger').remove();
+                    $('.is-invalid').removeClass('is-invalid');
 
                     $.each(errors, function(key, value){
                         let inputField = $('[name="' + key + '"]');

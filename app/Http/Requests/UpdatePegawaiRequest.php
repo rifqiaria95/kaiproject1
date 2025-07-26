@@ -37,7 +37,12 @@ class UpdatePegawaiRequest extends FormRequest
             'no_npwp_pegawai'    => 'nullable|string|max:255',
             'no_telp_pegawai'    => 'nullable|string|max:255',
             'jabatan_pegawai'    => 'required|string|max:255',
-            'active'             => 'required|in:0,1',
+            'status'             => 'required|in:active,inactive',
+            'id_perusahaan'      => 'required',
+            'id_divisi'          => 'required',
+            'id_cabang'          => 'required',
+            'id_departemen'      => 'required',
+            'id_jabatan'         => 'required',
             'user_id'            => 'required|integer',
             'email'              => 'required|email|unique:users,email,' . $this->user_id . ',id'
         ];

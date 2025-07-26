@@ -17,13 +17,13 @@ class MenuSeeder extends Seeder
 
         // Buat menu groups
         $menuGroupsData = [
-            ['name' => 'Purchasing', 'icon' => 'ri-shopping-bag-4-line', 'order' => 1, 'jenis_menu' => 1],
-            ['name' => 'HRD', 'icon' => 'ri-team-line', 'order' => 2, 'jenis_menu' => 2],
-            ['name' => 'Accounting', 'icon' => 'ri-calculator-line', 'order' => 3, 'jenis_menu' => 3],
-            ['name' => 'Inventory', 'icon' => 'ri-store-line', 'order' => 4, 'jenis_menu' => 4],
-            ['name' => 'Sales', 'icon' => 'ri-shopping-cart-line', 'order' => 5, 'jenis_menu' => 5],
-            ['name' => 'Company', 'icon' => 'ri-building-line', 'order' => 6, 'jenis_menu' => 6],
-            ['name' => 'Admin', 'icon' => 'ri-settings-line', 'order' => 7, 'jenis_menu' => 7],
+            ['name' => 'Purchasing', 'icon' => 'cash-register', 'order' => 1, 'jenis_menu' => 1],
+            ['name' => 'HRD', 'icon' => 'users-group', 'order' => 2, 'jenis_menu' => 2],
+            ['name' => 'Accounting', 'icon' => 'calculator', 'order' => 3, 'jenis_menu' => 3],
+            ['name' => 'Inventory', 'icon' => 'building-warehouse', 'order' => 4, 'jenis_menu' => 4],
+            ['name' => 'Sales', 'icon' => 'shopping-cart', 'order' => 5, 'jenis_menu' => 5],
+            ['name' => 'Company', 'icon' => 'building', 'order' => 6, 'jenis_menu' => 6],
+            ['name' => 'Admin', 'icon' => 'lock-heart', 'order' => 7, 'jenis_menu' => 7],
         ];
 
         $menuGroups = [];
@@ -45,11 +45,11 @@ class MenuSeeder extends Seeder
             ['name' => 'Customer', 'route' => '/sales/customer', 'status' => 1, 'order' => 5, 'menu_group' => 'Sales'],
 
             // Admin
-            ['name' => 'User Management', 'route' => '/users', 'status' => 1, 'order' => 1, 'menu_group' => 'Admin'],
-            ['name' => 'Role Management', 'route' => '/admin/roles', 'status' => 1, 'order' => 2, 'menu_group' => 'Admin'],
-            ['name' => 'Permission Management', 'route' => '/admin/permissions', 'status' => 1, 'order' => 3, 'menu_group' => 'Admin'],
+            ['name' => 'User Management', 'route' => '/admin/users', 'status' => 1, 'order' => 1, 'menu_group' => 'Admin'],
+            ['name' => 'Role Management', 'route' => '/admin/role', 'status' => 1, 'order' => 2, 'menu_group' => 'Admin'],
+            ['name' => 'Permission Management', 'route' => '/admin/permission', 'status' => 1, 'order' => 3, 'menu_group' => 'Admin'],
             ['name' => 'Menu Group', 'route' => '/admin/menu-group', 'status' => 1, 'order' => 4, 'menu_group' => 'Admin'],
-            ['name' => 'Menu Detail', 'route' => '/admin/menu-detail', 'status' => 1, 'order' => 5, 'menu_group' => 'Admin'],
+            ['name' => 'Menu Detail', 'route' => '/admin/menu', 'status' => 1, 'order' => 5, 'menu_group' => 'Admin'],
 
             // Purchasing
             ['name' => 'Purchase Order', 'route' => '/purchasing/purchase-order', 'status' => 1, 'order' => 1, 'menu_group' => 'Purchasing'],

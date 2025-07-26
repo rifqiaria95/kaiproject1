@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/perusahaan/",
+            url: "/company/perusahaan/",
             type: 'GET'
         },
         columns: [{
@@ -265,11 +265,11 @@ $(document).ready(function () {
         let method = '';
 
         if(id){
-            url = '/perusahaan/update/' + id;
+            url = '/company/perusahaan/update/' + id;
             method = 'POST';
             formData.append('_method', 'PUT');
         } else {
-            url = '/perusahaan/store';
+            url = '/company/perusahaan/store';
             method = 'POST';
         }
 
@@ -316,7 +316,7 @@ function editPerusahaan(id) {
     $('#formPerusahaan .text-danger.small').text('');
 
     $.ajax({
-        url: '/perusahaan/edit/' + id,
+        url: '/company/perusahaan/edit/' + id,
         type: 'GET',
         success: function(response) {
             if (response.success) {
@@ -358,7 +358,7 @@ $(document).on('click', '.delete-record', function () {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/perusahaan/delete/' + id,
+                url: '/company/perusahaan/delete/' + id,
                 type: 'DELETE',
                 data: {
                     _method: 'DELETE',

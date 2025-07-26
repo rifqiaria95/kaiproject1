@@ -142,6 +142,7 @@
                                     <option value="6">Company</option>
                                     <option value="7">Admin</option>
                                     <option value="8">Portfolio</option>
+                                    <option value="9">Program</option>
                                 </select>
                             </fieldset>
                         </div>

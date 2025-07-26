@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/item/",
+            url: "/inventory/item/",
             type: 'GET'
         },
         columns: [{
@@ -188,52 +188,49 @@ $(document).ready(function () {
                 }
             },
             {
-                data: 'kd_barcode',
-                name: 'kd_barcode'
+              data: 'kd_barcode',
+              name: 'kd_barcode'
             },
             {
-                data: 'kd_item',
-                name: 'kd_item'
+              data: 'kd_item',
+              name: 'kd_item'
             },
             {
-                data: 'nm_item',
-                name: 'nm_item'
+              data: 'nm_item',
+              name: 'nm_item'
             },
             {
-                data: 'kategori',
-                name: 'kategori',
+              data: 'kategori',
+              name: 'kategori',
             },
             {
-                data: 'stok_satuan',
-                name: 'stok_satuan'
+              data: 'stok_satuan',
+              name: 'stok_satuan'
             },
             {
-                data: 'aksi',
-                name: 'aksi',
-                render: function (data, type, full, meta) {
-                    let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit item");
-                    let canDelete       = userPermissions.includes("delete item");
+              data: 'aksi',
+              name: 'aksi',
+              render: function (data, type, full, meta) {
+                let userPermissions = window.userPermissions || [];
+                let canEdit         = userPermissions.includes("edit_item");
+                let canDelete       = userPermissions.includes("delete_item");
 
-                    let buttons = '<div class="d-flex align-items-center">';
+                let buttons = '<div class="d-flex align-items-center">';
 
+                if (canEdit) {
+                    buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                    buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canDelete) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
+                        buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
                     }
-
-                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
-
-                    if (canEdit) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
-                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        buttons += '<a href="javascript:;" class="dropdown-item edit-record" data-id="' + full.id + '">Edit</a>';
-                        buttons += '</div>';
-                    }
-
+                    buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     buttons += '</div>';
-
-                    return buttons;
                 }
+
+                buttons += '</div>';
+
+                return buttons;
+              }
             }
         ],
         order: [
@@ -257,9 +254,9 @@ $(document).ready(function () {
       let url = '';
 
       if(id == "" || id == 0){
-          url = "/item/store";
+          url = "/inventory/item/store";
       } else {
-          url = "/item/update/" + id;
+          url = "/inventory/item/update/" + id;
           formData.append('_method', 'PUT');
       }
 
@@ -312,7 +309,7 @@ $(document).ready(function () {
         $('#formItem .text-danger.small').text('');
 
         $.ajax({
-            url: '/item/edit/' + id,
+            url: '/inventory/item/edit/' + id,
             type: 'GET',
             success: function(response) {
                 if (response) {
@@ -351,7 +348,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/item/delete/' + id,
+                    url: '/inventory/item/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',

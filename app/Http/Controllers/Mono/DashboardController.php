@@ -14,4 +14,9 @@ class DashboardController extends Controller
         return view('dashboard');
     }
 
+    public function extDashboard()
+    {
+        return view('ext-dashboard');
+    }
+
 }

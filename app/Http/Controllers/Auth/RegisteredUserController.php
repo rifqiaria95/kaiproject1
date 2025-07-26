@@ -39,12 +39,16 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'active' => 0, // User tidak aktif sampai verifikasi email
         ]);
 
+        // Kirim email verifikasi
         event(new Registered($user));
 
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+        // JANGAN login user, tapi redirect ke halaman verifikasi
+        return redirect()->route('verification.notice')->with([
+            'message' => 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.',
+            'email' => $user->email
+        ]);
     }
 }

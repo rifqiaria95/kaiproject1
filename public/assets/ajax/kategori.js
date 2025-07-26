@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/kategori/",
+            url: "/inventory/kategori/",
             type: 'GET'
         },
         columns: [
@@ -207,21 +207,18 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit kategori");
-                    let canDelete       = userPermissions.includes("delete kategori");
+                    let canEdit         = userPermissions.includes("edit_kategori");
+                    let canDelete       = userPermissions.includes("delete_kategori");
 
                     let buttons = '<div class="d-flex align-items-center">';
-
-                    if (canDelete) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
-                    }
-
-                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
 
                     if (canEdit) {
                         buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                         buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
+                        if (canDelete) {
+                            buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                        }
+                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                         buttons += '</div>';
                     }
 
@@ -254,7 +251,7 @@ $(document).ready(function () {
         $('.text-danger').text('');
 
         $.ajax({
-            url: `/kategori/edit/${id}/`,
+            url: `/inventory/kategori/edit/${id}/`,
             type: "GET",
             success: function (response) {
                 if (response.success) {
@@ -284,11 +281,11 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
         let id       = $("#id").val();
-        let url      = "/kategori/store";
+        let url      = "/inventory/kategori/store";
         let method   = "POST";
 
         if (id) {
-            url = "/kategori/update/" + id;
+            url = "/inventory/kategori/update/" + id;
             formData.append("_method", "PUT");
         }
 
@@ -341,7 +338,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/kategori/delete/' + id,
+                    url: '/inventory/kategori/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',

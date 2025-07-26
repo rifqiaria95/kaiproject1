@@ -37,7 +37,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/departemen/",
+            url: "/hrd/departemen/",
             type: 'GET'
         },
         columns: [
@@ -65,21 +65,18 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit menu detail");
-                    let canDelete       = userPermissions.includes("delete menu detail");
+                    let canEdit         = userPermissions.includes("edit_departemen");
+                    let canDelete       = userPermissions.includes("delete_departemen");
 
                     let buttons = '<div class="d-flex align-items-center">';
-
-                    if (canDelete) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
-                    }
-
-                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
 
                     if (canEdit) {
                         buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                         buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
+                        if (canDelete) {
+                            buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                        }
+                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                         buttons += '</div>';
                     }
 
@@ -114,7 +111,7 @@ $(document).ready(function () {
         $('.text-danger').text('');
         // Mode Edit (Ambil data dari API)
         $.ajax({
-            url: `departemen/edit/${id}/`, // Pastikan route ini benar
+            url: `/hrd/departemen/edit/${id}/`, // Pastikan route ini benar
             type: "GET",
             success: function (response) {
                 if (response.success) {
@@ -146,11 +143,11 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
         let id       = $("#id").val();
-        let url      = "/departemen/store";
+        let url      = "/hrd/departemen/store";
         let method   = "POST";
 
         if (id) {
-            url = "/departemen/update/" + id;
+            url = "/hrd/departemen/update/" + id;
             formData.append("_method", "PUT");
         }
 
@@ -189,6 +186,20 @@ $(document).ready(function () {
         });
     });
 
+    // Filter by divisi
+    $('#filter_divisi').on('change', function() {
+        let divisiId = $(this).val();
+        let table = $('#TableDepartemen').DataTable();
+        
+        if (divisiId) {
+            // Filter berdasarkan divisi
+            table.column(2).search(divisiId).draw();
+        } else {
+            // Tampilkan semua data
+            table.column(2).search('').draw();
+        }
+    });
+
     $(document).on('click', '.delete-record', function () {
         let id = $(this).data('id');
 
@@ -204,7 +215,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/departemen/delete/' + id,
+                    url: '/hrd/departemen/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',

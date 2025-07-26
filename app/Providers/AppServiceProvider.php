@@ -10,6 +10,7 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\MenuGroup;
 use App\Models\MenuDetail;
 use Illuminate\Support\Facades\URL;
+use App\Http\View\Composers\MenuComposer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,14 +31,9 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Cek apakah tabel 'menu_groups' sudah ada sebelum mengambil data
+        // Daftarkan view composer untuk menu
         if (Schema::hasTable('menu_groups')) {
-            $menuGroups = MenuGroup::with(['menuDetails' => function ($query) {
-                $query->orderBy('order', 'asc')->with('subMenuDetails');
-            }])->orderBy('order', 'asc')->get();
-
-            // Bagikan data ke semua view
-            View::share('menuGroups', $menuGroups);
+            View::composer(['layouts.side-menu', 'internal.permission.index'], MenuComposer::class);
         }
 
         // Custom pesan validasi

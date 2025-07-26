@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\User;
+use App\Models\UserProfile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateUserRequest;
 use Spatie\Permission\Models\Role;
@@ -62,7 +63,15 @@ class UserController extends Controller
             ]);
         }
 
-        $user->update($request->validated());
+        // Siapkan data untuk update
+        $updateData = $request->only(['name', 'email', 'active']);
+        
+        // Jika password diisi, hash dan tambahkan ke data update
+        if ($request->filled('password')) {
+            $updateData['password'] = bcrypt($request->password);
+        }
+
+        $user->update($updateData);
 
         if ($request->has('role')) {
             $role = Role::findById($request->role);
@@ -109,6 +118,13 @@ class UserController extends Controller
             'status' => 200,
             'message' => 'Data User Berhasil Dihapus'
         ]);
+    }
+
+    public function profile($id)
+    {
+        $user = User::findOrFail($id)->with('roles', 'user_profile')->first();
+        $userProfile = UserProfile::where('user_id', $id)->first();
+        return view('internal/user.profile', compact('user', 'userProfile'));
     }
 
 }

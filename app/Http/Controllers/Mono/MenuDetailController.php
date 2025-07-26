@@ -30,7 +30,7 @@ class MenuDetailController extends Controller
                 ->toJson();
         }
 
-        return view('menu_details.index', compact(['menuDetail', 'menuGroup']));
+        return view('internal/menu_details.index', compact(['menuDetail', 'menuGroup']));
     }
 
     public function store(Request $request)

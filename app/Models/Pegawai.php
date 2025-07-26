@@ -20,7 +20,6 @@ class Pegawai extends Model
         'foto_pegawai',
         'gaji_pegawai',
         'jenis_kelamin',
-        'jabatan_pegawai',
         'tgl_lahir_pegawai',
         'tgl_masuk_pegawai',
         'tgl_keluar_pegawai',
@@ -28,9 +27,14 @@ class Pegawai extends Model
         'no_sim_pegawai',
         'no_npwp_pegawai',
         'id_kota',
+        'id_perusahaan',
+        'id_divisi',
+        'id_cabang',
+        'id_departemen',
+        'id_jabatan',
         'id_provinsi',
         'user_id',
-        'active',
+        'status',
     ];
 
     public function user()
@@ -52,6 +56,11 @@ class Pegawai extends Model
     public function cabang()
     {
         return $this->belongsTo(Cabang::class, 'id_cabang');
+    }
+
+    public function perusahaan()
+    {
+        return $this->belongsTo(Perusahaan::class, 'id_perusahaan');
     }
 
     public function divisi()

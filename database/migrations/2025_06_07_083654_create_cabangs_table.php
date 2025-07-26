@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('alamat_cabang');
             $table->string('no_telp_cabang');
             $table->string('email_cabang');
-            $table->string('foto_cabang')->nullable();
             $table->unsignedBigInteger('id_perusahaan')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();

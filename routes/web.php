@@ -1,16 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\Mono\TagController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Mono\ItemController;
+use App\Http\Controllers\Mono\NewsController;
 use App\Http\Controllers\Mono\UnitController;
 use App\Http\Controllers\Mono\UserController;
+use App\Http\Controllers\Mono\AboutController;
 use App\Http\Controllers\Mono\AdminController;
+use App\Http\Controllers\Mono\CabangController;
 use App\Http\Controllers\Mono\DivisiController;
 use App\Http\Controllers\Mono\GudangController;
 use App\Http\Controllers\Mono\VendorController;
 use App\Http\Controllers\Mono\JabatanController;
 use App\Http\Controllers\Mono\PegawaiController;
+use App\Http\Controllers\Mono\ProgramController;
 use App\Http\Controllers\Mono\KategoriController;
 use App\Http\Controllers\Mono\DashboardController;
 use App\Http\Controllers\Mono\MenuGroupController;
@@ -19,20 +25,41 @@ use App\Http\Controllers\Mono\DepartemenController;
 use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\PermissionController;
 use App\Http\Controllers\Mono\PerusahaanController;
-use App\Http\Controllers\Mono\RolePermissionController;
+use App\Http\Controllers\Ext\RegistrationController;
+use App\Http\Controllers\Mono\JenisProgramController;
 use App\Http\Controllers\Mono\SubMenuDetailController;
-use App\Http\Controllers\Mono\NewsController;
-use App\Http\Controllers\Mono\TagController;
-use App\Http\Controllers\Mono\AboutController;
-use App\Http\Controllers\Mono\CabangController;
+use App\Http\Controllers\Mono\RolePermissionController;
+use App\Http\Controllers\Auth\EmailVerificationController;
+use App\Http\Controllers\Mono\ProgramReqController;
+use App\Http\Controllers\Mono\ProgramRegistController;
+use App\Http\Controllers\Ext\ProgramRegistController as ExtProgramRegistController;
 
 Route::get('/', function () {
     return view('auth.login');
 });
 
+// Route untuk External
+Route::prefix('registration')->name('registration.')->group(function () {
+    Route::get('/', [RegistrationController::class, 'index'])->name('index');
+    Route::post('/store', [RegistrationController::class, 'store'])->name('store');
+    Route::get('/show/{id}', [RegistrationController::class, 'show'])->name('show');
+    Route::get('/edit/{id}', [RegistrationController::class, 'edit'])->name('edit');
+    Route::post('/update/{id}', [RegistrationController::class, 'update'])->name('update');
+    Route::delete('/delete/{id}', [RegistrationController::class, 'destroy'])->name('destroy');
+});
+
+// API Routes untuk dropdown wilayah
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/provinsi', [RegistrationController::class, 'getProvinsi'])->name('provinsi');
+    Route::get('/kota/{id_provinsi}', [RegistrationController::class, 'getKota'])->name('kota');
+    Route::get('/kecamatan/{id_kota}', [RegistrationController::class, 'getKecamatan'])->name('kecamatan');
+    Route::get('/kelurahan/{id_kecamatan}', [RegistrationController::class, 'getKelurahan'])->name('kelurahan');
+});
+
 // Route untuk Semua Role
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/ext-dashboard', [DashboardController::class, 'extDashboard'])->name('ext-dashboard');
 
     // Route User
     Route::prefix('satuan')->name('satuan.')->group(function () {
@@ -41,11 +68,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [UnitController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [UnitController::class, 'destroy'])->name('destroy');
-        Route::get('/profile/{id}', [UnitController::class, 'profile'])->name('profile');
     });
 
     // Route Pegawai
-    Route::prefix('pegawai')->name('pegawai.')->group(function () {
+    Route::prefix('hrd/pegawai')->name('pegawai.')->group(function () {
         Route::get('/', [PegawaiController::class, 'index'])->name('index');
         Route::post('/store', [PegawaiController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [PegawaiController::class, 'edit'])->name('edit');
@@ -53,10 +79,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/delete/{id}', [PegawaiController::class, 'destroy'])->name('destroy');
         Route::get('/profile/{id}', [PegawaiController::class, 'profile'])->name('profile');
         Route::get('/get-kota/{id_provinsi}', [PegawaiController::class, 'getKotaByProvinsi'])->name('pegawai.get-kota');
+        Route::get('/get-cabang/{id_perusahaan}', [PegawaiController::class, 'getCabangByPerusahaan'])->name('pegawai.get-cabang');
+        Route::get('/get-departemen/{id_divisi}', [PegawaiController::class, 'getDepartemenByDivisi'])->name('pegawai.get-departemen');
+        Route::get('/form-example', [PegawaiController::class, 'formExample'])->name('pegawai.form-example');
     });
 
     // Route Jabatan
-    Route::prefix('jabatan')->name('jabatan.')->group(function () {
+    Route::prefix('hrd/jabatan')->name('jabatan.')->group(function () {
         Route::get('/', [JabatanController::class, 'index'])->name('index');
         Route::post('/store', [JabatanController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [JabatanController::class, 'edit'])->name('edit');
@@ -65,7 +94,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Route Divisi
-    Route::prefix('divisi')->name('divisi.')->group(function () {
+    Route::prefix('hrd/divisi')->name('divisi.')->group(function () {
         Route::get('/', [DivisiController::class, 'index'])->name('index');
         Route::post('/store', [DivisiController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [DivisiController::class, 'edit'])->name('edit');
@@ -74,16 +103,17 @@ Route::middleware('auth')->group(function () {
     });
 
     // Route Departemen
-    Route::prefix('departemen')->name('departemen.')->group(function () {
+    Route::prefix('hrd/departemen')->name('departemen.')->group(function () {
         Route::get('/', [DepartemenController::class, 'index'])->name('index');
         Route::post('/store', [DepartemenController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [DepartemenController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [DepartemenController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [DepartemenController::class, 'destroy'])->name('destroy');
+        Route::get('/get-by-divisi/{id_divisi}', [DepartemenController::class, 'getByDivisi'])->name('get.by.divisi');
     });
 
     // Route Perusahaan
-    Route::prefix('perusahaan')->name('perusahaan.')->group(function () {
+    Route::prefix('company/perusahaan')->name('perusahaan.')->group(function () {
         Route::get('/', [PerusahaanController::class, 'index'])->name('index');
         Route::post('/store', [PerusahaanController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [PerusahaanController::class, 'edit'])->name('edit');
@@ -92,17 +122,18 @@ Route::middleware('auth')->group(function () {
     });
 
     // Route Cabang
-    Route::prefix('cabang')->name('cabang.')->group(function () {
+    Route::prefix('company/cabang')->name('cabang.')->group(function () {
         Route::get('/', [CabangController::class, 'index'])->name('index');
         Route::post('/store', [CabangController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [CabangController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [CabangController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [CabangController::class, 'destroy'])->name('destroy');
         Route::get('/get-perusahaan', [CabangController::class, 'getPerusahaan'])->name('get.perusahaan');
+        Route::get('/get-by-perusahaan/{id_perusahaan}', [CabangController::class, 'getByPerusahaan'])->name('get.by.perusahaan');
     });
 
     // Route Item
-    Route::prefix('item')->name('item.')->group(function () {
+    Route::prefix('inventory/item')->name('item.')->group(function () {
         Route::get('/', [ItemController::class, 'index'])->name('index');
         Route::post('/store', [ItemController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [ItemController::class, 'edit'])->name('edit');
@@ -112,7 +143,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Route Gudang
-    Route::prefix('gudang')->name('gudang.')->group(function () {
+    Route::prefix('inventory/gudang')->name('gudang.')->group(function () {
         Route::get('/', [GudangController::class, 'index'])->name('index');
         Route::post('/store', [GudangController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [GudangController::class, 'edit'])->name('edit');
@@ -121,12 +152,118 @@ Route::middleware('auth')->group(function () {
     });
 
     // Route Kategori
-    Route::prefix('kategori')->name('kategori.')->group(function () {
+    Route::prefix('inventory/kategori')->name('kategori.')->group(function () {
         Route::get('/', [KategoriController::class, 'index'])->name('index');
         Route::post('/store', [KategoriController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [KategoriController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [KategoriController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [KategoriController::class, 'destroy'])->name('destroy');
+    });
+
+    // Route Jenis Program
+    Route::prefix('program/jenis-program')->name('jenis-program.')->group(function () {
+        Route::get('/', [JenisProgramController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_jenis_program');
+        Route::post('/store', [JenisProgramController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:approve_jenis_program');
+        Route::get('/edit/{id}', [JenisProgramController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_jenis_program');
+        Route::put('/update/{id}', [JenisProgramController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_jenis_program');
+        Route::delete('/delete/{id}', [JenisProgramController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_jenis_program');
+        Route::get('/show/{id}', [JenisProgramController::class, 'show'])
+            ->name('show')
+            ->middleware('permission:show_jenis_program');
+        Route::post('/approve/{id}', [JenisProgramController::class, 'approve'])
+            ->name('approve')
+            ->middleware('permission:approve_jenis_program');
+        Route::post('/reject/{id}', [JenisProgramController::class, 'reject'])
+            ->name('reject')
+            ->middleware('permission:reject_jenis_program');
+    });
+
+    // Route Program
+    Route::prefix('program/daftar-program')->name('daftar-program.')->group(function () {
+        Route::get('/', [ProgramController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_daftar_program');
+        Route::post('/store', [ProgramController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:approve_daftar_program');
+        Route::get('/edit/{id}', [ProgramController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_daftar_program');
+        Route::put('/update/{id}', [ProgramController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_daftar_program');
+        Route::delete('/delete/{id}', [ProgramController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_daftar_program');
+        Route::get('/show/{id}', [ProgramController::class, 'show'])
+            ->name('show')
+            ->middleware('permission:show_daftar_program');
+        Route::post('/approve/{id}', [ProgramController::class, 'approve'])
+            ->name('approve')
+            ->middleware('permission:approve_daftar_program');
+        Route::post('/reject/{id}', [ProgramController::class, 'reject'])
+            ->name('reject')
+            ->middleware('permission:reject_daftar_program');
+    });
+
+    // Route Program Requirement
+    Route::prefix('program/program-requirement')->name('program-requirement.')->group(function () {
+        Route::get('/', [ProgramReqController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_program_requirement');
+        Route::post('/store', [ProgramReqController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:approve_program_requirement');
+        Route::get('/edit/{id}', [ProgramReqController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_program_requirement');
+        Route::put('/update/{id}', [ProgramReqController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_program_requirement');
+        Route::delete('/delete/{id}', [ProgramReqController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_program_requirement');
+    });
+
+    // Route Program Registration
+    Route::prefix('program/program-registration')->name('program-registration.')->group(function () {
+        Route::get('/', [ProgramRegistController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_program_registration');
+        Route::post('/store', [ProgramRegistController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_program_registration');
+        Route::get('/edit/{id}', [ProgramRegistController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_program_registration');
+        Route::put('/update/{id}', [ProgramRegistController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_program_registration');
+        Route::delete('/delete/{id}', [ProgramRegistController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_program_registration');
+    });
+
+    // Route Program Registration External
+    Route::prefix('registration-program')->name('registration-program.')->group(function () {
+        Route::get('/', [ExtProgramRegistController::class, 'index'])
+            ->name('index');
+        Route::post('/store', [ExtProgramRegistController::class, 'store'])
+            ->name('store');
+        Route::get('/edit/{id}', [ExtProgramRegistController::class, 'edit'])
+            ->name('edit');
+        Route::put('/update/{id}', [ExtProgramRegistController::class, 'update'])
+            ->name('update');
     });
 
     // Route Tag
@@ -177,6 +314,11 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{id}', [AboutController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [AboutController::class, 'destroy'])->name('destroy');
     });
+
+    // Route User
+    Route::prefix('/admin/users')->name('user.')->group(function () {
+        Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
+    });
 });
 
 // Route untuk Superadmin
@@ -189,7 +331,6 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::get('/getPermission/{id}', [UserController::class, 'getPermission'])->name('getPermission');
         Route::post('/update/{id}', [UserController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('destroy');
-        Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
     });
 
     // Route Role
