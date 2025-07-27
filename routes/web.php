@@ -14,6 +14,7 @@ use App\Http\Controllers\Mono\CabangController;
 use App\Http\Controllers\Mono\DivisiController;
 use App\Http\Controllers\Mono\GudangController;
 use App\Http\Controllers\Mono\VendorController;
+use App\Http\Controllers\Mono\ChatLogController;
 use App\Http\Controllers\Mono\JabatanController;
 use App\Http\Controllers\Mono\PegawaiController;
 use App\Http\Controllers\Mono\ProgramController;
@@ -25,14 +26,16 @@ use App\Http\Controllers\Mono\DepartemenController;
 use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\PermissionController;
 use App\Http\Controllers\Mono\PerusahaanController;
+use App\Http\Controllers\Mono\ProgramReqController;
 use App\Http\Controllers\Ext\RegistrationController;
 use App\Http\Controllers\Mono\JenisProgramController;
+use App\Http\Controllers\Mono\ProgramRegistController;
 use App\Http\Controllers\Mono\SubMenuDetailController;
 use App\Http\Controllers\Mono\RolePermissionController;
+use App\Http\Controllers\Mono\KnowledgeController;  
 use App\Http\Controllers\Auth\EmailVerificationController;
-use App\Http\Controllers\Mono\ProgramReqController;
-use App\Http\Controllers\Mono\ProgramRegistController;
 use App\Http\Controllers\Ext\ProgramRegistController as ExtProgramRegistController;
+use App\Http\Controllers\Mono\EducationController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -110,7 +113,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/update/{id}', [DepartemenController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [DepartemenController::class, 'destroy'])->name('destroy');
         Route::get('/get-by-divisi/{id_divisi}', [DepartemenController::class, 'getByDivisi'])->name('get.by.divisi');
-    });
+    }); 
 
     // Route Perusahaan
     Route::prefix('company/perusahaan')->name('perusahaan.')->group(function () {
@@ -299,25 +302,78 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route News
     Route::prefix('portfolio/news')->name('news.')->group(function () {
-        Route::get('/', [NewsController::class, 'index'])->name('index');
-        Route::post('/store', [NewsController::class, 'store'])->name('store');
-        Route::get('/edit/{id:uuid}', [NewsController::class, 'edit'])->name('edit');
-        Route::put('/update/{id}', [NewsController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [NewsController::class, 'destroy'])->name('destroy');
+        Route::get('/', [NewsController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_news');
+        Route::post('/store', [NewsController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_news');
+        Route::get('/edit/{id:uuid}', [NewsController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_news');
+        Route::put('/update/{id}', [NewsController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_news');
+        Route::delete('/delete/{id}', [NewsController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_news');
     });
 
     // Route About
     Route::prefix('portfolio/about')->name('about.')->group(function () {
-        Route::get('/', [AboutController::class, 'index'])->name('index');
-        Route::post('/store', [AboutController::class, 'store'])->name('store');
-        Route::get('/edit/{id}', [AboutController::class, 'edit'])->name('edit');
-        Route::put('/update/{id}', [AboutController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [AboutController::class, 'destroy'])->name('destroy');
+        Route::get('/', [AboutController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_about');
+        Route::post('/store', [AboutController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_about');
+        Route::get('/edit/{id}', [AboutController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_about');
+        Route::put('/update/{id}', [AboutController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_about');
+        Route::delete('/delete/{id}', [AboutController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_about');
+    });
+
+    // Route Education
+    Route::prefix('portfolio/education')->name('education.')->group(function () {
+        Route::get('/', [EducationController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_education');
+        Route::post('/store', [EducationController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_education');
+        Route::get('/edit/{id}', [EducationController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_education');
+        Route::put('/update/{id}', [EducationController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_education');
+        Route::delete('/delete/{id}', [EducationController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_education');
     });
 
     // Route User
     Route::prefix('/admin/users')->name('user.')->group(function () {
         Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
+    });
+
+    // Route Chat
+    Route::prefix('admin/chat')->name('chat.')->group(function () {
+        Route::get('/chat', [ChatLogController::class, 'index'])->name('index');
+    });
+
+    // Route Knowledge
+    Route::prefix('admin/knowledge')->name('knowledge.')->group(function () {
+        Route::get('/', [KnowledgeController::class, 'index'])->name('index');
+        Route::post('/store', [KnowledgeController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [KnowledgeController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [KnowledgeController::class, 'update'])->name('update');
+        Route::delete('/delete/{id}', [KnowledgeController::class, 'destroy'])->name('destroy');
     });
 });
 

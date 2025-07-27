@@ -9,7 +9,7 @@
         <h1 class="mb-2 mx-2" style="line-height: 6rem; font-size: 6rem">403</h1>
         <h4 class="mb-2 mx-2">Anda tidak memiliki otorisasi! 🔐</h4>
         <p class="mb-6 mx-2">Anda tidak memiliki izin untuk mengakses halaman ini. Silakan kembali ke beranda!</p>
-        <a href="{{ url('/') }}" class="btn btn-primary">Kembali ke Beranda</a>
+        <a href="{{ url('/dashboard') }}" class="btn btn-primary">Kembali ke Beranda</a>
         <div class="mt-12">
           <img
             src="{{ asset('assets/img/illustrations/page-misc-you-are-not-authorized.png') }}"

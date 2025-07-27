@@ -103,22 +103,17 @@
                 </div>
             </div>
             <div class="card-datatable table-responsive">
-                <table id="TableAbout" class="datatables-about table">
+                <table id="TableEducation" class="datatables-education table">
                 <thead class="border-top">
                     <tr>
                     <th>#</th>
                     <th>Image</th>
                     <th>Title</th>
                     <th>Subtitle</th>
+                    <th>Institution</th>
                     <th>Description</th>
-                    <th>Address</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Facebook</th>
-                    <th>Instagram</th>
-                    <th>Twitter</th>
-                    <th>Tiktok</th>
-                    <th>Youtube</th>
+                    <th>Year</th>
+                    <th>Created By</th>
                     <th>Aksi</th>
                     </tr>
                 </thead>
@@ -128,10 +123,10 @@
                 <div class="modal-dialog modal-dialog-centered modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="modal-judul">Tambah Tentang Saya</h4>
+                            <h4 class="modal-title" id="modal-judul">Tambah Pendidikan</h4>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <form id="formAbout" class="form-horizontal" enctype="multipart/form-data">
+                        <form id="formEducation" class="form-horizontal" enctype="multipart/form-data">
                             @csrf
                             <div class="modal-body">
                                 <input type="hidden" name="id" id="id">
@@ -150,19 +145,7 @@
                                                     data-bs-target="#navs-top-home"
                                                     aria-controls="navs-top-home"
                                                     aria-selected="true">
-                                                    Detail Tentang Saya
-                                                    </button>
-                                                </li>
-                                                <li class="nav-item">
-                                                    <button
-                                                    type="button"
-                                                    class="nav-link"
-                                                    role="tab"
-                                                    data-bs-toggle="tab"
-                                                    data-bs-target="#navs-top-profile"
-                                                    aria-controls="navs-top-profile"
-                                                    aria-selected="false">
-                                                    Social Media
+                                                    Detail Pendidikan
                                                     </button>
                                                 </li>
                                             </ul>
@@ -175,7 +158,7 @@
                                                                 type="text"
                                                                 class="form-control"
                                                                 id="title"
-                                                                placeholder="Masukkan judul tentang saya"
+                                                                placeholder="Masukkan judul pendidikan"
                                                                 name="title"
                                                                 aria-label="Title" />
                                                             <div class="text-danger small" id="title-error"></div>
@@ -186,7 +169,7 @@
                                                                 type="text"
                                                                 class="form-control"
                                                                 id="subtitle"
-                                                                placeholder="Masukkan subtitle tentang saya"
+                                                                placeholder="Masukkan subtitle pendidikan"
                                                                 name="subtitle"
                                                                 aria-label="Subtitle" />
                                                             <div class="text-danger small" id="subtitle-error"></div>
@@ -196,7 +179,7 @@
                                                             <textarea
                                                                 class="form-control"
                                                                 id="description"
-                                                                placeholder="Masukkan deskripsi tentang saya..."
+                                                                placeholder="Masukkan deskripsi pendidikan..."
                                                                 name="description"
                                                                 aria-label="Description"
                                                                 rows="10"
@@ -204,19 +187,30 @@
                                                             <div class="text-danger small" id="description-error"></div>
                                                         </div>
                                                         <div class="col-xl-12 mb-6">
-                                                            <label class="form-label" for="address">Address</label>
-                                                            <textarea
+                                                            <label class="form-label" for="institution">Institution</label>
+                                                            <input
+                                                                type="text"
                                                                 class="form-control"
-                                                                id="address"
-                                                                placeholder="Masukkan alamat saya..."
-                                                                aria-label="Address"
-                                                                name="address"
-                                                                rows="3"
-                                                            ></textarea>
-                                                            <div class="text-danger small" id="address-error"></div>
+                                                                id="institution"
+                                                                placeholder="Masukkan institusi pendidikan"
+                                                                aria-label="Institution"
+                                                                name="institution"
+                                                            />
+                                                            <div class="text-danger small" id="institution-error"></div>
                                                         </div>
                                                     </div>
                                                     <div class="row">
+                                                        <div class="col-xl-6 mb-6">
+                                                            <label class="form-label" for="year">Year</label>
+                                                            <input
+                                                                type="text"
+                                                                id="year"
+                                                                class="form-control"
+                                                                aria-label="Year"
+                                                                name="year"
+                                                            />
+                                                            <div class="text-danger small" id="year-error"></div>
+                                                        </div>
                                                         <div class="col-xl-6 mb-6">
                                                             <label class="form-label" for="image">Image</label>
                                                             <input
@@ -229,102 +223,6 @@
                                                             />
                                                             <div class="form-text">Upload gambar untuk image (JPG, PNG, GIF)</div>
                                                             <div class="text-danger small" id="image-error"></div>
-                                                        </div>
-                                                        <div class="col-xl-6 mb-6">
-                                                            <label class="form-label" for="video">Video</label>
-                                                            <input
-                                                                type="text"
-                                                                id="video"
-                                                                class="form-control"
-                                                                aria-label="Video"
-                                                                name="video"
-                                                                placeholder="Masukkan link video YouTube"
-                                                            />
-                                                            <div class="text-danger small" id="video-error"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-xl-6 mb-6">
-                                                            <label class="form-label" for="phone">Phone</label>
-                                                            <input
-                                                                type="text"
-                                                                id="phone"
-                                                                class="form-control"
-                                                                aria-label="Phone"
-                                                                name="phone"
-                                                            />
-                                                            <div class="text-danger small" id="phone-error"></div>
-                                                        </div>
-                                                        <div class="col-xl-6 mb-6">
-                                                            <label class="form-label" for="email">Email</label>
-                                                            <input
-                                                                type="email"
-                                                                id="email"
-                                                                class="form-control"
-                                                                aria-label="Email"
-                                                                name="email"
-                                                            />
-                                                            <div class="text-danger small" id="email-error"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
-                                                    <div class="row">
-                                                        <div class="col-xl-6 mb-6">
-                                                            <label class="form-label" for="facebook">Facebook</label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                id="facebook"
-                                                                placeholder="Masukkan link Facebook"
-                                                                name="facebook"
-                                                                aria-label="Facebook" />
-                                                            <div class="text-danger small" id="facebook-error"></div>
-                                                        </div>
-                                                        <div class="col-xl-6 mb-6">
-                                                            <label class="form-label" for="instagram">Instagram</label>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control"
-                                                                id="instagram"
-                                                                placeholder="Masukkan link Instagram"
-                                                                name="instagram"
-                                                                aria-label="Instagram" />
-                                                            <div class="text-danger small" id="instagram-error"></div>
-                                                        </div>
-                                                        <div class="col-xl-6 mb-6">
-                                                            <label class="form-label" for="twitter">Twitter</label>
-                                                            <input
-                                                                type="text"
-                                                                id="twitter"
-                                                                class="form-control"
-                                                                placeholder="Masukkan link Twitter"
-                                                                name="twitter" />
-                                                            <div class="text-danger small" id="twitter-error"></div>
-                                                        </div>
-                                                        <div class="col-xl-6 mb-6">
-                                                            <label class="form-label" for="tiktok">Tiktok</label>
-                                                            <input
-                                                                type="text"
-                                                                id="tiktok"
-                                                                class="form-control"
-                                                                placeholder="Masukkan link Tiktok"
-                                                                aria-label="Tiktok"
-                                                                name="tiktok"
-                                                            />
-                                                            <div class="text-danger small" id="tiktok-error"></div>
-                                                        </div>
-                                                        <div class="col-xl-12 mb-6">
-                                                            <label class="form-label" for="youtube">Youtube</label>
-                                                            <input
-                                                                type="text"
-                                                                id="youtube"
-                                                                class="form-control"
-                                                                placeholder="Masukkan link Youtube"
-                                                                aria-label="Youtube"
-                                                                name="youtube"
-                                                            />
-                                                            <div class="text-danger small" id="youtube-error"></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -407,5 +305,5 @@
 <script src="{{ asset('assets/vendor/libs/@form-validation/auto-focus.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/cleavejs/cleave.js') }}"></script>
 <script src="{{ asset('assets/vendor/libs/cleavejs/cleave-phone.js') }}"></script>
-<script src="{{ asset('assets/ajax/about.js') }}"></script>
+<script src="{{ asset('assets/ajax/education.js') }}"></script>
 @endsection

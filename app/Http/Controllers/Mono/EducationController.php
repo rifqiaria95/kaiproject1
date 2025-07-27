@@ -2,30 +2,30 @@
 
 namespace App\Http\Controllers\Mono;
 
-use Illuminate\Http\Request;
-use App\Models\About;
-use App\Http\Requests\AboutRequest;
+use App\Http\Controllers\Controller;
+use App\Models\Education;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Http\Requests\EducationRequest;
 
-class AboutController extends Controller
+class EducationController extends Controller
 {
     public function index(Request $request)
     {
         // Menampilkan Data about
-        $about = About::withoutTrashed()->with(['creator', 'updater', 'deleter']);
+        $education = Education::withoutTrashed()->with(['createdBy', 'updatedBy', 'deletedBy']);
         
         if ($request->ajax()) {
-            return datatables()->of($about)
+            return datatables()->of($education)
                 ->addColumn('created_by', function ($data) {
-                    return optional($data->creator)->name ?? '-';
+                    return optional($data->createdBy)->name ?? '-';
                 })
                 ->addColumn('updated_by', function ($data) {
-                    return optional($data->updater)->name ?? '-';
+                    return optional($data->updatedBy)->name ?? '-';
                 })
                 ->addColumn('deleted_by', function ($data) {
-                    return optional($data->deleter)->name ?? '-';
+                    return optional($data->deletedBy)->name ?? '-';
                 })
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -36,10 +36,10 @@ class AboutController extends Controller
                 ->toJson();
         }
 
-        return view('internal/about.index', compact(['about']));
+        return view('internal/education.index', compact(['education']));
     }
 
-    public function store(AboutRequest $request)
+    public function store(EducationRequest $request)
     {
         $validatedData = $request->validated();
 
@@ -57,15 +57,15 @@ class AboutController extends Controller
             // Set created_by berdasarkan user yang sedang login
             $validatedData['created_by'] = auth()->id();
 
-            // Create About
-            $about = About::create($validatedData);
+            // Create Education
+            $education = Education::create($validatedData);
 
             DB::commit();
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Data about berhasil disimpan!',
-                'data' => $about
+                'message' => 'Data education berhasil disimpan!',
+                'data' => $education
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -81,21 +81,21 @@ class AboutController extends Controller
     public function edit($id)
     {
         try {
-            $about = About::with(['creator', 'updater', 'deleter'])->where('id', $id)->first();
+            $education = Education::with(['createdBy', 'updatedBy', 'deletedBy'])->where('id', $id)->first();
 
-            if (!$about) {
+            if (!$education) {
                 return response()->json([
                     'status' => 404,
-                    'message' => 'Data about tidak ditemukan'
+                    'message' => 'Data education tidak ditemukan'
                 ], 404);
             }
 
             // Format data untuk frontend
-            $aboutData = $about->toArray();
+            $educationData = $education->toArray();
 
             return response()->json([
                 'success' => true,
-                'about' => $aboutData
+                'education' => $educationData
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -106,14 +106,14 @@ class AboutController extends Controller
         }
     }
 
-    public function update($id, AboutRequest $request)
+    public function update($id, EducationRequest $request)
     {
         try {
             DB::beginTransaction();
 
-            $about = About::findOrFail($id);
+            $education = Education::findOrFail($id);
             $validatedData = $request->validated();
-            $oldImage = $about->image;
+            $oldImage = $education->image;
 
             // Upload image baru jika ada
             if ($request->hasFile('image')) {
@@ -131,14 +131,14 @@ class AboutController extends Controller
             // Set updated_by berdasarkan user yang sedang login
             $validatedData['updated_by'] = auth()->id();
 
-            // Update about
-            $about->update($validatedData);
+            // Update education
+            $education->update($validatedData);
 
             DB::commit();
 
             return response()->json([
                 'status'  => 200,
-                'message' => 'Data about berhasil diubah'
+                'message' => 'Data education berhasil diubah'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -156,32 +156,32 @@ class AboutController extends Controller
         try {
             DB::beginTransaction();
 
-            $about = About::where('id', $id)->first();
+            $education = Education::where('id', $id)->first();
 
-            if (!$about) {
+            if (!$education) {
                 return response()->json([
                     'status' => 404,
-                    'errors' => 'Data About Tidak Ditemukan'
+                    'errors' => 'Data Education Tidak Ditemukan'
                 ]);
             }
 
             // Hapus thumbnail jika ada
-            if ($about->image && File::exists(public_path('images/' . $about->image))) {
-                File::delete(public_path('images/' . $about->image));
+            if ($education->image && File::exists(public_path('images/' . $education->image))) {
+                File::delete(public_path('images/' . $education->image));
             }
 
             // Set deleted_by berdasarkan user yang sedang login
-            $about->deleted_by = auth()->id();
-            $about->save();
+            $education->deleted_by = auth()->id();
+            $education->save();
 
             // Hapus data (Soft Delete)
-            $about->delete();
+            $education->delete();
 
             DB::commit();
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Data About Berhasil Dihapus'
+                'message' => 'Data Education Berhasil Dihapus'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

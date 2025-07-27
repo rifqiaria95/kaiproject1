@@ -11,7 +11,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $('#TableAbout').DataTable({
+    $('#TableEducation').DataTable({
         dom:
             '<"row me-2"' +
             '<"col-md-2"<"me-3"l>>' +
@@ -180,7 +180,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "portfolio/about/",
+            url: "portfolio/education/",
             type: 'GET'
         },
         columns: [{
@@ -214,40 +214,20 @@ $(document).ready(function () {
               name: 'subtitle'
             },
             {
+              data: 'institution',
+              name: 'institution'
+            },
+            {
               data: 'description',
               name: 'description'
             },
             {
-              data: 'address',
-              name: 'address'
+              data: 'year',
+              name: 'year'
             },
             {
-              data: 'phone',
-              name: 'phone'
-            },
-            {
-              data: 'email',
-              name: 'email'
-            },
-            {
-              data: 'facebook',
-              name: 'facebook'
-            },
-            {
-              data: 'instagram',
-              name: 'instagram'
-            },
-            {
-              data: 'twitter',
-              name: 'twitter'
-            },
-            {
-              data: 'tiktok',
-              name: 'tiktok'
-            },
-            {
-              data: 'youtube',
-              name: 'youtube'
+              data: 'created_by',
+              name: 'created_by'
             },
             {
                 data: 'aksi',
@@ -285,12 +265,12 @@ $(document).ready(function () {
         dropdownParent: $('#tambahModal')
     });
 
-    $('#formAbout').on('submit', function(e){
+    $('#formEducation').on('submit', function(e){
         e.preventDefault();
 
         // Clear previous errors
-        $('#formAbout .form-control, #formAbout .form-select').removeClass('is-invalid');
-        $('#formAbout .text-danger.small').text('');
+        $('#formEducation .form-control, #formEducation .form-select').removeClass('is-invalid');
+        $('#formEducation .text-danger.small').text('');
         setTinyMCEError(false);
 
         // Trigger TinyMCE to save content to textarea
@@ -304,11 +284,11 @@ $(document).ready(function () {
         let method = '';
 
         if(id){
-            url = '/portfolio/about/update/' + id;
+            url = '/portfolio/education/update/' + id;
             method = 'POST';
             formData.append('_method', 'PUT');
         } else {
-            url = '/portfolio/about/store';
+            url = '/portfolio/education/store';
             method = 'POST';
         }
 
@@ -321,7 +301,7 @@ $(document).ready(function () {
             success: function(response){
                 if (response.status === 200) {
                     $('#tambahModal').modal('hide');
-                    $('#TableAbout').DataTable().ajax.reload();
+                    $('#TableEducation').DataTable().ajax.reload();
                     toastr.success('Data berhasil disimpan!');
                 } else {
                     toastr.error('Terjadi kesalahan, silakan coba lagi!');
@@ -331,8 +311,8 @@ $(document).ready(function () {
               if (xhr.status === 422) {
                   let errors = xhr.responseJSON.errors;
                   // Clear previous errors
-                  $('#formAbout .form-control, #formAbout .form-select').removeClass('is-invalid');
-                  $('#formAbout .text-danger.small').text('');
+                  $('#formEducation .form-control, #formEducation .form-select').removeClass('is-invalid');
+                  $('#formEducation .text-danger.small').text('');
                   setTinyMCEError(false);
                   
                   $.each(errors, function (key, value) {
@@ -352,13 +332,13 @@ $(document).ready(function () {
     });
 
     $('#tambahModal').on('hidden.bs.modal', function () {
-        $('#formAbout')[0].reset();
+        $('#formEducation')[0].reset();
         $('#id').val('');
-        $('#modal-judul').text('Tambah Tentang Saya');
+        $('#modal-judul').text('Tambah Pendidikan');
         
         // Clear errors
-        $('#formAbout .form-control, #formAbout .form-select').removeClass('is-invalid');
-        $('#formAbout .text-danger.small').text('');
+        $('#formEducation .form-control, #formEducation .form-select').removeClass('is-invalid');
+        $('#formEducation .text-danger.small').text('');
         setTinyMCEError(false);
         
         // Clear TinyMCE content
@@ -370,41 +350,35 @@ $(document).ready(function () {
 
 function editAbout(id) {
     // Clear previous errors
-    $('#formAbout .form-control, #formAbout .form-select').removeClass('is-invalid');
-    $('#formAbout .text-danger.small').text('');
+    $('#formEducation .form-control, #formEducation .form-select').removeClass('is-invalid');
+    $('#formEducation .text-danger.small').text('');
     setTinyMCEError(false);
 
     $.ajax({
-        url: '/portfolio/about/edit/' + id,
+        url: '/portfolio/education/edit/' + id,
         type: 'GET',
         success: function(response) {
             if (response.success) {
-                let about = response.about;
-                $('#id').val(about.id);
-                $('#title').val(about.title);
-                $('#subtitle').val(about.subtitle);
+                let education = response.education;
+                $('#id').val(education.id);
+                $('#title').val(education.title);
+                $('#subtitle').val(education.subtitle);
                 
                 // Set content to TinyMCE editor
                 if (tinymce.get('description')) {
-                    tinymce.get('description').setContent(about.description || '');
+                    tinymce.get('description').setContent(education.description || '');
                 } else {
-                    $('#description').val(about.description);
+                    $('#description').val(education.description);
                 }
                 
-                $('#address').val(about.address);
-                $('#phone').val(about.phone);
-                $('#email').val(about.email);
-                $('#facebook').val(about.facebook);
-                $('#instagram').val(about.instagram);
-                $('#twitter').val(about.twitter);
-                $('#tiktok').val(about.tiktok);
-                $('#youtube').val(about.youtube);
-                $('#video').val(about.video);
+                $('#institution').val(education.institution);
+                $('#year').val(education.year);
 
-                $('#modal-judul').text('Edit Tentang Saya');
+
+                $('#modal-judul').text('Edit Pendidikan');
                 $('#tambahModal').modal('show');
             } else {
-                toastr.error('Data about tidak ditemukan.');
+                toastr.error('Data education tidak ditemukan.');
             }
         },
         error: function() {
@@ -418,7 +392,7 @@ $(document).on('click', '.delete-record', function () {
 
     Swal.fire({
         title: 'Apakah Anda yakin?',
-        text: "Data about akan dihapus!",
+        text: "Data education akan dihapus!",
         icon: 'warning',
         customClass: {
             confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
@@ -433,7 +407,7 @@ $(document).on('click', '.delete-record', function () {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/portfolio/about/delete/' + id,
+                url: '/portfolio/education/delete/' + id,
                 type: 'DELETE',
                 data: {
                     _method: 'DELETE',
@@ -449,7 +423,7 @@ $(document).on('click', '.delete-record', function () {
                               confirmButton: 'btn btn-success waves-effect waves-light'
                             }
                         });
-                        $('#TableAbout').DataTable().ajax.reload();
+                        $('#TableEducation').DataTable().ajax.reload();
                     } else {
                         Swal.fire(
                             'Error!',
