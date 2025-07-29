@@ -17,7 +17,13 @@ class RolePermissionController extends Controller
         // Menampilkan Data role
         $role        = Role::with('permissions')->get();
         $menuGroups  = MenuGroup::all();
-        $menuDetails = MenuDetail::all();
+
+        // Ambil semua menuGroup ID
+        $menuGroupIds = $menuGroups->pluck('id')->toArray();
+
+        // Ambil menuDetails yang hanya dimiliki oleh menuGroups saja
+        $menuDetails = MenuDetail::whereIn('menu_group_id', $menuGroupIds)->get();
+
         $permissions = Permission::with(['roles', 'menuGroups', 'menuDetails'])->get();
         // dd($permissions->toArray());
 

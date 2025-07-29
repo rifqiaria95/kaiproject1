@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             VendorSeeder::class,
             UserSeeder::class,
+            NewsSeeder::class,
         ]);
 
         Pelanggan::factory(10)->create();

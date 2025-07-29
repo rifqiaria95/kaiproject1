@@ -168,7 +168,7 @@ $(document).ready(function () {
               ]
             },
             {
-              text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Tentang Saya</span>',
+              text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Pendidikan</span>',
               className: 'add-new btn btn-primary waves-effect waves-light',
               attr: {
                 'data-bs-toggle': 'modal',
@@ -233,25 +233,25 @@ $(document).ready(function () {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
-                    let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit_profile");
-                    let canDelete       = userPermissions.includes("delete_profile");
+                  let userPermissions = window.userPermissions || [];
+                  let canEdit         = userPermissions.includes("edit_education");
+                  let canDelete       = userPermissions.includes("delete_education");
 
-                    let buttons = '<div class="d-flex align-items-center">';
+                  let buttons = '<div class="d-flex align-items-center">';
 
+                  buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                    buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canEdit) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
-                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        if (canDelete) {
-                            buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
-                        }
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="editAbout(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
-                        buttons += '</div>';
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="editEducation(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     }
-
+                    if (canDelete) {
+                      buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                    }
                     buttons += '</div>';
 
-                    return buttons;
+                  buttons += '</div>';
+
+                  return buttons;
                 }
             }
         ],
@@ -348,7 +348,7 @@ $(document).ready(function () {
     });
 });
 
-function editAbout(id) {
+function editEducation(id) {
     // Clear previous errors
     $('#formEducation .form-control, #formEducation .form-select').removeClass('is-invalid');
     $('#formEducation .text-danger.small').text('');

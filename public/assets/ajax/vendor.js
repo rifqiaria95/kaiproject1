@@ -203,25 +203,22 @@ $('#TablePelanggan').DataTable({
             name: 'aksi',
             render: function (data, type, full, meta) {
                 let userPermissions = window.userPermissions || [];
-                let canEdit         = userPermissions.includes("edit vendor");
-                let canDelete       = userPermissions.includes("delete vendor");
+                let canEdit         = userPermissions.includes("edit_vendor");
+                let canDelete       = userPermissions.includes("delete_vendor");
 
                 let buttons = '<div class="d-flex align-items-center">';
 
-                if (canDelete) {
-                    buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
-                }
-
-                buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
-
-                if (canEdit) {
-                    buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                     buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                    buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(\'' + full.id + '\')">Edit</a>';
+                    if (canEdit) {
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="editVendor(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
+                    }
+                    if (canDelete) {
+                      buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                    }
                     buttons += '</div>';
-                }
 
-                buttons += '</div>';
+                  buttons += '</div>';
 
                 return buttons;
             }

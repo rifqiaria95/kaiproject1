@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/satuan/",
+            url: "/inventory/unit/",
             type: 'GET'
         },
         columns: [
@@ -204,25 +204,22 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                     let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit satuan");
-                    let canDelete       = userPermissions.includes("delete satuan");
+                    let canEdit         = userPermissions.includes("edit_unit");
+                    let canDelete       = userPermissions.includes("delete_unit");
 
                     let buttons = '<div class="d-flex align-items-center">';
 
-                    if (canDelete) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
-                    }
-
-                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
-
+                    buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                    buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canEdit) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
-                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
-                        buttons += '</div>';
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     }
-
+                    if (canDelete) {
+                      buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                    }
                     buttons += '</div>';
+
+                  buttons += '</div>';
 
                     return buttons;
                 }
@@ -252,7 +249,7 @@ $(document).ready(function () {
             $('#btn-update').val('update');
 
             $.ajax({
-                url: `/satuan/edit/${id}/`, // Pastikan route ini benar
+                url: `/inventory/unit/edit/${id}/`, // Pastikan route ini benar
                 type: "GET",
                 success: function (response) {
                     if (response.success) {
@@ -280,11 +277,11 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
         let id       = $("#id").val();
-        let url      = "/satuan/store";
+        let url      = "/inventory/unit/store";
         let method   = "POST";
 
         if (id) {
-            url = "/satuan/update/" + id;
+            url = "/inventory/unit/update/" + id;
             formData.append("_method", "PUT");
         }
 
@@ -329,7 +326,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/satuan/delete/' + id,
+                    url: '/inventory/unit/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',

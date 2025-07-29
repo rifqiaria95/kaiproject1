@@ -224,28 +224,25 @@ $(document).ready(function () {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
-                    let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes('edit_permission');
-                    let canDelete       = userPermissions.includes('delete_permission');
+                  let userPermissions = window.userPermissions || [];
+                  let canEdit         = userPermissions.includes("edit_permission");
+                  let canDelete       = userPermissions.includes("delete_permission");
 
-                    let buttons = '<div class="d-flex align-items-center">';
+                  let buttons = '<div class="d-flex align-items-center">';
 
-                    if (canDelete) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i></a>';
-                    }
-
-                    buttons += '<a href="' + data + '" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill"><i class="ti ti-eye ti-md"></i></a>';
-
+                  buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                    buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canEdit) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
-                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')">Edit</a>';
-                        buttons += '</div>';
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     }
-
+                    if (canDelete) {
+                      buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                    }
                     buttons += '</div>';
 
-                    return buttons;
+                  buttons += '</div>';
+
+                  return buttons;
                 }
             }
         ],
@@ -257,6 +254,47 @@ $(document).ready(function () {
 
     $('.select2').select2({
         dropdownParent: $('#tambahModal')
+    });
+
+    // Event listener untuk menu_groups yang akan mengupdate menu_details
+    $('#menu_groups').on('change', function() {
+        let menuGroupId = $(this).val();
+        let menuDetailsSelect = $('#menu_details');
+        
+        // Reset menu_details select
+        menuDetailsSelect.empty().append('<option selected disabled>Pilih Menu Details</option>');
+        
+        if (menuGroupId && menuGroupId !== '') {
+            // Show loading state
+            menuDetailsSelect.prop('disabled', true);
+            
+            // Ambil menu details berdasarkan menu group yang dipilih
+            $.ajax({
+                url: 'admin/permission/get-menu-details-by-group',
+                type: 'GET',
+                data: {
+                    menu_group_id: menuGroupId
+                },
+                success: function(response) {
+                    if (response && response.length > 0) {
+                        $.each(response, function(index, item) {
+                            menuDetailsSelect.append(`<option value="${item.id}">${item.name}</option>`);
+                        });
+                    } else {
+                        menuDetailsSelect.append('<option disabled>Tidak ada menu details untuk group ini</option>');
+                    }
+                    menuDetailsSelect.prop('disabled', false);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching menu details:', error);
+                    menuDetailsSelect.append('<option disabled>Error loading menu details</option>');
+                    menuDetailsSelect.prop('disabled', false);
+                    toastr.error('Gagal mengambil data menu details!');
+                }
+            });
+        } else {
+            menuDetailsSelect.prop('disabled', false);
+        }
     });
 
     window.ViewData = function (id) {
@@ -272,6 +310,9 @@ $(document).ready(function () {
             // Reset Select2
             $("#menu_groups").val("").trigger("change");
             $("#menu_details").val("").trigger("change");
+            
+            // Reset menu_details options
+            $("#menu_details").empty().append('<option selected disabled>Pilih Menu Details</option>');
 
         } else {
             // Mode Edit (Ambil data dari API)
@@ -286,11 +327,20 @@ $(document).ready(function () {
                     if (response.success) {
                         $("#id").val(response.permission.id);
                         $("#name").val(response.permission.name);
+                        
+                        // Set menu_groups terlebih dahulu
                         $("#menu_groups").val(response.permission.menu_groups).trigger("change");
-                        $("#menu_details").val(response.permission.menu_details).trigger("change");
+                        
+                        // Tunggu sebentar agar event change menu_groups selesai, lalu set menu_details
+                        setTimeout(function() {
+                            if (response.permission.menu_details && response.permission.menu_details.length > 0) {
+                                $("#menu_details").val(response.permission.menu_details).trigger("change");
+                            }
+                        }, 1000); // Increase timeout to ensure menu details are loaded
                     }
                 },
-                error: function () {
+                error: function (xhr, status, error) {
+                    console.error('Error fetching permission data:', error);
                     toastr.error('Gagal mengambil data!');
                 }
             });
@@ -324,6 +374,9 @@ $(document).ready(function () {
 
                     $("#menu_groups").prop("selectedIndex", 0).trigger("change");
                     $("#menu_details").prop("selectedIndex", 0).trigger("change");
+                    
+                    // Reset menu_details options
+                    $("#menu_details").empty().append('<option selected disabled>Pilih Menu Details</option>');
 
                     toastr.success(response.message);
                     $("#TablePermission").DataTable().ajax.reload(null, false);

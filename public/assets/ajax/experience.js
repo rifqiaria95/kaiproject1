@@ -1,4 +1,7 @@
 $(document).ready(function () {
+    $('.select2').select2({
+        dropdownParent: $('#tambahModal')
+    });
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -8,7 +11,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $('#TablePerusahaan').DataTable({
+    $('#TableExperience').DataTable({
         dom:
             '<"row me-2"' +
             '<"col-md-2"<"me-3"l>>' +
@@ -165,7 +168,7 @@ $(document).ready(function () {
               ]
             },
             {
-              text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Perusahaan</span>',
+              text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Pengalaman</span>',
               className: 'add-new btn btn-primary waves-effect waves-light',
               attr: {
                 'data-bs-toggle': 'modal',
@@ -177,57 +180,81 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/company/perusahaan/",
+            url: "portfolio/experience/",
             type: 'GET'
         },
         columns: [{
               data: null,
-              name: 'id',
+              name: 'no_urut',
+              title: 'No',
+              orderable: false,
+              searchable: false,
               render: function (data, type, full, meta) {
-                  return meta.row + 1;
+                  // Mengembalikan nomor urut otomatis berdasarkan index baris
+                  return meta.row + meta.settings._iDisplayStart + 1;
               }
             },
             {
-              data: 'logo_perusahaan',
-              name: 'logo_perusahaan',
+              data: 'image',
+              name: 'image',
               render: function (data, type, full, meta) {
                   if (data) {
-                    return '<img src="' + window.images_path + '/' + data + '" alt="Logo Perusahaan" class="img-fluid" style="width: 30px; height: 30px;">';
+                    return '<img src="' + window.images_path + '/' + data + '" alt="Image" class="img-fluid" style="width: 30px; height: 30px;">';
                   } else {
-                    return '<img src="https://via.placeholder.com/50" alt="Logo Perusahaan" class="img-fluid" style="width: 30px; height: 30px;">';
+                    return '<img src="https://via.placeholder.com/50" alt="Image" class="img-fluid" style="width: 30px; height: 30px;">';
                   }
               }
             },
             {
-              data: 'nama_perusahaan',
-              name: 'nama_perusahaan'
+              data: 'title',
+              name: 'title'
             },
             {
-              data: 'alamat_perusahaan',
-              name: 'alamat_perusahaan'
+              data: 'subtitle',
+              name: 'subtitle'
             },
             {
-              data: 'no_telp_perusahaan',
-              name: 'no_telp_perusahaan'
+              data: 'company',
+              name: 'company'
             },
             {
-              data: 'email_perusahaan',
-              name: 'email_perusahaan'
+              data: 'description',
+              name: 'description',
+                render: function (data, type, full, meta) {
+                    // Tampilkan maksimal 3 kata saja, lalu tambahkan "..."
+                    if (!data) return '';
+                    // Hilangkan tag HTML jika ada
+                    let text = $('<div>').html(data).text();
+                    let words = text.trim().split(/\s+/);
+                    if (words.length > 3) {
+                        return words.slice(0, 3).join(' ') + ' ...';
+                    } else {
+                        return text;
+                    }
+                }
+            },
+            {
+              data: 'year',
+              name: 'year'
+            },
+            {
+              data: 'created_by',
+              name: 'created_by'
             },
             {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
-                    let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit_perusahaan");
-                    let canDelete       = userPermissions.includes("delete_perusahaan");
+                  let userPermissions = window.userPermissions || [];
+                  let canEdit         = userPermissions.includes("edit_experience");
+                  let canDelete       = userPermissions.includes("delete_experience");
 
-                    let buttons = '<div class="d-flex align-items-center">';
+                  let buttons = '<div class="d-flex align-items-center">';
 
-                    buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                  buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                     buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canEdit) {
-                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="editPerusahaan(\'' + full.id + '\')"><i class="ti ti-edit ti-md"></i>Edit</a>';
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="editExperience(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     }
                     if (canDelete) {
                       buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
@@ -236,7 +263,7 @@ $(document).ready(function () {
 
                   buttons += '</div>';
 
-                    return buttons;
+                  return buttons;
                 }
             }
         ],
@@ -250,11 +277,18 @@ $(document).ready(function () {
         dropdownParent: $('#tambahModal')
     });
 
-    $('#formPerusahaan').on('submit', function(e){
+    $('#formExperience').on('submit', function(e){
         e.preventDefault();
 
-        $('#formPerusahaan .form-control, #formPerusahaan .form-select').removeClass('is-invalid');
-        $('#formPerusahaan .text-danger.small').text('');
+        // Clear previous errors
+        $('#formExperience .form-control, #formExperience .form-select').removeClass('is-invalid');
+        $('#formExperience .text-danger.small').text('');
+        setTinyMCEError(false);
+
+        // Trigger TinyMCE to save content to textarea
+        if (tinymce.get('description')) {
+            tinymce.get('description').save();
+        }
 
         let formData = new FormData(this);
         let id = $('#id').val();
@@ -262,11 +296,11 @@ $(document).ready(function () {
         let method = '';
 
         if(id){
-            url = '/company/perusahaan/update/' + id;
+            url = '/portfolio/experience/update/' + id;
             method = 'POST';
             formData.append('_method', 'PUT');
         } else {
-            url = '/company/perusahaan/store';
+            url = '/portfolio/experience/store';
             method = 'POST';
         }
 
@@ -279,7 +313,7 @@ $(document).ready(function () {
             success: function(response){
                 if (response.status === 200) {
                     $('#tambahModal').modal('hide');
-                    $('#TablePerusahaan').DataTable().ajax.reload();
+                    $('#TableExperience').DataTable().ajax.reload();
                     toastr.success('Data berhasil disimpan!');
                 } else {
                     toastr.error('Terjadi kesalahan, silakan coba lagi!');
@@ -288,9 +322,19 @@ $(document).ready(function () {
             error: function (xhr) {
               if (xhr.status === 422) {
                   let errors = xhr.responseJSON.errors;
+                  // Clear previous errors
+                  $('#formExperience .form-control, #formExperience .form-select').removeClass('is-invalid');
+                  $('#formExperience .text-danger.small').text('');
+                  setTinyMCEError(false);
+                  
                   $.each(errors, function (key, value) {
                       $('#' + key).addClass('is-invalid');
                       $('#' + key + '-error').text(value[0]);
+                      
+                      // Handle TinyMCE error styling
+                      if (key === 'description') {
+                          setTinyMCEError(true);
+                      }
                   });
               } else {
                   toastr.error('Gagal menyimpan data!');
@@ -300,33 +344,53 @@ $(document).ready(function () {
     });
 
     $('#tambahModal').on('hidden.bs.modal', function () {
-        $('#formPerusahaan')[0].reset();
+        $('#formExperience')[0].reset();
         $('#id').val('');
-        $('#modal-judul').text('Tambah Perusahaan');
-        $('#formPerusahaan .form-control, #formPerusahaan .form-select').removeClass('is-invalid');
-        $('#formPerusahaan .text-danger.small').text('');
+        $('#modal-judul').text('Tambah Pengalaman');
+        
+        // Clear errors
+        $('#formExperience .form-control, #formExperience .form-select').removeClass('is-invalid');
+        $('#formExperience .text-danger.small').text('');
+        setTinyMCEError(false);
+        
+        // Clear TinyMCE content
+        if (tinymce.get('description')) {
+            tinymce.get('description').setContent('');
+        }
     });
 });
 
-function editPerusahaan(id) {
-    $('#formPerusahaan .form-control, #formPerusahaan .form-select').removeClass('is-invalid');
-    $('#formPerusahaan .text-danger.small').text('');
+function editExperience(id) {
+    // Clear previous errors
+    $('#formExperience .form-control, #formExperience .form-select').removeClass('is-invalid');
+    $('#formExperience .text-danger.small').text('');
+    setTinyMCEError(false);
 
     $.ajax({
-        url: '/company/perusahaan/edit/' + id,
+        url: '/portfolio/experience/edit/' + id,
         type: 'GET',
         success: function(response) {
             if (response.success) {
-                let perusahaan = response.perusahaan;
-                $('#id').val(perusahaan.id);
-                $('#nama_perusahaan').val(perusahaan.nama_perusahaan);
-                $('#alamat_perusahaan').val(perusahaan.alamat_perusahaan);
-                $('#email_perusahaan').val(perusahaan.email_perusahaan);
-                $('#no_telp_perusahaan').val(perusahaan.no_telp_perusahaan);
-                $('#modal-judul').text('Edit Perusahaan');
+                let experience = response.experience;
+                $('#id').val(experience.id);
+                $('#title').val(experience.title);
+                $('#subtitle').val(experience.subtitle);
+                
+                // Set content to TinyMCE editor
+                if (tinymce.get('description')) {
+                    tinymce.get('description').setContent(experience.description || '');
+                } else {
+                    $('#description').val(experience.description);
+                }
+                
+                $('#company').val(experience.company);
+                $('#year').val(experience.year);
+
+
+                $('#modal-judul').text('Edit Pengalaman');
                 $('#tambahModal').modal('show');
             } else {
-                toastr.error('Data perusahaan tidak ditemukan.');
+                toastr.error('Data experience tidak ditemukan.');
             }
         },
         error: function() {
@@ -340,7 +404,7 @@ $(document).on('click', '.delete-record', function () {
 
     Swal.fire({
         title: 'Apakah Anda yakin?',
-        text: "Data perusahaan akan dihapus!",
+        text: "Data experience akan dihapus!",
         icon: 'warning',
         customClass: {
             confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
@@ -355,7 +419,7 @@ $(document).on('click', '.delete-record', function () {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/company/perusahaan/delete/' + id,
+                url: '/portfolio/experience/delete/' + id,
                 type: 'DELETE',
                 data: {
                     _method: 'DELETE',
@@ -371,7 +435,7 @@ $(document).on('click', '.delete-record', function () {
                               confirmButton: 'btn btn-success waves-effect waves-light'
                             }
                         });
-                        $('#TablePerusahaan').DataTable().ajax.reload();
+                        $('#TableExperience').DataTable().ajax.reload();
                     } else {
                         Swal.fire(
                             'Error!',

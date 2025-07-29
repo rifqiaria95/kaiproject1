@@ -206,25 +206,25 @@ $(document).ready(function () {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
-                    let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit_knowledge");
-                    let canDelete       = userPermissions.includes("delete_knowledge");
+                  let userPermissions = window.userPermissions || [];
+                  let canEdit         = userPermissions.includes("edit_knowledge");
+                  let canDelete       = userPermissions.includes("delete_knowledge");
 
-                    let buttons = '<div class="d-flex align-items-center">';
+                  let buttons = '<div class="d-flex align-items-center">';
 
+                  buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                    buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canEdit) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
-                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        if (canDelete) {
-                            buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
-                        }
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
-                        buttons += '</div>';
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     }
-
+                    if (canDelete) {
+                      buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                    }
                     buttons += '</div>';
 
-                    return buttons;
+                  buttons += '</div>';
+
+                  return buttons;
                 }
             }
         ],

@@ -147,7 +147,6 @@
                                             @endforeach
                                         </select>
                                     </div>
-
                                     <div class="col-md-12">
                                         <label class="form-label">Menu Details</label>
                                         <select id="menu_details" name="menu_details" class="select2 form-select">

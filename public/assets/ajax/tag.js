@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/tag/",
+            url: "/portfolio/news/tag/",
             type: 'GET'
         },
         columns: [
@@ -254,7 +254,7 @@ $(document).ready(function () {
         $('.text-danger').text('');
 
         $.ajax({
-            url: `/tag/edit/${id}/`,
+            url: `/portfolio/news/tag/edit/${id}/`,
             type: "GET",
             success: function (response) {
                 if (response.success) {
@@ -284,11 +284,11 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
         let id       = $("#id").val();
-        let url      = "/tag/store";
+        let url      = "/portfolio/news/tag/store";
         let method   = "POST";
 
         if (id) {
-            url = "/tag/update/" + id;
+            url = "/portfolio/news/tag/update/" + id;
             formData.append("_method", "PUT");
         }
 
@@ -341,7 +341,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/tag/delete/' + id,
+                    url: '/portfolio/news/tag/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',

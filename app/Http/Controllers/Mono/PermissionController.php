@@ -157,6 +157,20 @@ class PermissionController extends Controller
         return response()->json($menuDetails);
     }
 
+    public function getMenuDetailsByGroup(Request $request)
+    {
+        $menuGroupId = $request->input('menu_group_id');
+        
+        if (!$menuGroupId) {
+            return response()->json([]);
+        }
+
+        $menuDetails = MenuDetail::where('menu_group_id', $menuGroupId)
+            ->select('id', 'name')
+            ->get();
+
+        return response()->json($menuDetails);
+    }
 
 
 }

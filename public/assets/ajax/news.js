@@ -183,108 +183,133 @@ $(document).ready(function () {
             url: "portfolio/news/",
             type: 'GET'
         },
-        columns: [{
-              data: null,
-              name: 'no_urut',
-              title: 'No',
-              orderable: false,
-              searchable: false,
-              render: function (data, type, full, meta) {
-                  // Mengembalikan nomor urut otomatis berdasarkan index baris
-                  return meta.row + meta.settings._iDisplayStart + 1;
-              }
-            },
+        columns: [
             {
-              data: 'thumbnail',
-              name: 'thumbnail',
-              render: function (data, type, full, meta) {
-                  if (data) {
-                    return '<img src="' + window.images_path + '/' + data + '" alt="Thumbnail" class="img-fluid" style="width: 30px; height: 30px;">';
-                  } else {
-                    return '<img src="https://via.placeholder.com/50" alt="Thumbnail" class="img-fluid" style="width: 30px; height: 30px;">';
-                  }
-              }
-            },
-            {
-              data: 'title',
-              name: 'title'
-            },
-            {
-              data: 'slug',
-              name: 'slug'
-            },
-            {
-              data: 'content',
-              name: 'content'
-            },
-            {
-              data: 'summary',
-              name: 'summary'
-            },
-            {
-              data: 'author',
-              name: 'author'
-            },
-            {
-              data: 'category',
-              name: 'category'
-            },
-            {
-              data: 'tags',
-              name: 'tags'
-            },
-            {
-              data: 'status',
-              name: 'status',
-              render: function (data, type, full, meta) {
-                let labelClass = '';
-                let labelText = '';
-                if (data === 'draft') {
-                  labelClass = 'badge bg-dark';
-                  labelText = 'Draft';
-                } else if (data === 'archived') {
-                  labelClass = 'badge bg-secondary';
-                  labelText = 'Archived';
-                } else if (data === 'published') {
-                  labelClass = 'badge bg-success';
-                  labelText = 'Published';
-                } else {
-                  labelClass = 'badge bg-light';
-                  labelText = data;
+                data: null,
+                name: 'no_urut',
+                title: 'No',
+                orderable: false,
+                searchable: false,
+                render: function (data, type, full, meta) {
+                    // Mengembalikan nomor urut otomatis berdasarkan index baris
+                    return meta.row + meta.settings._iDisplayStart + 1;
                 }
-                return '<span class="' + labelClass + '">' + labelText + '</span>';
-              }
             },
             {
-              data: 'published_at',
-              name: 'published_at'
+                data: 'thumbnail',
+                name: 'thumbnail',
+                render: function (data, type, full, meta) {
+                    if (data) {
+                        return '<img src="' + window.images_path + '/' + data + '" alt="Thumbnail" class="img-fluid" style="width: 30px; height: 30px;">';
+                    } else {
+                        return '<img src="https://via.placeholder.com/50" alt="Thumbnail" class="img-fluid" style="width: 30px; height: 30px;">';
+                    }
+                }
+            },
+            {
+                data: 'title',
+                name: 'title'
+            },
+            {
+                data: 'slug',
+                name: 'slug'
+            },
+            {
+                data: 'content',
+                name: 'content',
+                render: function (data, type, full, meta) {
+                    // Tampilkan maksimal 3 kata saja, lalu tambahkan "..."
+                    if (!data) return '';
+                    // Hilangkan tag HTML jika ada
+                    let text = $('<div>').html(data).text();
+                    let words = text.trim().split(/\s+/);
+                    if (words.length > 3) {
+                        return words.slice(0, 3).join(' ') + ' ...';
+                    } else {
+                        return text;
+                    }
+                }
+            },
+            {
+                data: 'summary',
+                name: 'summary',
+                render: function (data, type, full, meta) {
+                    // Tampilkan maksimal 3 kata saja, lalu tambahkan "..."
+                    if (!data) return '';
+                    // Hilangkan tag HTML jika ada
+                    let text = $('<div>').html(data).text();
+                    let words = text.trim().split(/\s+/);
+                    if (words.length > 3) {
+                        return words.slice(0, 3).join(' ') + ' ...';
+                    } else {
+                        return text;
+                    }
+                }
+            },
+            {
+                data: 'author',
+                name: 'author'
+            },
+            {
+                data: 'category',
+                name: 'category'
+            },
+            {
+                data: 'tags',
+                name: 'tags'
+            },
+            {
+                data: 'status',
+                name: 'status',
+                render: function (data, type, full, meta) {
+                    let labelClass = '';
+                    let labelText = '';
+                    if (data === 'draft') {
+                        labelClass = 'badge bg-dark';
+                        labelText = 'Draft';
+                    } else if (data === 'archived') {
+                        labelClass = 'badge bg-secondary';
+                        labelText = 'Archived';
+                    } else if (data === 'published') {
+                        labelClass = 'badge bg-success';
+                        labelText = 'Published';
+                    } else {
+                        labelClass = 'badge bg-light';
+                        labelText = data;
+                    }
+                    return '<span class="' + labelClass + '">' + labelText + '</span>';
+                }
+            },
+            {
+                data: 'published_at',
+                name: 'published_at'
             },
             {
                 data: 'aksi',
                 name: 'aksi',
                 render: function (data, type, full, meta) {
-                    let userPermissions = window.userPermissions || [];
-                    let canEdit         = userPermissions.includes("edit_jenis_program");
-                    let canDelete       = userPermissions.includes("delete_jenis_program");
+                  let userPermissions = window.userPermissions || [];
+                  let canEdit         = userPermissions.includes("edit_news");
+                  let canDelete       = userPermissions.includes("delete_news");
 
-                    let buttons = '<div class="d-flex align-items-center">';
+                  let buttons = '<div class="d-flex align-items-center">';
 
+                  buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
+                    buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canEdit) {
-                        buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
-                        buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
-                        if (canDelete) {
-                            buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
-                        }
-                        buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
-                        buttons += '</div>';
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     }
-
+                    if (canDelete) {
+                      buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
+                    }
                     buttons += '</div>';
 
-                    return buttons;
+                  buttons += '</div>';
+
+                  return buttons;
                 }
             }
-        ],
+        ],  
         order: [
             [0, 'asc']
         ],

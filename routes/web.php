@@ -20,22 +20,23 @@ use App\Http\Controllers\Mono\PegawaiController;
 use App\Http\Controllers\Mono\ProgramController;
 use App\Http\Controllers\Mono\KategoriController;
 use App\Http\Controllers\Mono\DashboardController;
+use App\Http\Controllers\Mono\EducationController;
 use App\Http\Controllers\Mono\MenuGroupController;
 use App\Http\Controllers\Mono\PelangganController;
 use App\Http\Controllers\Mono\DepartemenController;
+use App\Http\Controllers\Mono\ExperienceController;
 use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\PermissionController;
 use App\Http\Controllers\Mono\PerusahaanController;
 use App\Http\Controllers\Mono\ProgramReqController;
 use App\Http\Controllers\Ext\RegistrationController;
+use App\Http\Controllers\Mono\KnowledgeController;  
 use App\Http\Controllers\Mono\JenisProgramController;
 use App\Http\Controllers\Mono\ProgramRegistController;
 use App\Http\Controllers\Mono\SubMenuDetailController;
 use App\Http\Controllers\Mono\RolePermissionController;
-use App\Http\Controllers\Mono\KnowledgeController;  
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Ext\ProgramRegistController as ExtProgramRegistController;
-use App\Http\Controllers\Mono\EducationController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -65,7 +66,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/ext-dashboard', [DashboardController::class, 'extDashboard'])->name('ext-dashboard');
 
     // Route User
-    Route::prefix('satuan')->name('satuan.')->group(function () {
+    Route::prefix('inventory/unit')->name('unit.')->group(function () {
         Route::get('/', [UnitController::class, 'index'])->name('index');
         Route::post('/store', [UnitController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [UnitController::class, 'edit'])->name('edit');
@@ -270,7 +271,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Route Tag
-    Route::prefix('tag')->name('tag.')->group(function () {
+    Route::prefix('portfolio/news/tag')->name('tag.')->group(function () {
         Route::get('/', [TagController::class, 'index'])->name('index');
         Route::post('/store', [TagController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [TagController::class, 'edit'])->name('edit');
@@ -279,7 +280,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Route Pelanggan
-    Route::prefix('pelanggan')->name('pelanggan.')->group(function () {
+    Route::prefix('sales/customer')->name('sales/customer.')->group(function () {
         Route::get('/', [PelangganController::class, 'index'])->name('index');
         Route::post('/store', [PelangganController::class, 'store'])->name('store');
         Route::get('/edit/{id:uuid}', [PelangganController::class, 'edit'])->name('edit');
@@ -357,6 +358,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->middleware('permission:delete_education');
     });
 
+    // Route Experience
+    Route::prefix('portfolio/experience')->name('experience.')->group(function () {
+        Route::get('/', [ExperienceController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_experience');
+        Route::post('/store', [ExperienceController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_experience');
+        Route::get('/edit/{id}', [ExperienceController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_experience');
+        Route::put('/update/{id}', [ExperienceController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_experience');
+        Route::delete('/delete/{id}', [ExperienceController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_experience');
+    });
+
     // Route User
     Route::prefix('/admin/users')->name('user.')->group(function () {
         Route::get('/profile/{id}', [UserController::class, 'profile'])->name('profile');
@@ -411,6 +431,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::get('/permissions', [PermissionController::class, 'getPermissions']);
         Route::get('/get-menu-groups', [PermissionController::class, 'getMenuGroups'])->name('get.menu.groups');
         Route::get('/get-menu-details', [PermissionController::class, 'getMenuDetails'])->name('get.menu.details');
+        Route::get('/get-menu-details-by-group', [PermissionController::class, 'getMenuDetailsByGroup'])->name('get.menu.details.by.group');
 
     });
 
