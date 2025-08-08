@@ -18,7 +18,12 @@ class ProgramController extends Controller
         // Menampilkan Data pelanggan
         $program       = Program::withoutTrashed()->with('jenisProgram', 'user');
         $jenis_program = JenisProgram::where('status', 'true')->get();
-        $user          = User::all();
+        // Cache data user untuk dropdown
+        $user = \Cache::remember('users_list_programs', 900, function() {
+            return User::select(['id', 'name', 'email'])
+                ->where('active', true)
+                ->get();
+        });
         // dd($pelanggan);
         if ($request->ajax()) {
             return datatables()->of($program)

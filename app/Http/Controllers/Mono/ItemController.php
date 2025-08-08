@@ -17,12 +17,23 @@ class ItemController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil semua data yang diperlukan
-        $unit_berat = UnitBerat::all();
-        $kategori   = Kategori::all();
+        // Optimasi: Cache data dropdown dan gunakan select untuk field yang diperlukan
+        $unit_berat = \Cache::remember('unit_berat_list', 1800, function() {
+            return UnitBerat::select(['id', 'nama'])->get();
+        });
+        $kategori = \Cache::remember('kategori_list', 1800, function() {
+            return Kategori::select(['id', 'nama_kategori'])->get();
+        });
 
         if ($request->ajax()) {
-            return datatables()->of(Item::with(['unit_berat', 'kategori']))
+            // Optimasi: Select hanya field yang diperlukan dan eager load dengan field spesifik
+            $items = Item::select(['id', 'nama_item', 'kd_item', 'harga_item', 'stok_item', 'id_unit_berat', 'id_kategori', 'foto_item'])
+                ->with([
+                    'unit_berat:id,nama',
+                    'kategori:id,nama_kategori'
+                ]);
+
+            return datatables()->of($items)
                 ->addColumn('stok_satuan', function ($item) {
                     return $item->unit_berat ? $item->unit_berat->nama : '-';
                 })
@@ -87,7 +98,14 @@ class ItemController extends Controller
 
     public function edit($id)
     {
-        $item = Item::with('kategori')->with('unit_berat')->where('id', $id)->first();
+        // Optimasi: Gabungkan with dan select field yang diperlukan
+        $item = Item::with([
+                'kategori:id,nama_kategori',
+                'unit_berat:id,nama'
+            ])
+            ->select(['id', 'nama_item', 'kd_item', 'harga_item', 'stok_item', 'id_unit_berat', 'id_kategori', 'foto_item'])
+            ->where('id', $id)
+            ->first();
 
         return response()->json($item);
     }

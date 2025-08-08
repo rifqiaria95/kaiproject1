@@ -32,8 +32,11 @@ class RegistrationController extends Controller
             ->whereHas('roles', function($query) {
                 $query->where('name', 'guest');
             });
-        $user_profile = UserProfile::all();
-        
+        // Cache data user profile untuk referensi
+        $user_profile = \Cache::remember('user_profiles_list', 1800, function() {
+            return UserProfile::select(['id', 'name', 'email'])->get();
+        });
+
         if ($request->ajax()) {
             return datatables()->of($user)
                 ->addColumn('email', function ($data) {
@@ -93,7 +96,7 @@ class RegistrationController extends Controller
 
             // Pastikan role 'guest' ada, jika tidak buat role baru
             $guestRole = Role::firstOrCreate(['name' => 'guest']);
-            
+
             // Assign role 'guest' menggunakan Spatie Permission
             $user->assignRole('guest');
 
@@ -149,7 +152,7 @@ class RegistrationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             return response()->json([
                 'status' => 500,
                 'message' => 'Terjadi kesalahan pada server.',
@@ -288,9 +291,9 @@ class RegistrationController extends Controller
     {
         try {
             $user = User::with('user_profile')->findOrFail($id);
-            
+
             return view('external.registration.show', compact('user'));
-            
+
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'User tidak ditemukan');
         }
@@ -300,12 +303,12 @@ class RegistrationController extends Controller
     {
         try {
             $user = User::with('user_profile')->findOrFail($id);
-            
+
             return response()->json([
                 'user' => $user,
                 'user_profile' => $user->user_profile
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -320,7 +323,7 @@ class RegistrationController extends Controller
             DB::beginTransaction();
 
             $user = User::findOrFail($id);
-            
+
             // Update user data
             $user->update([
                 'name' => $request->name,
@@ -359,7 +362,7 @@ class RegistrationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            
+
             return response()->json([
                 'status' => 500,
                 'message' => 'Terjadi kesalahan pada server.'

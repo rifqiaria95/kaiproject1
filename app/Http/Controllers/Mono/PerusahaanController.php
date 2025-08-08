@@ -13,7 +13,21 @@ class PerusahaanController extends Controller
     public function index(Request $request)
     {
         // Menampilkan Data pegawai
-        $perusahaan = Perusahaan::all();
+        if ($request->ajax()) {
+            // Optimasi: Query data hanya saat AJAX request
+            $perusahaan = Perusahaan::select(['id', 'nama_perusahaan', 'alamat_perusahaan', 'no_telp_perusahaan', 'email_perusahaan', 'created_at']);
+
+            return datatables()->of($perusahaan)
+                ->addColumn('aksi', function ($data) {
+                    $button = '';
+                    return $button;
+                })
+                ->rawColumns(['aksi'])
+                ->addIndexColumn()
+                ->toJson();
+        }
+
+        return view('internal/perusahaan.index');
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($perusahaan)

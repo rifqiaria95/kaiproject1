@@ -12,11 +12,15 @@ class PermissionController extends Controller
 {
     public function index(Request $request)
     {
-        $permissions = Permission::with(['roles', 'menuGroups', 'menuDetails'])->get();
-        $menuGroups  = MenuGroup::all();
-        $menuDetails = MenuDetail::all();
-
         if ($request->ajax()) {
+            // Optimasi: Query permissions dengan eager loading efisien
+            $permissions = Permission::select(['id', 'name', 'created_at'])
+                ->with([
+                    'roles:id,name',
+                    'menuGroups:id,name',
+                    'menuDetails:id,name'
+                ]);
+
             return datatables()->of($permissions)
                 ->addColumn('assigned_to', function ($permission) {
                     return $permission->roles ? $permission->roles->pluck('name')->toArray() : [];
@@ -30,7 +34,15 @@ class PermissionController extends Controller
                 ->toJson();
         }
 
-        return view('internal/permission.index', compact('permissions', 'menuGroups', 'menuDetails'));
+        // Cache data dropdown yang jarang berubah
+        $menuGroups = \Cache::remember('menu_groups_permissions', 1800, function() {
+            return MenuGroup::select(['id', 'name'])->get();
+        });
+        $menuDetails = \Cache::remember('menu_details_permissions', 1800, function() {
+            return MenuDetail::select(['id', 'name'])->get();
+        });
+
+        return view('internal/permission.index', compact('menuGroups', 'menuDetails'));
     }
 
     public function store(Request $request)
@@ -160,7 +172,7 @@ class PermissionController extends Controller
     public function getMenuDetailsByGroup(Request $request)
     {
         $menuGroupId = $request->input('menu_group_id');
-        
+
         if (!$menuGroupId) {
             return response()->json([]);
         }

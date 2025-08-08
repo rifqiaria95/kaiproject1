@@ -13,7 +13,21 @@ class GudangController extends Controller
     public function index(Request $request)
     {
         // Menampilkan Data pegawai
-        $gudang = Gudang::all();
+        if ($request->ajax()) {
+            // Optimasi: Query data hanya saat AJAX request
+            $gudang = Gudang::select(['id', 'nama_gudang', 'alamat_gudang', 'kapasitas', 'status', 'created_at']);
+
+            return datatables()->of($gudang)
+                ->addColumn('aksi', function ($data) {
+                    $button = '';
+                    return $button;
+                })
+                ->rawColumns(['aksi'])
+                ->addIndexColumn()
+                ->toJson();
+        }
+
+        return view('internal/gudang.index');
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($gudang)

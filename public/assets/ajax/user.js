@@ -15,6 +15,11 @@ $(document).ready(function () {
             '<"col-sm-12 col-md-6"i>' +
             '<"col-sm-12 col-md-6"p>' +
             '>',
+        deferRender: true,
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+        stateSave: true,
+        stateDuration: 300,
         language: {
             sLengthMenu: '_MENU_',
             search: '',
@@ -238,7 +243,7 @@ $(document).ready(function () {
                     $('#name').val(res.user.name);
                     $('#email').val(res.user.email);
                     $('#active').val(res.user.active);
-                    
+
                     // Reset password fields
                     $('#password').val('');
                     $('#password_confirmation').val('');
@@ -280,15 +285,15 @@ $(document).ready(function () {
                     toastr.success('Data berhasil disimpan!');
                     $('#editModal').modal('hide');
                     $('#formEdit')[0].reset();
-                    
+
                     // Clear error messages
                     $('.text-danger').remove();
                     $('.is-invalid').removeClass('is-invalid');
-                    
+
                     // Reset select2 dropdowns
                     $('#role').val('').trigger('change');
                     $('#active').val('').trigger('change');
-                    
+
                     $('#TableUser').DataTable().ajax.reload(null, false);
                 } else {
                     alert(res.errors);
@@ -297,7 +302,7 @@ $(document).ready(function () {
             error: function (xhr) {
                 if(xhr.status === 400 || xhr.status === 422) {
                     let errors = xhr.responseJSON.errors;
-                    
+
                     // Clear previous error messages
                     $('.text-danger').remove();
                     $('.is-invalid').removeClass('is-invalid');

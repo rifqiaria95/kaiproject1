@@ -24,12 +24,31 @@ class PegawaiController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data pegawai
-        $pegawai    = Pegawai::withoutTrashed()->with('user', 'jabatan', 'departemen', 'cabang', 'divisi', 'perusahaan');
-        $provinsi   = Province::all();
-        $perusahaan = Perusahaan::all();
-        $divisi     = Divisi::all();
-        $jabatan    = Jabatan::all();
+        // Menampilkan Data pegawai dengan optimasi query
+        $pegawai = Pegawai::withoutTrashed()
+            ->select(['id', 'nm_pegawai', 'no_telp_pegawai', 'status', 'foto_pegawai', 'user_id', 'id_jabatan', 'id_departemen', 'id_cabang', 'id_divisi', 'id_perusahaan'])
+            ->with([
+                'user:id,email',
+                'jabatan:id,nama_jabatan',
+                'departemen:id,nama_departemen',
+                'cabang:id,nama_cabang',
+                'divisi:id,nama_divisi',
+                'perusahaan:id,nama_perusahaan'
+            ]);
+
+        // Optimasi untuk dropdown - hanya ambil field yang diperlukan
+        $provinsi   = \Cache::remember('provinces_list', 3600, function() {
+            return Province::select(['id_provinsi', 'name'])->get();
+        });
+        $perusahaan = \Cache::remember('companies_list', 1800, function() {
+            return Perusahaan::select(['id', 'nama_perusahaan'])->get();
+        });
+        $divisi     = \Cache::remember('divisions_list', 1800, function() {
+            return Divisi::select(['id', 'nama_divisi'])->get();
+        });
+        $jabatan    = \Cache::remember('positions_list', 1800, function() {
+            return Jabatan::select(['id', 'nama_jabatan'])->get();
+        });
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($pegawai)
@@ -173,7 +192,12 @@ class PegawaiController extends Controller
     public function profile($id)
     {
         $pegawai = Pegawai::find($id);
-        $user    = User::all();
+        // Cache data user untuk dropdown (sudah dioptimalkan sebelumnya)
+        $user = \Cache::remember('users_list_pegawai', 900, function() {
+            return User::select(['id', 'name', 'email'])
+                ->where('active', true)
+                ->get();
+        });
 
         return view('pegawai.profile', compact(['pegawai', 'user']));
     }
@@ -207,11 +231,20 @@ class PegawaiController extends Controller
 
     public function formExample()
     {
-        $provinsi = Province::all();
-        $perusahaan = Perusahaan::all();
-        $divisi = Divisi::all();
-        $jabatan = Jabatan::all();
-        
+        // Gunakan cache untuk data yang jarang berubah
+        $provinsi = \Cache::remember('provinces_list', 3600, function() {
+            return Province::select(['id_provinsi', 'name'])->get();
+        });
+        $perusahaan = \Cache::remember('companies_list', 1800, function() {
+            return Perusahaan::select(['id', 'nama_perusahaan'])->get();
+        });
+        $divisi = \Cache::remember('divisions_list', 1800, function() {
+            return Divisi::select(['id', 'nama_divisi'])->get();
+        });
+        $jabatan = \Cache::remember('positions_list', 1800, function() {
+            return Jabatan::select(['id', 'nama_jabatan'])->get();
+        });
+
         return view('internal.pegawai.form-example', compact(['provinsi', 'perusahaan', 'divisi', 'jabatan']));
     }
 

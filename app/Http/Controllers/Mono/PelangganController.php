@@ -15,13 +15,11 @@ class PelangganController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data pelanggan
-        $pelanggan = Pelanggan::withoutTrashed();
-        $provinsi  = Province::all();
-        $kota      = City::all();
-        $kendaraan = Kendaraan::all();
-        // dd($pelanggan);
         if ($request->ajax()) {
+            // Optimasi: Query data pelanggan dengan select field spesifik
+            $pelanggan = Pelanggan::withoutTrashed()
+                ->select(['id', 'nama_pelanggan', 'alamat_pelanggan', 'no_telp_pelanggan', 'email_pelanggan', 'status', 'created_at']);
+
             return datatables()->of($pelanggan)
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -32,7 +30,15 @@ class PelangganController extends Controller
                 ->toJson();
         }
 
-        return view('internal/pelanggan.index', compact(['pelanggan', 'provinsi', 'kendaraan']));
+        // Cache data dropdown yang jarang berubah
+        $provinsi = \Cache::remember('indonesia_provinces_list', 3600, function() {
+            return Province::select(['id', 'name'])->get();
+        });
+        $kendaraan = \Cache::remember('kendaraan_list', 1800, function() {
+            return Kendaraan::select(['id', 'nama_kendaraan', 'type'])->get();
+        });
+
+        return view('internal/pelanggan.index', compact(['provinsi', 'kendaraan']));
     }
 
     public function store(StorePelangganRequest $request)

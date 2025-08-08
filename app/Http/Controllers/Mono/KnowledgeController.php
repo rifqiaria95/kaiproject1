@@ -12,7 +12,21 @@ class KnowledgeController extends Controller
     public function index(Request $request)
     {
         // Menampilkan Data pegawai
-        $knowledge = Knowledge::all();
+        if ($request->ajax()) {
+            // Optimasi: Query data hanya saat AJAX request
+            $knowledge = Knowledge::select(['id', 'title', 'content', 'category', 'created_at']);
+
+            return datatables()->of($knowledge)
+                ->addColumn('aksi', function ($data) {
+                    $button = '';
+                    return $button;
+                })
+                ->rawColumns(['aksi'])
+                ->addIndexColumn()
+                ->toJson();
+        }
+
+        return view('internal/knowledge.index');
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($knowledge)

@@ -18,6 +18,11 @@ $(document).ready(function () {
             '<"col-sm-12 col-md-6"i>' +
             '<"col-sm-12 col-md-6"p>' +
             '>',
+        deferRender: true,
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+        stateSave: true,
+        stateDuration: 300, // 5 minutes
         language: {
             sLengthMenu: '_MENU_',
             search: '',
@@ -355,7 +360,7 @@ $(document).ready(function () {
                 $('#modal-judul').text('Tambah Pegawai');
                 $('#formPegawai')[0].reset();
                 $('#btn-simpan').val('create');
-                
+
                 // Reset hierarki dropdowns
                 $('#pegawai-cabang').empty().append('<option value="" selected disabled>Pilih Cabang</option>');
                 $('#pegawai-departemen').empty().append('<option value="" selected disabled>Pilih Departemen</option>');
@@ -381,7 +386,7 @@ $(document).ready(function () {
                             $('#no_ktp_pegawai').val(response.no_ktp_pegawai);
                             $('#pegawai-perusahaan').val(response.id_perusahaan).trigger('change');
                             $('#pegawai-divisi').val(response.id_divisi).trigger('change');
-                            
+
                             // Populate cabang dropdown
                             if (response.id_perusahaan) {
                                 $.ajax({
@@ -398,7 +403,7 @@ $(document).ready(function () {
                                     }
                                 });
                             }
-                            
+
                             // Populate departemen dropdown
                             if (response.id_divisi) {
                                 $.ajax({
@@ -507,7 +512,7 @@ $(document).ready(function () {
     $('#tambahModal').on('hidden.bs.modal', function() {
         // Reset cabang dropdown
         $('#pegawai-cabang').empty().append('<option value="" selected disabled>Pilih Cabang</option>');
-        
+
         // Reset departemen dropdown
         $('#pegawai-departemen').empty().append('<option value="" selected disabled>Pilih Departemen</option>');
     });

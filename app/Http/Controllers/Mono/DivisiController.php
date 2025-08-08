@@ -11,10 +11,10 @@ class DivisiController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data pegawai
-        $divisi = Divisi::all();
-        // dd($pegawai);
         if ($request->ajax()) {
+            // Optimasi: Query data hanya saat AJAX request
+            $divisi = Divisi::select(['id', 'nama_divisi', 'deskripsi', 'created_at']);
+
             return datatables()->of($divisi)
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -25,7 +25,7 @@ class DivisiController extends Controller
                 ->toJson();
         }
 
-        return view('internal/divisi.index', compact(['divisi']));
+        return view('internal/divisi.index');
     }
 
     public function store(DivisiRequest $request)

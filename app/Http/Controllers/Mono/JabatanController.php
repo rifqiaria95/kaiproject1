@@ -11,10 +11,10 @@ class JabatanController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data pegawai
-        $jabatan = Jabatan::all();
-        // dd($pegawai);
         if ($request->ajax()) {
+            // Optimasi: Query data hanya saat AJAX request
+            $jabatan = Jabatan::select(['id', 'nama_jabatan', 'deskripsi', 'created_at']);
+
             return datatables()->of($jabatan)
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -25,7 +25,7 @@ class JabatanController extends Controller
                 ->toJson();
         }
 
-        return view('internal/jabatan.index', compact(['jabatan']));
+        return view('internal/jabatan.index');
     }
 
     public function store(JabatanRequest $request)

@@ -14,20 +14,11 @@ class RolePermissionController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data role
-        $role        = Role::with('permissions')->get();
-        $menuGroups  = MenuGroup::all();
-
-        // Ambil semua menuGroup ID
-        $menuGroupIds = $menuGroups->pluck('id')->toArray();
-
-        // Ambil menuDetails yang hanya dimiliki oleh menuGroups saja
-        $menuDetails = MenuDetail::whereIn('menu_group_id', $menuGroupIds)->get();
-
-        $permissions = Permission::with(['roles', 'menuGroups', 'menuDetails'])->get();
-        // dd($permissions->toArray());
-
         if ($request->ajax()) {
+            // Optimasi: Query role dengan eager loading yang efisien
+            $role = Role::select(['id', 'name', 'created_at'])
+                ->with(['permissions:id,name,module_name']);
+
             return datatables()->of($role)
                 ->addColumn('module_name', function ($data) {
                     return $data->permissions->pluck('module_name')->implode(', ');
@@ -41,7 +32,28 @@ class RolePermissionController extends Controller
                 ->toJson();
         }
 
-        return view('internal/role.index', compact(['role', 'permissions', 'menuGroups', 'menuDetails']));
+        // Cache data dropdown yang jarang berubah
+        $menuGroups = \Cache::remember('menu_groups_list', 1800, function() {
+            return MenuGroup::select(['id', 'name'])->get();
+        });
+
+        $menuGroupIds = $menuGroups->pluck('id')->toArray();
+        $menuDetails = \Cache::remember("menu_details_for_groups_" . md5(implode(',', $menuGroupIds)), 1800, function() use ($menuGroupIds) {
+            return MenuDetail::select(['id', 'name', 'menu_group_id'])
+                ->whereIn('menu_group_id', $menuGroupIds)
+                ->get();
+        });
+
+        $permissions = \Cache::remember('permissions_with_relations', 900, function() {
+            return Permission::select(['id', 'name', 'module_name'])
+                ->with([
+                    'roles:id,name',
+                    'menuGroups:id,name',
+                    'menuDetails:id,name'
+                ])->get();
+        });
+
+        return view('internal/role.index', compact(['permissions', 'menuGroups', 'menuDetails']));
     }
 
     public function store(Request $request)
@@ -86,8 +98,14 @@ class RolePermissionController extends Controller
 
     public function edit($id)
     {
-        $role            = Role::findOrFail($id);
-        $permissions     = Permission::all();
+        $role = Role::select(['id', 'name'])
+            ->with(['permissions:id,name'])
+            ->findOrFail($id);
+
+        $permissions = \Cache::remember('permissions_list_edit', 900, function() {
+            return Permission::select(['id', 'name', 'module_name'])->get();
+        });
+
         $rolePermissions = $role->permissions->pluck('id');
 
         return response()->json([

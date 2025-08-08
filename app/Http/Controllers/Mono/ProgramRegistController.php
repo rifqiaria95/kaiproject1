@@ -17,7 +17,7 @@ class ProgramRegistController extends Controller
     {
         // Menampilkan Data program registrasi dengan filter berdasarkan role
         $currentUser = auth()->user();
-        
+
         // Jika user memiliki role 'guest', tampilkan hanya data milik user tersebut
         if ($currentUser->hasRole('guest')) {
             $programregist = ProgramRegistration::withoutTrashed()
@@ -27,10 +27,7 @@ class ProgramRegistController extends Controller
             // Jika selain role 'guest', tampilkan semua data
             $programregist = ProgramRegistration::withoutTrashed()->with('program', 'user');
         }
-        
-        $program = Program::all();
-        $user    = User::all();
-        // dd($pelanggan);
+
         if ($request->ajax()) {
             return datatables()->of($programregist)
                 ->addColumn('program', function ($data) {
@@ -48,7 +45,19 @@ class ProgramRegistController extends Controller
                 ->toJson();
         }
 
-        return view('internal/program_regist.index', compact(['programregist', 'program', 'user']));
+        // Cache data dropdown yang jarang berubah
+        $program = \Cache::remember('programs_list_regist', 1800, function() {
+            return Program::select(['id', 'name', 'status'])
+                ->where('status', 'active')
+                ->get();
+        });
+        $user = \Cache::remember('users_list_regist', 900, function() {
+            return User::select(['id', 'name', 'email'])
+                ->where('active', true)
+                ->get();
+        });
+
+        return view('internal/program_regist.index', compact(['program', 'user']));
     }
 
     public function store(ProgramRegistRequest $request)
@@ -87,7 +96,7 @@ class ProgramRegistController extends Controller
             // Kirim email notifikasi pendaftaran
             $user = User::find($validatedData['user_id']);
             $program = Program::find($validatedData['program_id']);
-            
+
             try {
                 Mail::to($user->email)->send(new ProgramRegistrationMail($user, $program));
             } catch (\Exception $e) {

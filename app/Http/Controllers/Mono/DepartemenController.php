@@ -12,11 +12,11 @@ class DepartemenController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data pegawai
-        $departemen = Departemen::with('divisi');
-        $divisi     = Divisi::all();
-        // dd($pegawai);
         if ($request->ajax()) {
+            // Optimasi: Query data dengan eager loading yang efisien
+            $departemen = Departemen::select(['id', 'nama_departemen', 'deskripsi', 'id_divisi', 'created_at'])
+                ->with(['divisi:id,nama_divisi']);
+
             return datatables()->of($departemen)
                 ->addColumn('divisi', function ($data) {
                     return $data->divisi->nama_divisi ?? '-';
@@ -30,7 +30,12 @@ class DepartemenController extends Controller
                 ->toJson();
         }
 
-        return view('internal/departemen.index', compact(['departemen', 'divisi']));
+        // Cache data divisi untuk dropdown
+        $divisi = \Cache::remember('divisions_list', 1800, function() {
+            return Divisi::select(['id', 'nama_divisi'])->get();
+        });
+
+        return view('internal/departemen.index', compact(['divisi']));
     }
 
     public function store(DepartemenRequest $request)

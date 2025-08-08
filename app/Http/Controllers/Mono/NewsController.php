@@ -18,19 +18,33 @@ class NewsController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data news
-        $news     = News::withoutTrashed()->with('user', 'categories', 'tags');
-        $kategori = Kategori::all();
-        $tags     = Tag::all();
-        $users    = User::all();
-        
+        // Cache data dropdown yang jarang berubah
+        $kategori = \Cache::remember('kategori_news_list', 1800, function() {
+            return Kategori::select(['id', 'nama_kategori'])->get();
+        });
+        $tags = \Cache::remember('tags_list', 1800, function() {
+            return Tag::select(['id', 'name'])->get();
+        });
+        $users = \Cache::remember('users_author_list', 1800, function() {
+            return User::select(['id', 'name'])->where('active', true)->get();
+        });
+
         if ($request->ajax()) {
+            // Optimasi: Select field spesifik dan eager load yang efisien
+            $news = News::withoutTrashed()
+                ->select(['id', 'title', 'slug', 'status', 'thumbnail', 'published_at', 'author_id', 'created_at'])
+                ->with([
+                    'user:id,name',
+                    'categories:id,nama_kategori',
+                    'tags:id,name'
+                ]);
+
             return datatables()->of($news)
                 ->addColumn('author', function ($data) {
                     return optional($data->user)->name ?? '-';
                 })
                 ->addColumn('category', function ($data) {
-                    return $data->categories->pluck('name')->join(', ') ?: '-';
+                    return $data->categories->pluck('nama_kategori')->join(', ') ?: '-';
                 })
                 ->addColumn('tags', function ($data) {
                     return $data->tags->pluck('name')->join(', ') ?: '-';
@@ -44,7 +58,7 @@ class NewsController extends Controller
                 ->toJson();
         }
 
-        return view('internal/news.index', compact(['news', 'kategori', 'tags', 'users']));
+        return view('internal/news.index', compact(['kategori', 'tags', 'users']));
     }
 
     public function store(NewsRequest $request)
@@ -95,7 +109,7 @@ class NewsController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Hapus file yang sudah diupload jika ada error
             if (isset($filename) && File::exists(public_path('images/' . $filename))) {
                 File::delete(public_path('images/' . $filename));
@@ -123,7 +137,7 @@ class NewsController extends Controller
 
             // Format data untuk frontend
             $newsData = $news->toArray();
-            
+
             // Tambahkan category_id dan tags_id untuk form edit
             $newsData['category_id'] = $news->categories->pluck('id')->toArray();
             $newsData['tags_id'] = $news->tags->pluck('id')->toArray();
@@ -194,7 +208,7 @@ class NewsController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Hapus file yang sudah diupload jika ada error
             if (isset($filename) && File::exists(public_path('images/' . $filename))) {
                 File::delete(public_path('images/' . $filename));

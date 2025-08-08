@@ -10,10 +10,11 @@ class UnitController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data pegawai
-        $satuan = UnitBerat::all();
-        // dd($pegawai);
         if ($request->ajax()) {
+            // Optimasi: Query data hanya saat AJAX request
+            $satuan = UnitBerat::select(['id', 'nama', 'simbol', 'order', 'created_at'])
+                ->orderBy('order', 'asc');
+
             return datatables()->of($satuan)
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -24,7 +25,7 @@ class UnitController extends Controller
                 ->toJson();
         }
 
-        return view('internal/satuan.index', compact(['satuan']));
+        return view('internal/satuan.index');
     }
 
     public function store(Request $request)

@@ -18,6 +18,11 @@ $(document).ready(function () {
             '<"col-sm-12 col-md-6"i>' +
             '<"col-sm-12 col-md-6"p>' +
             '>',
+        deferRender: true,
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+        stateSave: true,
+        stateDuration: 300,
         language: {
             sLengthMenu: '_MENU_',
             search: '',

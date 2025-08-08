@@ -14,7 +14,12 @@ class ProgramReqController extends Controller
     {
         // Menampilkan Data pelanggan
         $programreq       = ProgramRequirement::withoutTrashed()->with('program');
-        $program          = Program::all();
+        // Cache data program untuk dropdown
+        $program = \Cache::remember('programs_list_requirements', 1800, function() {
+            return Program::select(['id', 'name', 'status'])
+                ->where('status', 'active')
+                ->get();
+        });
         // dd($pelanggan);
         if ($request->ajax()) {
             return datatables()->of($programreq)

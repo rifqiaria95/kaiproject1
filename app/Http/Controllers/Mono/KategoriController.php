@@ -11,10 +11,10 @@ class KategoriController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data pegawai
-        $kategori = Kategori::all();
-        // dd($pegawai);
         if ($request->ajax()) {
+            // Optimasi: Query data hanya saat AJAX request
+            $kategori = Kategori::select(['id', 'nama_kategori', 'deskripsi', 'created_at']);
+
             return datatables()->of($kategori)
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -25,7 +25,7 @@ class KategoriController extends Controller
                 ->toJson();
         }
 
-        return view('internal/kategori.index', compact(['kategori']));
+        return view('internal/kategori.index');
     }
 
     public function store(KategoriRequest $request)

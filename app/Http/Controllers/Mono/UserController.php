@@ -17,9 +17,12 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $users = User::withoutTrashed();
-
         if ($request->ajax()) {
+            // Optimasi: Select hanya field yang diperlukan dan eager load roles
+            $users = User::withoutTrashed()
+                ->select(['id', 'name', 'email', 'active', 'avatar', 'created_at'])
+                ->with(['roles:id,name']);
+
             return datatables()->of($users)
                 ->addColumn('active', function (User $user) {
                     return $user->active
@@ -27,8 +30,8 @@ class UserController extends Controller
                         : '<span class="badge bg-label-danger">Inactive</span>';
                 })
                 ->addColumn('role', function (User $user) {
-                    return $user->getRoleNames()
-                        ->map(fn ($role) => '<span class="badge bg-label-primary">' . $role . '</span>')
+                    return $user->roles
+                        ->map(fn ($role) => '<span class="badge bg-label-primary">' . $role->name . '</span>')
                         ->implode(' ');
                 })
                 ->addColumn('aksi', function () {
@@ -39,15 +42,23 @@ class UserController extends Controller
                 ->toJson();
         }
 
-        return view('internal/user.index', compact('users'));
+        return view('internal/user.index');
     }
 
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        // Optimasi: Select field yang diperlukan dan cache roles
+        $user = User::select(['id', 'name', 'email', 'active', 'avatar'])
+            ->with(['roles:id,name'])
+            ->findOrFail($id);
+
+        $roles = \Cache::remember('roles_list', 3600, function() {
+            return Role::select(['id', 'name'])->get();
+        });
+
         return response()->json([
             'user'            => $user,
-            'roles'           => Role::all(),
+            'roles'           => $roles,
             'userRole'        => $user->roles->pluck('id')->first()
         ]);
     }
@@ -65,7 +76,7 @@ class UserController extends Controller
 
         // Siapkan data untuk update
         $updateData = $request->only(['name', 'email', 'active']);
-        
+
         // Jika password diisi, hash dan tambahkan ke data update
         if ($request->filled('password')) {
             $updateData['password'] = bcrypt($request->password);
@@ -122,7 +133,14 @@ class UserController extends Controller
 
     public function profile($id)
     {
-        $user = User::findOrFail($id)->with('roles', 'user_profile')->first();
+        // Optimasi: Eager load dan select field yang diperlukan
+        $user = User::with([
+                'roles:id,name',
+                'user_profile'
+            ])
+            ->select(['id', 'name', 'email', 'active', 'avatar', 'created_at'])
+            ->findOrFail($id);
+
         $userProfile = UserProfile::where('user_id', $id)->first();
         return view('internal/user.profile', compact('user', 'userProfile'));
     }

@@ -10,7 +10,14 @@ class ExperienceController extends Controller
 {
     public function index()
     {
-        $experience = Experience::all();
+        // Optimasi: Cache API response untuk experience
+        $experience = \Cache::remember('api_experience_data', 1800, function() {
+            return Experience::select(['id', 'company', 'position', 'description', 'start_date', 'end_date', 'user_id'])
+                ->with(['user:id,name'])
+                ->orderBy('start_date', 'desc')
+                ->get();
+        });
+
         return response()->json($experience);
     }
 }

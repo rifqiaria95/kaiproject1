@@ -14,7 +14,10 @@ class MenuDetailController extends Controller
     {
         // Menampilkan Data pegawai
         $menuDetail = MenuDetail::with('menuGroup');
-        $menuGroup  = MenuGroup::all();
+        // Cache data menu group untuk dropdown
+        $menuGroup = \Cache::remember('menu_groups_for_details', 1800, function() {
+            return MenuGroup::select(['id', 'name'])->get();
+        });
         // dd($pegawai);
         if ($request->ajax()) {
             return datatables()->of($menuDetail)
@@ -61,7 +64,7 @@ class MenuDetailController extends Controller
     {
         // Ubah nama menu menjadi lowercase dan replace spasi dengan underscore
         $menuName = strtolower(str_replace(' ', '_', $menuDetail->name));
-        
+
         // Daftar permission yang akan dibuat
         $permissionTypes = [
             'view_' . $menuName,
@@ -78,17 +81,17 @@ class MenuDetailController extends Controller
         foreach ($permissionTypes as $permissionName) {
             // Cek apakah permission sudah ada
             $existingPermission = Permission::where('name', $permissionName)->first();
-            
+
             if (!$existingPermission) {
                 // Buat permission baru
                 $permission = Permission::create([
                     'name' => $permissionName,
                     'guard_name' => 'web'
                 ]);
-                
+
                 // Hubungkan permission dengan menu detail
                 $permission->menuDetails()->attach($menuDetail->id);
-                
+
                 $createdPermissions[] = $permission;
             } else {
                 // Jika permission sudah ada, hubungkan dengan menu detail ini juga
@@ -126,7 +129,7 @@ class MenuDetailController extends Controller
 
         $menuDetail = MenuDetail::findOrFail($id);
         $oldName = $menuDetail->name;
-        
+
         // Update menu detail
         $menuDetail->update($request->all());
 
@@ -148,21 +151,21 @@ class MenuDetailController extends Controller
     {
         $oldMenuName = strtolower(str_replace(' ', '_', $oldName));
         $newMenuName = strtolower(str_replace(' ', '_', $menuDetail->name));
-        
+
         // Daftar permission yang akan diupdate
         $permissionTypes = ['view_', 'create_', 'edit_', 'show_', 'delete_', 'approve_', 'reject_'];
-        
+
         foreach ($permissionTypes as $type) {
             $oldPermissionName = $type . $oldMenuName;
             $newPermissionName = $type . $newMenuName;
-            
+
             // Cari permission lama
             $oldPermission = Permission::where('name', $oldPermissionName)->first();
-            
+
             if ($oldPermission) {
                 // Cek apakah permission baru sudah ada
                 $existingNewPermission = Permission::where('name', $newPermissionName)->first();
-                
+
                 if (!$existingNewPermission) {
                     // Update nama permission
                     $oldPermission->update(['name' => $newPermissionName]);
@@ -170,7 +173,7 @@ class MenuDetailController extends Controller
                     // Jika permission baru sudah ada, pindahkan relasi ke permission yang sudah ada
                     $existingNewPermission->menuDetails()->syncWithoutDetaching($menuDetail->id);
                     $oldPermission->menuDetails()->detach($menuDetail->id);
-                    
+
                     // Hapus permission lama jika tidak memiliki relasi lain
                     if ($oldPermission->menuDetails()->count() === 0) {
                         $oldPermission->delete();
@@ -200,10 +203,10 @@ class MenuDetailController extends Controller
         if ($menu_detail) {
             // Hapus relasi permissions dengan menu detail ini
             $this->cleanupMenuPermissions($menu_detail);
-            
+
             // Hapus menu detail
             $menu_detail->delete();
-            
+
             return response()->json([
                 'status'    => 200,
                 'message'   => 'Sukses! Data menu_detail dan permissions terkait berhasil dihapus'
@@ -222,7 +225,7 @@ class MenuDetailController extends Controller
     private function cleanupMenuPermissions(MenuDetail $menuDetail)
     {
         $menuName = strtolower(str_replace(' ', '_', $menuDetail->name));
-        
+
         // Daftar permission yang akan dibersihkan
         $permissionTypes = [
             'view_' . $menuName,
@@ -236,11 +239,11 @@ class MenuDetailController extends Controller
 
         foreach ($permissionTypes as $permissionName) {
             $permission = Permission::where('name', $permissionName)->first();
-            
+
             if ($permission) {
                 // Hapus relasi dengan menu detail ini
                 $permission->menuDetails()->detach($menuDetail->id);
-                
+
                 // Jika permission tidak memiliki relasi dengan menu detail lain, hapus permission
                 if ($permission->menuDetails()->count() === 0 && $permission->menuGroups()->count() === 0) {
                     // Hapus juga relasi dengan roles jika ada

@@ -11,10 +11,10 @@ class TagController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data pegawai
-        $tag = Tag::all();
-        // dd($pegawai);
         if ($request->ajax()) {
+            // Optimasi: Query data hanya saat AJAX request
+            $tag = Tag::select(['id', 'name', 'slug', 'created_at']);
+
             return datatables()->of($tag)
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -25,7 +25,7 @@ class TagController extends Controller
                 ->toJson();
         }
 
-        return view('internal/tag.index', compact(['tag']));
+        return view('internal/tag.index');
     }
 
     public function store(TagRequest $request)

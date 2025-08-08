@@ -14,8 +14,12 @@ class CabangController extends Controller
     {
         // Menampilkan Data cabang
         $cabang = Cabang::with('perusahaan');
-        $perusahaan = Perusahaan::all();
-        
+
+        // Cache data perusahaan untuk dropdown
+        $perusahaan = \Cache::remember('perusahaan_list_cabang', 1800, function() {
+            return Perusahaan::select(['id', 'nama_perusahaan'])->get();
+        });
+
         if ($request->ajax()) {
             return datatables()->of($cabang)
                 ->addColumn('perusahaan', function ($data) {
@@ -96,7 +100,10 @@ class CabangController extends Controller
 
     public function getPerusahaan()
     {
-        $perusahaan = Perusahaan::all();
+        // Cache API response untuk perusahaan
+        $perusahaan = \Cache::remember('api_perusahaan_list', 1800, function() {
+            return Perusahaan::select(['id', 'nama_perusahaan'])->get();
+        });
         return response()->json($perusahaan);
     }
 

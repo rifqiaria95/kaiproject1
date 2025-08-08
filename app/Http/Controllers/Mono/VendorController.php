@@ -12,12 +12,11 @@ class VendorController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan Data vendor
-        $vendor    = Vendor::withoutTrashed();
-        $provinsi  = Province::all();
-        $kota      = City::all();
-        // dd($vendor);
         if ($request->ajax()) {
+            // Optimasi: Query data vendor dengan select field spesifik
+            $vendor = Vendor::withoutTrashed()
+                ->select(['id', 'nama_vendor', 'alamat_vendor', 'no_telp_vendor', 'email_vendor', 'status', 'created_at']);
+
             return datatables()->of($vendor)
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -28,6 +27,11 @@ class VendorController extends Controller
                 ->toJson();
         }
 
-        return view('internal/vendor.index', compact(['vendor', 'provinsi']));
+        // Cache data provinsi untuk dropdown - data yang jarang berubah
+        $provinsi = \Cache::remember('indonesia_provinces_list', 3600, function() {
+            return Province::select(['id', 'name'])->get();
+        });
+
+        return view('internal/vendor.index', compact(['provinsi']));
     }
 }
