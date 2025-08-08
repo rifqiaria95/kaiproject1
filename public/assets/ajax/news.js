@@ -1,16 +1,15 @@
 $(document).ready(function () {
+    // Initialize select2 with proper dropdown parent for modal
     $('.select2').select2({
         dropdownParent: $('#tambahModal')
     });
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
-});
-
-$(document).ready(function () {
     $('#TableNews').DataTable({
         dom:
             '<"row me-2"' +
@@ -173,7 +172,15 @@ $(document).ready(function () {
               attr: {
                 'data-bs-toggle': 'modal',
                 'data-bs-target': '#tambahModal',
-
+              },
+              action: function () {
+                // Initialize select2 when add button is clicked
+                setTimeout(function() {
+                    $('.select2').select2('destroy');
+                    $('.select2').select2({
+                        dropdownParent: $('#tambahModal')
+                    });
+                }, 100);
               }
             }
         ],
@@ -297,7 +304,7 @@ $(document).ready(function () {
                   buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                     buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canEdit) {
-                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="editNews(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     }
                     if (canDelete) {
                       buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
@@ -309,15 +316,11 @@ $(document).ready(function () {
                   return buttons;
                 }
             }
-        ],  
+        ],
         order: [
             [0, 'asc']
         ],
 
-    });
-
-    $('.select2').select2({
-        dropdownParent: $('#tambahModal')
     });
 
     $('#formNews').on('submit', function(e){
@@ -380,18 +383,87 @@ $(document).ready(function () {
         $('#modal-judul').text('Tambah Berita');
         $('#formNews .form-control, #formNews .form-select').removeClass('is-invalid');
         $('#formNews .text-danger.small').text('');
-        
+
         // Clear Select2
         $('#category_id').val('').trigger('change');
         $('#tags_id').val('').trigger('change');
-        
+
         // Clear TinyMCE content
         if (tinymce.get('content')) {
             tinymce.get('content').setContent('');
         }
     });
+
+    // Re-initialize select2 when modal is shown
+    $('#tambahModal').on('shown.bs.modal', function () {
+        // Destroy existing select2 instances
+        $('.select2').select2('destroy');
+        // Re-initialize select2 with proper dropdown parent
+        $('.select2').select2({
+            dropdownParent: $('#tambahModal')
+        });
+    });
+
+    // Event listener untuk delete
+    $(document).on('click', '.delete-record', function () {
+        let id = $(this).data('id');
+
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data news akan dihapus!",
+            icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
+                cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            buttonsStyling: false,
+            didRender: function () {
+                $('.swal2-actions').css('gap', '10px');
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/portfolio/news/delete/' + id,
+                    type: 'DELETE',
+                    data: {
+                        _method: 'DELETE',
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        if (response.status === 200) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message,
+                                customClass: {
+                                  confirmButton: 'btn btn-success waves-effect waves-light'
+                                }
+                            });
+                            $('#TableNews').DataTable().ajax.reload();
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                response.errors,
+                                'error'
+                            );
+                        }
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Oops!',
+                            'Terjadi kesalahan saat menghapus data.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    });
 });
 
+// Global function untuk edit news
 function editNews(id) {
     $('#formNews .form-control, #formNews .form-select').removeClass('is-invalid');
     $('#formNews .text-danger.small').text('');
@@ -405,45 +477,46 @@ function editNews(id) {
                 $('#id').val(news.id);
                 $('#title').val(news.title);
                 $('#slug').val(news.slug);
-                
+
                 // Set content to TinyMCE editor
                 if (tinymce.get('content')) {
                     tinymce.get('content').setContent(news.content || '');
                 } else {
                     $('#content').val(news.content);
                 }
-                
+
                 $('#summary').val(news.summary);
                 $('#status').val(news.status);
-                
+
                 // Set kategori dan tag
                 $('#category_id').val(news.category_id).trigger('change');
                 $('#tags_id').val(news.tags_id).trigger('change');
-                
+
                 // Format datetime untuk input datetime-local
                 if (news.published_at) {
                     let publishedDate = new Date(news.published_at);
-                    let formattedPublished = publishedDate.getFullYear() + '-' + 
-                        String(publishedDate.getMonth() + 1).padStart(2, '0') + '-' + 
-                        String(publishedDate.getDate()).padStart(2, '0') + 'T' + 
-                        String(publishedDate.getHours()).padStart(2, '0') + ':' + 
+                    let formattedPublished = publishedDate.getFullYear() + '-' +
+                        String(publishedDate.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(publishedDate.getDate()).padStart(2, '0') + 'T' +
+                        String(publishedDate.getHours()).padStart(2, '0') + ':' +
                         String(publishedDate.getMinutes()).padStart(2, '0');
                     $('#published_at').val(formattedPublished);
                 } else {
                     $('#published_at').val('');
                 }
-                
+
                 if (news.archived_at) {
                     let archivedDate = new Date(news.archived_at);
-                    let formattedArchived = archivedDate.getFullYear() + '-' + 
-                        String(archivedDate.getMonth() + 1).padStart(2, '0') + '-' + 
-                        String(archivedDate.getDate()).padStart(2, '0') + 'T' + 
-                        String(archivedDate.getHours()).padStart(2, '0') + ':' + 
+                    let formattedArchived = archivedDate.getFullYear() + '-' +
+                        String(archivedDate.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(archivedDate.getDate()).padStart(2, '0') + 'T' +
+                        String(archivedDate.getHours()).padStart(2, '0') + ':' +
                         String(archivedDate.getMinutes()).padStart(2, '0');
                     $('#archived_at').val(formattedArchived);
                 } else {
                     $('#archived_at').val('');
                 }
+
                 $('#modal-judul').text('Edit Berita');
                 $('#tambahModal').modal('show');
             } else {
@@ -455,60 +528,3 @@ function editNews(id) {
         }
     });
 }
-
-$(document).on('click', '.delete-record', function () {
-    let id = $(this).data('id');
-
-    Swal.fire({
-        title: 'Apakah Anda yakin?',
-        text: "Data news akan dihapus!",
-        icon: 'warning',
-        customClass: {
-            confirmButton: 'btn btn-primary waves-effect waves-light ml-3',
-            cancelButton: 'btn btn-label-secondary waves-effect waves-light'
-        },
-        showCancelButton: true,
-        cancelButtonText: 'Batal',
-        buttonsStyling: false,
-        didRender: function () {
-            $('.swal2-actions').css('gap', '10px');
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/portfolio/news/delete/' + id,
-                type: 'DELETE',
-                data: {
-                    _method: 'DELETE',
-                    _token: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response.status === 200) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deleted!',
-                            text: response.message,
-                            customClass: {
-                              confirmButton: 'btn btn-success waves-effect waves-light'
-                            }
-                        });
-                        $('#TableNews').DataTable().ajax.reload();
-                    } else {
-                        Swal.fire(
-                            'Error!',
-                            response.errors,
-                            'error'
-                        );
-                    }
-                },
-                error: function () {
-                    Swal.fire(
-                        'Oops!',
-                        'Terjadi kesalahan saat menghapus data.',
-                        'error'
-                    );
-                }
-            });
-        }
-    });
-});
