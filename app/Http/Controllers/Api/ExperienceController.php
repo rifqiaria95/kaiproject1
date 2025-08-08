@@ -12,9 +12,9 @@ class ExperienceController extends Controller
     {
         // Optimasi: Cache API response untuk experience
         $experience = \Cache::remember('api_experience_data', 1800, function() {
-            return Experience::select(['id', 'company', 'position', 'description', 'start_date', 'end_date', 'user_id'])
-                ->with(['user:id,name'])
-                ->orderBy('start_date', 'desc')
+            return Experience::select(['id', 'title', 'subtitle', 'company', 'year', 'description', 'created_by', 'created_at'])
+                ->with(['createdBy:id,name'])
+                ->orderBy('year', 'desc')
                 ->get();
         });
 

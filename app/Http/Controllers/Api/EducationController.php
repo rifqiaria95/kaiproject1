@@ -12,9 +12,9 @@ class EducationController extends Controller
     {
         // Optimasi: Cache API response untuk education
         $education = \Cache::remember('api_education_data', 1800, function() {
-            return Education::select(['id', 'institution', 'degree', 'field_of_study', 'start_date', 'end_date', 'user_id'])
-                ->with(['user:id,name'])
-                ->orderBy('start_date', 'desc')
+            return Education::select(['id', 'title', 'subtitle', 'institution', 'year', 'description', 'created_by', 'created_at'])
+                ->with(['createdBy:id,name'])
+                ->orderBy('year', 'desc')
                 ->get();
         });
 

@@ -12,8 +12,8 @@ class AboutController extends Controller
     {
         // Optimasi: Cache API response untuk about
         $about = \Cache::remember('api_about_data', 1800, function() {
-            return About::select(['id', 'title', 'content', 'user_id', 'created_at'])
-                ->with(['user:id,name'])
+            return About::select(['id', 'title', 'subtitle', 'description', 'created_by', 'created_at'])
+                ->with(['creator:id,name'])
                 ->get();
         });
 
