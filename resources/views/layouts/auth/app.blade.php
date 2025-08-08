@@ -5,7 +5,7 @@
   class="light-style customizer-hide"
   dir="ltr"
   data-theme="theme-default"
-  data-assets-path="../../assets/"
+  data-assets-path="{{ asset('assets/') }}"
   data-template="vertical-menu-template-no-customizer"
 >
   <head>
@@ -16,12 +16,12 @@
     />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login | Kainnova Digital Solutions</title>
+    <title>@yield('title') | Kainnova Digital Solutions</title>
 
     <meta name="description" content="" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="../../assets/img/favicon/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

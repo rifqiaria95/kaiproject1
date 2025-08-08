@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class NewPasswordController extends Controller
 {
@@ -36,27 +37,62 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user) use ($request) {
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+        // Debug: Log the request data
+        \Log::info('Password reset attempt', [
+            'email' => $request->email,
+            'token_length' => strlen($request->token),
+            'token_preview' => substr($request->token, 0, 20)
+        ]);
 
-                event(new PasswordReset($user));
-            }
-        );
+        // Find the token record in database
+        $tokenRecord = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+        
+        if (!$tokenRecord) {
+            \Log::info('No token found in database for email: ' . $request->email);
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'Token reset password tidak ditemukan.']);
+        }
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
-        return $status == Password::PASSWORD_RESET
-                    ? redirect()->route('login')->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        // Check if token is expired (60 minutes)
+        $tokenAge = now()->diffInMinutes($tokenRecord->created_at);
+        if ($tokenAge > 60) {
+            \Log::info('Token expired for email: ' . $request->email);
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'Token reset password sudah kadaluarsa.']);
+        }
+
+        // Verify the token hash
+        if (!Hash::check($request->token, $tokenRecord->token)) {
+            \Log::info('Invalid token for email: ' . $request->email);
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'Token reset password tidak valid.']);
+        }
+
+        // Find the user
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            \Log::info('User not found for email: ' . $request->email);
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => 'User tidak ditemukan.']);
+        }
+
+        // Update the password
+        $user->forceFill([
+            'password' => Hash::make($request->password),
+            'remember_token' => Str::random(60),
+        ])->save();
+
+        // Delete the token
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        // Fire the password reset event
+        event(new PasswordReset($user));
+
+        \Log::info('Password reset successful for email: ' . $request->email);
+
+        return redirect()->route('login')->with('status', 'Password berhasil direset! Silakan login dengan password baru Anda.');
     }
 }

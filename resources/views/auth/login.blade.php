@@ -1,9 +1,10 @@
 @extends('layouts.auth.app')
+@section('title', 'Login')
 @section('content')
 <div class="container-xxl">
     <div class="authentication-wrapper authentication-basic container-p-y">
         <div class="authentication-inner py-6">
-            <!-- Register Card -->
+            <!-- Login Card -->
             <div class="card">
                 <div class="card-body">
                     <!-- Logo -->
@@ -16,18 +17,26 @@
                         </a>
                     </div>
                     <!-- /Logo -->
-                    <h4 class="mb-1">Welcome to Kainnova Digital Solutions</h4>
-                    <p class="mb-6">Please login to continue</p>
+                    <h4 class="mb-1">Selamat Datang di Kainnova Digital Solutions</h4>
+                    <p class="mb-6">Silakan login untuk melanjutkan</p>
+
+                    @if (session('status'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="ti ti-check-circle me-2"></i>
+                            {{ session('status') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
 
                     <form id="formAuthentication" class="mb-6" action="{{ route('login') }}" method="POST">
                         @csrf
                         <div class="mb-6">
-                            <label for="email" class="form-label">Email</label>
+                            <label for="email" class="form-label">Alamat Email</label>
                             <x-text-input id="email" class="form-control" type="email" name="email" :value="old('email')" required autofocus autocomplete="email" />
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
                         <div class="mb-6 form-password-toggle">
-                            <label class="form-label" for="password">Password</label>
+                            <label class="form-label" for="password">Kata Sandi</label>
                             <div class="input-group input-group-merge">
                                 <x-text-input id="password" class="form-control" type="password" name="password" required autocomplete="current-password" />
                                 <x-input-error :messages="$errors->get('password')" class="mt-2 text-danger" />
@@ -39,24 +48,24 @@
                             <div class="form-check mb-0 ms-2">
                                 <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms" />
                                 <label class="form-check-label" for="terms-conditions">
-                                    I agree to
-                                    <a href="javascript:void(0);">privacy policy & terms</a>
+                                    Saya setuju dengan
+                                    <a href="javascript:void(0);">kebijakan privasi & syarat & ketentuan</a>
                                 </label>
                             </div>
                         </div>
-                        <button class="btn btn-primary d-grid w-100">Sign in</button>
+                        <button class="btn btn-primary d-grid w-100">Masuk</button>
                     </form>
 
                     <p class="text-center">
                         @if (Route::has('password.request'))
                             <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                                {{ __('Forgot your password?') }}
+                                {{ __('Lupa kata sandi?') }}
                             </a>
                         @endif
                     </p>
 
                     <div class="divider my-6">
-                        <div class="divider-text">or</div>
+                        <div class="divider-text">atau</div>
                     </div>
 
                     <div class="d-flex justify-content-center">
@@ -78,8 +87,34 @@
                     </div>
                 </div>
             </div>
-            <!-- Register Card -->
+            <!-- /Login Card -->
         </div>
     </div>
 </div>
+
+@if (session('status'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        toastr.success('{{ session('status') }}', 'Berhasil!', {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000
+        });
+    });
+</script>
+@endif
+
+@if ($errors->any())
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @foreach ($errors->all() as $error)
+            toastr.error('{{ $error }}', 'Error!', {
+                closeButton: true,
+                progressBar: true,
+                timeOut: 5000
+            });
+        @endforeach
+    });
+</script>
+@endif
 @endsection
