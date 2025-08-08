@@ -15,7 +15,7 @@ class Cors
         // Ganti '*' dengan domain yang diizinkan
         $allowedOrigins = [
             'http://localhost:3000',
-            'https://yourdomain.com',
+            'https://sagfrontend2.vercel.app',
             'https://www.yourdomain.com'
         ];
 
