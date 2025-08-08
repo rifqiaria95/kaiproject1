@@ -36,17 +36,21 @@ class ResetPasswordNotification extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $url = url(route('password.reset', [
+        // Buat URL yang mengarah ke frontend Nuxt
+        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
+        $url = $frontendUrl . '/reset-password?' . http_build_query([
             'token' => $this->token,
             'email' => $notifiable->getEmailForPasswordReset(),
-        ], false));
+        ]);
 
         return (new MailMessage)
-                    ->subject('Reset Password Notification')
-                    ->line('You are receiving this email because we received a password reset request for your account.')
+                    ->subject('Reset Password - KainnovaApp')
+                    ->greeting('Halo!')
+                    ->line('Anda menerima email ini karena kami menerima permintaan reset password untuk akun Anda.')
                     ->action('Reset Password', $url)
-                    ->line('This password reset link will expire in 60 minutes.')
-                    ->line('If you did not request a password reset, no further action is required.');
+                    ->line('Link reset password ini akan kedaluwarsa dalam 60 menit.')
+                    ->line('Jika Anda tidak meminta reset password, tidak ada tindakan lebih lanjut yang diperlukan.')
+                    ->salutation("Salam,\nKainnovaApp");
     }
 
     /**

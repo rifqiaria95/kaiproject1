@@ -259,7 +259,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Route Program Registration External
-    Route::prefix('registration-program')->name('registration-program.')->group(function () {
+    Route::prefix('registration-program')->name('registration-program.')->middleware('guest_role')->group(function () {
         Route::get('/', [ExtProgramRegistController::class, 'index'])
             ->name('index');
         Route::post('/store', [ExtProgramRegistController::class, 'store'])
