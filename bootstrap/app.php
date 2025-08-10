@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'guest_role' => \App\Http\Middleware\GuestRoleMiddleware::class,
+            'image.access' => \App\Http\Middleware\ImageAccessMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

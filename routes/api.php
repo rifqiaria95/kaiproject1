@@ -37,3 +37,25 @@ Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth
 Route::get('/auth/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
 Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
+
+// Route untuk gambar dinamis
+Route::get('/images/{filename}', function ($filename) {
+    $path = public_path('images/' . $filename);
+    
+    // Debug: log path yang dicari
+    \Log::info("Image request: {$filename}, Path: {$path}");
+    
+    if (!file_exists($path)) {
+        \Log::warning("Image file not found: {$path}");
+        abort(404, "Image not found: {$filename}");
+    }
+    
+    $file = file_get_contents($path);
+    $type = mime_content_type($path);
+    
+    \Log::info("Image served: {$filename}, Type: {$type}, Size: " . strlen($file));
+    
+    return response($file, 200)
+        ->header('Content-Type', $type)
+        ->header('Cache-Control', 'public, max-age=31536000');
+})->where('filename', '.*');

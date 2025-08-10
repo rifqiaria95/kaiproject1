@@ -214,12 +214,36 @@ $(document).ready(function () {
               name: 'subtitle'
             },
             {
-              data: 'description',
-              name: 'description'
+                data: 'description',
+                name: 'description',
+                render: function (data, type, full, meta) {
+                    // Tampilkan maksimal 3 kata saja, lalu tambahkan "..."
+                    if (!data) return '';
+                    // Hilangkan tag HTML jika ada
+                    let text = $('<div>').html(data).text();
+                    let words = text.trim().split(/\s+/);
+                    if (words.length > 3) {
+                        return words.slice(0, 3).join(' ') + ' ...';
+                    } else {
+                        return text;
+                    }
+                }
             },
             {
-              data: 'address',
-              name: 'address'
+                data: 'address',
+                name: 'address',
+                render: function (data, type, full, meta) {
+                    // Tampilkan maksimal 3 kata saja, lalu tambahkan "..."
+                    if (!data) return '';
+                    // Hilangkan tag HTML jika ada
+                    let text = $('<div>').html(data).text();
+                    let words = text.trim().split(/\s+/);
+                    if (words.length > 3) {
+                        return words.slice(0, 3).join(' ') + ' ...';
+                    } else {
+                        return text;
+                    }
+                }
             },
             {
               data: 'phone',
@@ -262,7 +286,7 @@ $(document).ready(function () {
                   buttons += '<a href="javascript:;" class="btn btn-icon btn-text-secondary waves-effect waves-light rounded-pill dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical ti-md"></i></a>';
                     buttons += '<div class="dropdown-menu dropdown-menu-end m-0">';
                     if (canEdit) {
-                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="ViewData(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
+                      buttons += '<a href="javascript:;" class="dropdown-item" onclick="editAbout(' + full.id + ')"><i class="ti ti-edit ti-md"></i>Edit</a>';
                     }
                     if (canDelete) {
                       buttons += '<a href="javascript:;" class="dropdown-item delete-record" data-id="' + full.id + '"><i class="ti ti-trash ti-md"></i>Hapus</a>';
