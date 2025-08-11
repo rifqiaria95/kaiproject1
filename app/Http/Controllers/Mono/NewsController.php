@@ -13,14 +13,22 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use App\Services\FileStorageService;
 
 class NewsController extends Controller
 {
+    protected $fileStorageService;
+
+    public function __construct(FileStorageService $fileStorageService)
+    {
+        $this->fileStorageService = $fileStorageService;
+    }
+
     public function index(Request $request)
     {
         // Cache data dropdown yang jarang berubah
         $kategori = \Cache::remember('kategori_news_list', 1800, function() {
-            return Kategori::select(['id', 'nama_kategori'])->get();
+            return Kategori::select(['id', 'name'])->get();
         });
         $tags = \Cache::remember('tags_list', 1800, function() {
             return Tag::select(['id', 'name'])->get();
@@ -30,13 +38,12 @@ class NewsController extends Controller
         });
 
         if ($request->ajax()) {
-            // Optimasi: Select field spesifik dan eager load yang efisien
+            // Temporary fix: Simplified query without specific select fields
             $news = News::withoutTrashed()
-                ->select(['id', 'title', 'slug', 'status', 'thumbnail', 'published_at', 'author_id', 'created_at'])
                 ->with([
-                    'user:id,name',
-                    'categories:id,nama_kategori',
-                    'tags:id,name'
+                    'user',
+                    'categories',
+                    'tags'
                 ]);
 
             return datatables()->of($news)
@@ -44,10 +51,17 @@ class NewsController extends Controller
                     return optional($data->user)->name ?? '-';
                 })
                 ->addColumn('category', function ($data) {
-                    return $data->categories->pluck('nama_kategori')->join(', ') ?: '-';
+                    return $data->categories->pluck('name')->join(', ') ?: '-';
                 })
                 ->addColumn('tags', function ($data) {
                     return $data->tags->pluck('name')->join(', ') ?: '-';
+                })
+                ->editColumn('thumbnail', function ($data) {
+                    // Return full storage URL untuk thumbnail
+                    if ($data->thumbnail) {
+                        return \Storage::disk('public')->url($data->thumbnail);
+                    }
+                    return null;
                 })
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -68,12 +82,18 @@ class NewsController extends Controller
         try {
             DB::beginTransaction();
 
-            // Upload thumbnail jika ada
+            // Upload thumbnail ke object storage jika ada
             if ($request->hasFile('thumbnail')) {
-                $file = $request->file('thumbnail');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/'), $filename);
-                $validatedData['thumbnail'] = $filename;
+                $uploadResult = $this->fileStorageService->uploadImage(
+                    $request->file('thumbnail'),
+                    'news/thumbnails'
+                );
+
+                if (!$uploadResult['success']) {
+                    throw new \Exception('Gagal upload thumbnail: ' . $uploadResult['error']);
+                }
+
+                $validatedData['thumbnail'] = $uploadResult['path'];
             }
 
             // Set author_id, created_by berdasarkan user yang sedang login
@@ -111,8 +131,8 @@ class NewsController extends Controller
             DB::rollBack();
 
             // Hapus file yang sudah diupload jika ada error
-            if (isset($filename) && File::exists(public_path('images/' . $filename))) {
-                File::delete(public_path('images/' . $filename));
+            if (isset($uploadResult) && $uploadResult['success']) {
+                $this->fileStorageService->deleteFile($uploadResult['path']);
             }
 
             return response()->json([
@@ -164,16 +184,22 @@ class NewsController extends Controller
             $validatedData = $request->validated();
             $oldThumbnail = $news->thumbnail;
 
-            // Upload thumbnail baru jika ada
+            // Upload thumbnail baru ke object storage jika ada
             if ($request->hasFile('thumbnail')) {
-                $file = $request->file('thumbnail');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/'), $filename);
-                $validatedData['thumbnail'] = $filename;
+                $uploadResult = $this->fileStorageService->uploadImage(
+                    $request->file('thumbnail'),
+                    'news/thumbnails'
+                );
+
+                if (!$uploadResult['success']) {
+                    throw new \Exception('Gagal upload thumbnail: ' . $uploadResult['error']);
+                }
+
+                $validatedData['thumbnail'] = $uploadResult['path'];
 
                 // Hapus thumbnail lama jika ada
-                if ($oldThumbnail && File::exists(public_path('images/' . $oldThumbnail))) {
-                    File::delete(public_path('images/' . $oldThumbnail));
+                if ($oldThumbnail) {
+                    $this->fileStorageService->deleteFile($oldThumbnail);
                 }
             }
 
@@ -210,8 +236,8 @@ class NewsController extends Controller
             DB::rollBack();
 
             // Hapus file yang sudah diupload jika ada error
-            if (isset($filename) && File::exists(public_path('images/' . $filename))) {
-                File::delete(public_path('images/' . $filename));
+            if (isset($uploadResult) && $uploadResult['success']) {
+                $this->fileStorageService->deleteFile($uploadResult['path']);
             }
 
             return response()->json([
@@ -236,9 +262,9 @@ class NewsController extends Controller
                 ]);
             }
 
-            // Hapus thumbnail jika ada
-            if ($news->thumbnail && File::exists(public_path('images/' . $news->thumbnail))) {
-                File::delete(public_path('images/' . $news->thumbnail));
+            // Hapus thumbnail dari object storage jika ada
+            if ($news->thumbnail) {
+                $this->fileStorageService->deleteFile($news->thumbnail);
             }
 
             // Set deleted_by berdasarkan user yang sedang login

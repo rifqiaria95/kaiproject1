@@ -19,9 +19,17 @@ use App\Models\Divisi;
 use App\Models\Cabang;
 use App\Models\Departemen;
 use App\Models\Jabatan;
+use App\Services\FileStorageService;
 
 class PegawaiController extends Controller
 {
+    protected $fileStorageService;
+
+    public function __construct(FileStorageService $fileStorageService)
+    {
+        $this->fileStorageService = $fileStorageService;
+    }
+
     public function index(Request $request)
     {
         // Menampilkan Data pegawai dengan optimasi query
@@ -54,6 +62,13 @@ class PegawaiController extends Controller
             return datatables()->of($pegawai)
                 ->addColumn('email', function ($data) {
                     return optional($data->user)->email ?? '-';
+                })
+                ->editColumn('foto_pegawai', function ($data) {
+                    // Return full storage URL untuk foto_pegawai
+                    if ($data->foto_pegawai) {
+                        return \Storage::disk('public')->url($data->foto_pegawai);
+                    }
+                    return null;
                 })
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -89,12 +104,18 @@ class PegawaiController extends Controller
             // Insert ke tabel Pegawai
             $pegawai = Pegawai::create(Arr::except($validatedData, ['email']));
 
-            // Upload Foto Pegawai
+            // Upload Foto Pegawai ke object storage
             if ($request->hasFile('foto_pegawai')) {
-                $file = $request->file('foto_pegawai');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/'), $filename);
-                $pegawai->foto_pegawai = $filename;
+                $uploadResult = $this->fileStorageService->uploadImage(
+                    $request->file('foto_pegawai'),
+                    'pegawai/fotos'
+                );
+
+                if (!$uploadResult['success']) {
+                    throw new \Exception('Gagal upload foto pegawai: ' . $uploadResult['error']);
+                }
+
+                $pegawai->foto_pegawai = $uploadResult['path'];
                 $pegawai->save();
             }
 
@@ -104,6 +125,11 @@ class PegawaiController extends Controller
                 'data' => $pegawai
             ]);
         } catch (\Exception $e) {
+            // Hapus file yang sudah diupload jika ada error
+            if (isset($uploadResult) && $uploadResult['success']) {
+                $this->fileStorageService->deleteFile($uploadResult['path']);
+            }
+
             return response()->json([
                 'status' => 500,
                 'message' => 'Terjadi kesalahan pada server.',
@@ -134,14 +160,24 @@ class PegawaiController extends Controller
             }
 
             if ($request->hasFile('foto_pegawai')) {
-                $path = 'images/' . $pegawai->foto_pegawai;
-                if (File::exists($path)) {
-                    File::delete($path);
+                $oldFoto = $pegawai->foto_pegawai;
+
+                $uploadResult = $this->fileStorageService->uploadImage(
+                    $request->file('foto_pegawai'),
+                    'pegawai/fotos'
+                );
+
+                if (!$uploadResult['success']) {
+                    throw new \Exception('Gagal upload foto pegawai: ' . $uploadResult['error']);
                 }
 
-                $request->file('foto_pegawai')->move('images/', $request->file('foto_pegawai')->getClientOriginalName());
-                $pegawai->foto_pegawai = $request->file('foto_pegawai')->getClientOriginalName();
+                $pegawai->foto_pegawai = $uploadResult['path'];
                 $pegawai->save();
+
+                // Hapus foto lama jika ada
+                if ($oldFoto) {
+                    $this->fileStorageService->deleteFile($oldFoto);
+                }
             }
 
             return response()->json([
@@ -167,12 +203,9 @@ class PegawaiController extends Controller
             ]);
         }
 
-        // Hapus foto jika ada
+        // Hapus foto dari object storage jika ada
         if ($pegawai->foto_pegawai) {
-            $path = 'images/' . $pegawai->foto_pegawai;
-            if (File::exists($path)) {
-                File::delete($path);
-            }
+            $this->fileStorageService->deleteFile($pegawai->foto_pegawai);
         }
 
         // Hapus data (Soft Delete)

@@ -11,9 +11,9 @@ class News extends Model
 {
     /** @use HasFactory<\Database\Factories\NewsFactory> */
     use HasFactory, SoftDeletes;
-    
+
     protected $table = 'news';
-    protected $fillable = ['title', 'slug', 'content', 'summary', 'thumbnail', 'status', 'published_at', 'archived_at', 'author_id', 'created_by', 'updated_by', 'deleted_by'];
+    protected $fillable = ['title', 'slug', 'content', 'summary', 'thumbnail', 'status', 'published_at', 'archived_at', 'author_id', 'created_by', 'updated_by', 'deleted_by', 'path'];
     protected $keyType = 'string';
     public $incrementing = false;
 

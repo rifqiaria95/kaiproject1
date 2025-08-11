@@ -196,11 +196,12 @@ $(document).ready(function () {
                 data: 'foto_pegawai',
                 name: 'foto_pegawai',
                 render: function (data) {
-                    let imageUrl = data
-                        ? (data.startsWith('http') ? data : '/uploads/pegawai/' + data)
-                        : '/assets/img/avatars/11.png';
-
-                    return '<img src="' + imageUrl + '" alt="Avatar" class="img-thumbnail" width="40" height="40" style="border-radius:50px;" ' + 'onerror="this.onerror=null; this.src=\'/assets/img/avatar/11.png\';" />';
+                    if (data) {
+                        // Data sudah berupa URL lengkap dari backend
+                        return '<img src="' + data + '" alt="Avatar" class="img-thumbnail" width="40" height="40" style="border-radius:50px;" onerror="this.onerror=null; this.src=\'/assets/img/avatars/11.png\';" />';
+                    } else {
+                        return '<img src="/assets/img/avatars/11.png" alt="Avatar" class="img-thumbnail" width="40" height="40" style="border-radius:50px;" />';
+                    }
                 }
             },
             {

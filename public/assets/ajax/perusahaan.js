@@ -192,7 +192,8 @@ $(document).ready(function () {
               name: 'logo_perusahaan',
               render: function (data, type, full, meta) {
                   if (data) {
-                    return '<img src="' + window.images_path + '/' + data + '" alt="Logo Perusahaan" class="img-fluid" style="width: 30px; height: 30px;">';
+                    // Data sudah berupa URL lengkap dari backend
+                    return '<img src="' + data + '" alt="Logo Perusahaan" class="img-fluid" style="width: 30px; height: 30px;" onerror="this.onerror=null; this.src=\'https://via.placeholder.com/50\';" />';
                   } else {
                     return '<img src="https://via.placeholder.com/50" alt="Logo Perusahaan" class="img-fluid" style="width: 30px; height: 30px;">';
                   }

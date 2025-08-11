@@ -35,6 +35,7 @@ class NewsRequest extends FormRequest
             'updated_by'   => 'nullable|exists:users,id',
             'deleted_by'   => 'nullable|exists:users,id',
             'created_by'   => 'nullable|exists:users,id',
+            'path'         => 'nullable|string',
         ];
     }
 }

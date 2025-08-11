@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('content');
             $table->text('summary')->nullable();
             $table->string('thumbnail')->nullable();
+            $table->string('path')->nullable();
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
             $table->date('published_at')->nullable();
             $table->date('archived_at')->nullable();

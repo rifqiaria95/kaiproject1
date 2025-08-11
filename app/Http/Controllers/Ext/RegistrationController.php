@@ -16,9 +16,17 @@ use Laravolt\Indonesia\Models\City;
 use Laravolt\Indonesia\Models\District;
 use Laravolt\Indonesia\Models\Village;
 use Spatie\Permission\Models\Role;
+use App\Services\FileStorageService;
 
 class RegistrationController extends Controller
 {
+    protected $fileStorageService;
+
+    public function __construct(FileStorageService $fileStorageService)
+    {
+        $this->fileStorageService = $fileStorageService;
+    }
+
     public function index(Request $request)
     {
         // Jika request untuk registration page, tampilkan form
@@ -124,19 +132,31 @@ class RegistrationController extends Controller
 
             $userProfile = UserProfile::create($userProfileData);
 
-            // Handle file uploads
+            // Handle file uploads ke object storage
             if ($request->hasFile('foto_ktp')) {
-                $file = $request->file('foto_ktp');
-                $filename = time() . '_ktp_' . $file->getClientOriginalName();
-                $file->move(public_path('images/'), $filename);
-                $userProfile->update(['foto_ktp' => $filename]);
+                $uploadResult = $this->fileStorageService->uploadImage(
+                    $request->file('foto_ktp'),
+                    'registration/ktp'
+                );
+
+                if (!$uploadResult['success']) {
+                    throw new \Exception('Gagal upload foto KTP: ' . $uploadResult['error']);
+                }
+
+                $userProfile->update(['foto_ktp' => $uploadResult['path']]);
             }
 
             if ($request->hasFile('foto_kk')) {
-                $file = $request->file('foto_kk');
-                $filename = time() . '_kk_' . $file->getClientOriginalName();
-                $file->move(public_path('images/'), $filename);
-                $userProfile->update(['foto_kk' => $filename]);
+                $uploadResult = $this->fileStorageService->uploadImage(
+                    $request->file('foto_kk'),
+                    'registration/kk'
+                );
+
+                if (!$uploadResult['success']) {
+                    throw new \Exception('Gagal upload foto KK: ' . $uploadResult['error']);
+                }
+
+                $userProfile->update(['foto_kk' => $uploadResult['path']]);
             }
 
             DB::commit();
@@ -152,6 +172,11 @@ class RegistrationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
+
+            // Hapus file yang sudah diupload jika ada error
+            if (isset($uploadResult) && $uploadResult['success']) {
+                $this->fileStorageService->deleteFile($uploadResult['path']);
+            }
 
             return response()->json([
                 'status' => 500,

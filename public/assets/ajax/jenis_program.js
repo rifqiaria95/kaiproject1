@@ -200,10 +200,12 @@ $(document).ready(function () {
                 data: 'gambar_jenis_program',
                 name: 'gambar_jenis_program',
                 render: function (data, type, full, meta) {
-                    if (!data || data.trim() === "") {
-                        return '-';
+                    if (data) {
+                        // Data sudah berupa URL lengkap dari backend
+                        return '<img src="' + data + '" alt="Gambar Jenis Program" class="img-fluid" style="width: 30px; height: 30px;" onerror="this.onerror=null; this.src=\'https://via.placeholder.com/50\';" />';
+                    } else {
+                        return '<span class="badge bg-secondary">No Image</span>';
                     }
-                    return data;
                 }
             },
             {

@@ -21,3 +21,37 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+README_OBJECT_STORAGE.md
+
+# Laravel Cache & Framework
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitkeep
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+
+# Logs
+/storage/logs/*.log
+*.log
+
+# User Uploads (PENTING untuk News!)
+/storage/app/public/uploads/*
+!/storage/app/public/uploads/.gitkeep
+
+# Build Assets Tambahan
+/public/mix-manifest.json
+/public/js/app.js
+/public/css/app.css
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.bak
+*.backup
+*.tmp
+
+# Environment Tambahan
+.env.local
+.env.staging
+.env.testing

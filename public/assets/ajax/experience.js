@@ -199,7 +199,8 @@ $(document).ready(function () {
               name: 'image',
               render: function (data, type, full, meta) {
                   if (data) {
-                    return '<img src="' + window.images_path + '/' + data + '" alt="Image" class="img-fluid" style="width: 30px; height: 30px;">';
+                    // Data sudah berupa URL lengkap dari backend
+                    return '<img src="' + data + '" alt="Image" class="img-fluid" style="width: 30px; height: 30px;" onerror="this.onerror=null; this.src=\'https://via.placeholder.com/50\';" />';
                   } else {
                     return '<img src="https://via.placeholder.com/50" alt="Image" class="img-fluid" style="width: 30px; height: 30px;">';
                   }
@@ -326,11 +327,11 @@ $(document).ready(function () {
                   $('#formExperience .form-control, #formExperience .form-select').removeClass('is-invalid');
                   $('#formExperience .text-danger.small').text('');
                   setTinyMCEError(false);
-                  
+
                   $.each(errors, function (key, value) {
                       $('#' + key).addClass('is-invalid');
                       $('#' + key + '-error').text(value[0]);
-                      
+
                       // Handle TinyMCE error styling
                       if (key === 'description') {
                           setTinyMCEError(true);
@@ -347,12 +348,12 @@ $(document).ready(function () {
         $('#formExperience')[0].reset();
         $('#id').val('');
         $('#modal-judul').text('Tambah Pengalaman');
-        
+
         // Clear errors
         $('#formExperience .form-control, #formExperience .form-select').removeClass('is-invalid');
         $('#formExperience .text-danger.small').text('');
         setTinyMCEError(false);
-        
+
         // Clear TinyMCE content
         if (tinymce.get('description')) {
             tinymce.get('description').setContent('');
@@ -375,14 +376,14 @@ function editExperience(id) {
                 $('#id').val(experience.id);
                 $('#title').val(experience.title);
                 $('#subtitle').val(experience.subtitle);
-                
+
                 // Set content to TinyMCE editor
                 if (tinymce.get('description')) {
                     tinymce.get('description').setContent(experience.description || '');
                 } else {
                     $('#description').val(experience.description);
                 }
-                
+
                 $('#company').val(experience.company);
                 $('#year').val(experience.year);
 

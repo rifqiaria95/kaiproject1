@@ -312,6 +312,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/edit/{id:uuid}', [NewsController::class, 'edit'])
             ->name('edit')
             ->middleware('permission:edit_news');
+        // Debug route without middleware
+        Route::get('/debug-edit/{id:uuid}', [NewsController::class, 'edit'])
+            ->name('debug-edit');
         Route::put('/update/{id}', [NewsController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit_news');

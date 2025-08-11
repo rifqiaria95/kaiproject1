@@ -8,14 +8,22 @@ use App\Http\Requests\AboutRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use App\Http\Controllers\Controller;
+use App\Services\FileStorageService;
 
 class AboutController extends Controller
 {
+    protected $fileStorageService;
+
+    public function __construct(FileStorageService $fileStorageService)
+    {
+        $this->fileStorageService = $fileStorageService;
+    }
+
     public function index(Request $request)
     {
         // Menampilkan Data about
         $about = About::withoutTrashed()->with(['creator', 'updater', 'deleter']);
-        
+
         if ($request->ajax()) {
             return datatables()->of($about)
                 ->addColumn('created_by', function ($data) {
@@ -26,6 +34,13 @@ class AboutController extends Controller
                 })
                 ->addColumn('deleted_by', function ($data) {
                     return optional($data->deleter)->name ?? '-';
+                })
+                ->editColumn('image', function ($data) {
+                    // Return full storage URL untuk image
+                    if ($data->image) {
+                        return \Storage::disk('public')->url($data->image);
+                    }
+                    return null;
                 })
                 ->addColumn('aksi', function ($data) {
                     $button = '';
@@ -46,12 +61,18 @@ class AboutController extends Controller
         try {
             DB::beginTransaction();
 
-            // Upload image jika ada
+            // Upload image ke object storage jika ada
             if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/'), $filename);
-                $validatedData['image'] = $filename;
+                $uploadResult = $this->fileStorageService->uploadImage(
+                    $request->file('image'),
+                    'about/images'
+                );
+
+                if (!$uploadResult['success']) {
+                    throw new \Exception('Gagal upload image: ' . $uploadResult['error']);
+                }
+
+                $validatedData['image'] = $uploadResult['path'];
             }
 
             // Set created_by berdasarkan user yang sedang login
@@ -62,14 +83,19 @@ class AboutController extends Controller
 
             DB::commit();
 
-            return response()->json([
+                        return response()->json([
                 'status' => 200,
                 'message' => 'Data about berhasil disimpan!',
                 'data' => $about
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
+            // Hapus file yang sudah diupload jika ada error
+            if (isset($uploadResult) && $uploadResult['success']) {
+                $this->fileStorageService->deleteFile($uploadResult['path']);
+            }
+
             return response()->json([
                 'status' => 500,
                 'message' => 'Terjadi kesalahan pada server.',
@@ -115,16 +141,22 @@ class AboutController extends Controller
             $validatedData = $request->validated();
             $oldImage = $about->image;
 
-            // Upload image baru jika ada
+            // Upload image baru ke object storage jika ada
             if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/'), $filename);
-                $validatedData['image'] = $filename;
+                $uploadResult = $this->fileStorageService->uploadImage(
+                    $request->file('image'),
+                    'about/images'
+                );
+
+                if (!$uploadResult['success']) {
+                    throw new \Exception('Gagal upload image: ' . $uploadResult['error']);
+                }
+
+                $validatedData['image'] = $uploadResult['path'];
 
                 // Hapus image lama jika ada
-                if ($oldImage && File::exists(public_path('images/' . $oldImage))) {
-                    File::delete(public_path('images/' . $oldImage));
+                if ($oldImage) {
+                    $this->fileStorageService->deleteFile($oldImage);
                 }
             }
 
@@ -140,9 +172,14 @@ class AboutController extends Controller
                 'status'  => 200,
                 'message' => 'Data about berhasil diubah'
             ]);
-        } catch (\Exception $e) {
+                } catch (\Exception $e) {
             DB::rollBack();
-            
+
+            // Hapus file yang sudah diupload jika ada error
+            if (isset($uploadResult) && $uploadResult['success']) {
+                $this->fileStorageService->deleteFile($uploadResult['path']);
+            }
+
             return response()->json([
                 'status' => 500,
                 'message' => 'Terjadi kesalahan pada server.',
@@ -165,9 +202,9 @@ class AboutController extends Controller
                 ]);
             }
 
-            // Hapus thumbnail jika ada
-            if ($about->image && File::exists(public_path('images/' . $about->image))) {
-                File::delete(public_path('images/' . $about->image));
+            // Hapus image dari object storage jika ada
+            if ($about->image) {
+                $this->fileStorageService->deleteFile($about->image);
             }
 
             // Set deleted_by berdasarkan user yang sedang login
