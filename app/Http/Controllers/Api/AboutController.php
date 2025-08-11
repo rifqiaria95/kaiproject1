@@ -21,7 +21,11 @@ class AboutController extends Controller
                     if ($item->image) {
                         $imagePath = public_path('images/' . $item->image);
                         if (File::exists($imagePath)) {
-                            $item->image_url = url('/images/' . $item->image);
+                            // Gunakan URL yang dinamis berdasarkan environment
+                            $baseUrl = config('app.env') === 'production' 
+                                ? config('app.url') 
+                                : url('/');
+                            $item->image_url = $baseUrl . '/api/images/' . $item->image;
                         } else {
                             // Jika file tidak ada, set image_url ke null
                             $item->image_url = null;

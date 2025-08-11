@@ -47,6 +47,15 @@ Route::get('/images/{filename}', function ($filename) {
     
     if (!file_exists($path)) {
         \Log::warning("Image file not found: {$path}");
+        // Return default image instead of 404
+        $defaultPath = public_path('images/about/about-img.jpg');
+        if (file_exists($defaultPath)) {
+            $file = file_get_contents($defaultPath);
+            $type = mime_content_type($defaultPath);
+            return response($file, 200)
+                ->header('Content-Type', $type)
+                ->header('Cache-Control', 'public, max-age=31536000');
+        }
         abort(404, "Image not found: {$filename}");
     }
     
@@ -57,5 +66,8 @@ Route::get('/images/{filename}', function ($filename) {
     
     return response($file, 200)
         ->header('Content-Type', $type)
-        ->header('Cache-Control', 'public, max-age=31536000');
+        ->header('Cache-Control', 'public, max-age=31536000')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
 })->where('filename', '.*');
