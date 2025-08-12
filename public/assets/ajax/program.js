@@ -272,6 +272,12 @@ $('.select2').select2({
 $('#formProgram').on('submit', function(e){
     e.preventDefault();
 
+    // Show loader on button
+    let submitBtn = $('#btn-simpan');
+    let originalText = submitBtn.html();
+    submitBtn.html('<i class="ti ti-loader ti-spin me-2"></i>Menyimpan...');
+    submitBtn.prop('disabled', true);
+
     let formData = new FormData(this);
     let id = $('#id').val();
     let url = '';
@@ -319,6 +325,11 @@ $('#formProgram').on('submit', function(e){
             } else {
                 toastr.error('Terjadi kesalahan, silakan coba lagi!');
             }
+        },
+        complete: function() {
+            // Hide loader and restore button
+            submitBtn.html(originalText);
+            submitBtn.prop('disabled', false);
         }
     });
 });

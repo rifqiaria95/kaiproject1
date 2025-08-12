@@ -269,6 +269,12 @@ $(document).ready(function () {
     $('#formEducation').on('submit', function(e){
         e.preventDefault();
 
+        // Show loader on button
+        let submitBtn = $('#btn-simpan');
+        let originalText = submitBtn.html();
+        submitBtn.html('<i class="ti ti-loader ti-spin me-2"></i>Menyimpan...');
+        submitBtn.prop('disabled', true);
+
         // Clear previous errors
         $('#formEducation .form-control, #formEducation .form-select').removeClass('is-invalid');
         $('#formEducation .text-danger.small').text('');
@@ -328,6 +334,11 @@ $(document).ready(function () {
               } else {
                   toastr.error('Gagal menyimpan data!');
               }
+            },
+            complete: function() {
+                // Hide loader and restore button
+                submitBtn.html(originalText);
+                submitBtn.prop('disabled', false);
             }
         });
     });
