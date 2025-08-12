@@ -11,7 +11,7 @@ class OrganisasiRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class OrganisasiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nama'      => 'required|string|max:255',
+            'jabatan'   => 'required|string|max:255',
+            'tahun'     => 'required|string|max:255',
+            'lokasi'    => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 }

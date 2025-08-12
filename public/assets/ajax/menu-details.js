@@ -83,8 +83,8 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                   let userPermissions = window.userPermissions || [];
-                  let canEdit         = userPermissions.includes("edit_menu_details");
-                  let canDelete       = userPermissions.includes("delete_menu_details");
+                  let canEdit         = userPermissions.includes("edit_menu_detail");
+                  let canDelete       = userPermissions.includes("delete_menu_detail");
 
                   let buttons = '<div class="d-flex align-items-center">';
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\ExperienceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GaleriController;
+use App\Http\Controllers\Api\OrganisasiController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -28,6 +29,9 @@ Route::get('/kategori-galeri', [App\Http\Controllers\Api\KategoriGaleriControlle
 
 // Education endpoint
 Route::get('/education', [EducationController::class, 'index']);
+
+// Organisasi endpoint
+Route::get('/organisasi', [OrganisasiController::class, 'index']);
 
 // News endpoint
 Route::get('/news', [NewsController::class, 'index']);

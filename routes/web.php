@@ -12,6 +12,7 @@ use App\Http\Controllers\Mono\AboutController;
 use App\Http\Controllers\Mono\AdminController;
 use App\Http\Controllers\Mono\CabangController;
 use App\Http\Controllers\Mono\DivisiController;
+use App\Http\Controllers\Mono\GaleriController;
 use App\Http\Controllers\Mono\GudangController;
 use App\Http\Controllers\Mono\VendorController;
 use App\Http\Controllers\Mono\ChatLogController;
@@ -21,21 +22,21 @@ use App\Http\Controllers\Mono\ProgramController;
 use App\Http\Controllers\Mono\KategoriController;
 use App\Http\Controllers\Mono\DashboardController;
 use App\Http\Controllers\Mono\EducationController;
-use App\Http\Controllers\Mono\GaleriController;
+use App\Http\Controllers\Mono\KnowledgeController;
 use App\Http\Controllers\Mono\MenuGroupController;
 use App\Http\Controllers\Mono\PelangganController;
 use App\Http\Controllers\Mono\DepartemenController;
 use App\Http\Controllers\Mono\ExperienceController;
 use App\Http\Controllers\Mono\MenuDetailController;
+use App\Http\Controllers\Mono\OrganisasiController;
 use App\Http\Controllers\Mono\PermissionController;
 use App\Http\Controllers\Mono\PerusahaanController;
 use App\Http\Controllers\Mono\ProgramReqController;
-use App\Http\Controllers\Mono\KategoriGaleriController;
 use App\Http\Controllers\Ext\RegistrationController;
-use App\Http\Controllers\Mono\KnowledgeController;
 use App\Http\Controllers\Mono\JenisProgramController;
 use App\Http\Controllers\Mono\ProgramRegistController;
 use App\Http\Controllers\Mono\SubMenuDetailController;
+use App\Http\Controllers\Mono\KategoriGaleriController;
 use App\Http\Controllers\Mono\RolePermissionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Ext\ProgramRegistController as ExtProgramRegistController;
@@ -396,6 +397,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/delete/{id}', [KategoriGaleriController::class, 'destroy'])
             ->name('destroy')
             ->middleware('permission:delete_kategori_galeri');
+    });
+
+    // Route Organisasi
+    Route::prefix('portfolio/organisasi')->name('organisasi.')->group(function () {
+        Route::get('/', [OrganisasiController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_organisasi');
+        Route::post('/store', [OrganisasiController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_organisasi');
+        Route::get('/edit/{id}', [OrganisasiController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_organisasi');
+        Route::put('/update/{id}', [OrganisasiController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_organisasi');
+        Route::delete('/delete/{id}', [OrganisasiController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_organisasi');
     });
 
     // Route Experience
