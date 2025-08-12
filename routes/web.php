@@ -21,6 +21,7 @@ use App\Http\Controllers\Mono\ProgramController;
 use App\Http\Controllers\Mono\KategoriController;
 use App\Http\Controllers\Mono\DashboardController;
 use App\Http\Controllers\Mono\EducationController;
+use App\Http\Controllers\Mono\GaleriController;
 use App\Http\Controllers\Mono\MenuGroupController;
 use App\Http\Controllers\Mono\PelangganController;
 use App\Http\Controllers\Mono\DepartemenController;
@@ -29,8 +30,9 @@ use App\Http\Controllers\Mono\MenuDetailController;
 use App\Http\Controllers\Mono\PermissionController;
 use App\Http\Controllers\Mono\PerusahaanController;
 use App\Http\Controllers\Mono\ProgramReqController;
+use App\Http\Controllers\Mono\KategoriGaleriController;
 use App\Http\Controllers\Ext\RegistrationController;
-use App\Http\Controllers\Mono\KnowledgeController;  
+use App\Http\Controllers\Mono\KnowledgeController;
 use App\Http\Controllers\Mono\JenisProgramController;
 use App\Http\Controllers\Mono\ProgramRegistController;
 use App\Http\Controllers\Mono\SubMenuDetailController;
@@ -114,7 +116,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/update/{id}', [DepartemenController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [DepartemenController::class, 'destroy'])->name('destroy');
         Route::get('/get-by-divisi/{id_divisi}', [DepartemenController::class, 'getByDivisi'])->name('get.by.divisi');
-    }); 
+    });
 
     // Route Perusahaan
     Route::prefix('company/perusahaan')->name('perusahaan.')->group(function () {
@@ -156,7 +158,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Route Kategori
-    Route::prefix('inventory/kategori')->name('kategori.')->group(function () {
+    Route::prefix('portfolio/news/kategori')->name('kategori.')->group(function () {
         Route::get('/', [KategoriController::class, 'index'])->name('index');
         Route::post('/store', [KategoriController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [KategoriController::class, 'edit'])->name('edit');
@@ -312,9 +314,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/edit/{id:uuid}', [NewsController::class, 'edit'])
             ->name('edit')
             ->middleware('permission:edit_news');
-        // Debug route without middleware
-        Route::get('/debug-edit/{id:uuid}', [NewsController::class, 'edit'])
-            ->name('debug-edit');
         Route::put('/update/{id}', [NewsController::class, 'update'])
             ->name('update')
             ->middleware('permission:edit_news');
@@ -359,6 +358,44 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/delete/{id}', [EducationController::class, 'destroy'])
             ->name('destroy')
             ->middleware('permission:delete_education');
+    });
+
+    // Route Galeri
+    Route::prefix('portfolio/galeri/list-galeri')->name('list-galeri.')->group(function () {
+        Route::get('/', [GaleriController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_galeri');
+        Route::post('/store', [GaleriController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_galeri');
+        Route::get('/edit/{id}', [GaleriController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_galeri');
+        Route::put('/update/{id}', [GaleriController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_galeri');
+        Route::delete('/delete/{id}', [GaleriController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_galeri');
+    });
+
+    // Route Kategori Galeri
+    Route::prefix('portfolio/galeri/kategori-galeri')->name('kategori-galeri.')->group(function () {
+        Route::get('/', [KategoriGaleriController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_kategori_galeri');
+        Route::post('/store', [KategoriGaleriController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_kategori_galeri');
+        Route::get('/edit/{id}', [KategoriGaleriController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_kategori_galeri');
+        Route::put('/update/{id}', [KategoriGaleriController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_kategori_galeri');
+        Route::delete('/delete/{id}', [KategoriGaleriController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_kategori_galeri');
     });
 
     // Route Experience

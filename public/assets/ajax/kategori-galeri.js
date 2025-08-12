@@ -8,7 +8,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    $('#Tablekategori').DataTable({
+    $('#TablekategoriGaleri').DataTable({
         dom:
             '<"row me-2"' +
             '<"col-md-2"<"me-3"l>>' +
@@ -169,7 +169,7 @@ $(document).ready(function () {
                 className: 'add-new btn btn-primary waves-effect waves-light',
                 attr: {
                     'data-bs-toggle': 'offcanvas',
-                    'data-bs-target': '#offcanvasAddkategori',
+                    'data-bs-target': '#offcanvasAddkategoriGaleri',
 
                 }
             }
@@ -177,7 +177,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/portfolio/news/kategori/",
+            url: "/portfolio/galeri/kategori-galeri/",
             type: 'GET'
         },
         columns: [
@@ -237,8 +237,8 @@ $(document).ready(function () {
     // Reset form when add new kategori button is clicked
     $('.card').on('click', '.dt-action-buttons .add-new', function() {
         $('#id').val('');
-        $('#formkategori')[0].reset();
-        $('#offcanvasAddkategoriLabel').text('Tambah Kategori');
+        $('#formkategoriGaleri')[0].reset();
+        $('#offcanvasAddkategoriGaleriLabel').text('Tambah Kategori Galeri');
         $('.data-submit').text('Submit');
         $('.form-control, .form-select').removeClass('is-invalid');
         $('.text-danger').text('');
@@ -251,7 +251,7 @@ $(document).ready(function () {
         $('.text-danger').text('');
 
         $.ajax({
-            url: `/portfolio/news/kategori/edit/${id}/`,
+            url: `/portfolio/galeri/kategori-galeri/edit/${id}/`,
             type: "GET",
             success: function (response) {
                 if (response.success) {
@@ -259,11 +259,11 @@ $(document).ready(function () {
                     $("#id").val(response.kategori.id);
                     $("#name").val(response.kategori.name);
                     $("#slug").val(response.kategori.slug);
-                    $('#offcanvasAddkategoriLabel').text('Edit Kategori');
+                    $('#offcanvasAddkategoriGaleriLabel').text('Edit Kategori Galeri');
                     // Ubah tombol submit agar tahu ini update
                     $(".data-submit").text("Update").attr("id", "updateMenu");
 
-                    $("#offcanvasAddkategori").offcanvas("show");
+                    $("#offcanvasAddkategoriGaleri").offcanvas("show");
                 }
             },
             error: function () {
@@ -273,7 +273,7 @@ $(document).ready(function () {
     }
 
     // Submit Form: Tambah & Update
-    $("#formkategori").submit(function (e) {
+    $("#formkategoriGaleri").submit(function (e) {
         e.preventDefault();
 
         $('.form-control, .form-select').removeClass('is-invalid');
@@ -281,11 +281,11 @@ $(document).ready(function () {
 
         let formData = new FormData(this);
         let id       = $("#id").val();
-        let url      = "/portfolio/news/kategori/store";
+        let url      = "/portfolio/galeri/kategori-galeri/store";
         let method   = "POST";
 
         if (id) {
-            url = "/portfolio/news/kategori/update/" + id;
+            url = "/portfolio/galeri/kategori-galeri/update/" + id;
             formData.append("_method", "PUT");
         }
 
@@ -299,11 +299,11 @@ $(document).ready(function () {
                 if (response.success) {
                     toastr.success(response.message);
 
-                    $('#Tablekategori').DataTable().ajax.reload(null, false);
-                    $("#formkategori")[0].reset();
+                    $('#TablekategoriGaleri').DataTable().ajax.reload(null, false);
+                    $("#formkategoriGaleri")[0].reset();
                     $("#id").val(""); // Reset ID agar tidak salah update nanti
 
-                    $("#offcanvasAddkategori").offcanvas("hide");
+                    $("#offcanvasAddkategoriGaleri").offcanvas("hide");
 
                     $(".data-submit").text("Submit").removeAttr("id");
                     selectedId = null;
@@ -328,7 +328,7 @@ $(document).ready(function () {
 
         Swal.fire({
             title: 'Apakah Anda yakin?',
-            text: "Data kategori akan dihapus!",
+            text: "Data kategori galeri akan dihapus!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -338,7 +338,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/portfolio/news/kategori/delete/' + id,
+                    url: '/portfolio/galeri/kategori-galeri/delete/' + id,
                     type: 'DELETE',
                     data: {
                         _method: 'DELETE',
@@ -351,7 +351,7 @@ $(document).ready(function () {
                                 'Data Kategori Berhasil Dihapus.',
                                 'success'
                             );
-                            $('#Tablekategori').DataTable().ajax.reload(null, false);
+                            $('#TablekategoriGaleri').DataTable().ajax.reload(null, false);
                         } else {
                             Swal.fire(
                                 'Error!',

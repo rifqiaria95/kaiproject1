@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Mono;
 
 use App\Http\Controllers\Controller;
+use App\Models\KategoriGaleri;
+use App\Http\Requests\KategoriGaleriRequest;
 use Illuminate\Http\Request;
-use App\Http\Requests\KategoriRequest;
-use App\Models\Kategori;
 
-class KategoriController extends Controller
+class KategoriGaleriController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
             // Optimasi: Query data hanya saat AJAX request
-            $kategori = Kategori::select(['id', 'name', 'slug', 'created_at']);
+            $kategori = KategoriGaleri::select(['id', 'name', 'slug', 'created_at']);
 
             return datatables()->of($kategori)
                 ->addColumn('aksi', function ($data) {
@@ -25,14 +25,14 @@ class KategoriController extends Controller
                 ->toJson();
         }
 
-        return view('internal/kategori.index');
+        return view('internal/kategori_galeri.index');
     }
 
-    public function store(KategoriRequest $request)
+    public function store(KategoriGaleriRequest $request)
     {
         $validatedData = $request->validated();
 
-        $kategori = Kategori::create($validatedData);
+        $kategori = KategoriGaleri::create($validatedData);
 
         return response()->json([
             'success'  => true,
@@ -43,7 +43,7 @@ class KategoriController extends Controller
 
     public function edit($id)
     {
-        $kategori = Kategori::findOrFail($id);
+        $kategori = KategoriGaleri::findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -51,11 +51,11 @@ class KategoriController extends Controller
         ]);
     }
 
-    public function update(KategoriRequest $request, $id)
+    public function update(KategoriGaleriRequest $request, $id)
     {
         $validatedData = $request->validated();
 
-        $kategori = Kategori::findOrFail($id);
+        $kategori = KategoriGaleri::findOrFail($id);
         $kategori->update($validatedData);
 
         return response()->json([
@@ -66,7 +66,7 @@ class KategoriController extends Controller
 
     public function destroy($id)
     {
-        $kategori = Kategori::find($id);
+        $kategori = KategoriGaleri::find($id);
 
         // \ActivityLog::addToLog('Menghapus data kategori');
 

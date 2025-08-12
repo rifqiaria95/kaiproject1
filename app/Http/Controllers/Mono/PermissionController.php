@@ -31,6 +31,10 @@ class PermissionController extends Controller
                 ->addColumn('menu_details', function ($permission) {
                     return $permission->menuDetails ? $permission->menuDetails->pluck('name')->toArray() : [];
                 })
+                ->addColumn('aksi', function ($permission) {
+                    return ''; // Kolom aksi akan di-render di JavaScript
+                })
+                ->rawColumns(['aksi'])
                 ->toJson();
         }
 

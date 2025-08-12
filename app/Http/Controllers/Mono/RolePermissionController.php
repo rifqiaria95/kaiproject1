@@ -17,17 +17,14 @@ class RolePermissionController extends Controller
         if ($request->ajax()) {
             // Optimasi: Query role dengan eager loading yang efisien
             $role = Role::select(['id', 'name', 'created_at'])
-                ->with(['permissions:id,name,module_name']);
+                ->with(['permissions:id,name']);
 
             return datatables()->of($role)
-                ->addColumn('module_name', function ($data) {
-                    return $data->permissions->pluck('module_name')->implode(', ');
-                })
                 ->addColumn('aksi', function ($data) {
                     $button = '';
                     return $button;
                 })
-                ->rawColumns(['module_name', 'aksi', 'permissions'])
+                ->rawColumns(['aksi', 'permissions'])
                 ->addIndexColumn()
                 ->toJson();
         }
@@ -45,7 +42,7 @@ class RolePermissionController extends Controller
         });
 
         $permissions = \Cache::remember('permissions_with_relations', 900, function() {
-            return Permission::select(['id', 'name', 'module_name'])
+            return Permission::select(['id', 'name'])
                 ->with([
                     'roles:id,name',
                     'menuGroups:id,name',
@@ -103,7 +100,7 @@ class RolePermissionController extends Controller
             ->findOrFail($id);
 
         $permissions = \Cache::remember('permissions_list_edit', 900, function() {
-            return Permission::select(['id', 'name', 'module_name'])->get();
+            return Permission::select(['id', 'name'])->get();
         });
 
         $rolePermissions = $role->permissions->pluck('id');
