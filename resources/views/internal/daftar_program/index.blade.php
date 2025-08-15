@@ -12,16 +12,15 @@
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div class="content-left">
-                                <span class="text-heading">Session</span>
+                                <span class="text-heading">Program</span>
                                 <div class="d-flex align-items-center my-1">
-                                    <h4 class="mb-0 me-2">21,459</h4>
-                                    <p class="text-success mb-0">(+29%)</p>
+                                    <h4 class="mb-0 me-2">{{ totalProgram() }}</h4>
                                 </div>
-                                <small class="mb-0">Total pelanggan</small>
+                                <small class="mb-0">Total Program</small>
                             </div>
                             <div class="avatar">
                                 <span class="avatar-initial rounded bg-label-primary">
-                                    <i class="ti ti-pelanggans ti-26px"></i>
+                                    <i class="ti ti-notes ti-26px"></i>
                                 </span>
                             </div>
                         </div>
@@ -33,16 +32,15 @@
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div class="content-left">
-                                <span class="text-heading">Paid pelanggan</span>
+                                <span class="text-heading">Open Program</span>
                                 <div class="d-flex align-items-center my-1">
-                                    <h4 class="mb-0 me-2">4,567</h4>
-                                    <p class="text-success mb-0">(+18%)</p>
+                                    <h4 class="mb-0 me-2">{{ openProgram() }}</h4>
                                 </div>
-                                <small class="mb-0">Last week analytics </small>
+                                <small class="mb-0">Total Open Program</small>
                             </div>
                             <div class="avatar">
                                 <span class="avatar-initial rounded bg-label-danger">
-                                    <i class="ti ti-pelanggan-plus ti-26px"></i>
+                                    <i class="ti ti-lock-open-2 ti-26px"></i>
                                 </span>
                             </div>
                         </div>
@@ -54,16 +52,15 @@
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div class="content-left">
-                                <span class="text-heading">Active pelanggan</span>
+                                <span class="text-heading">Draft Program</span>
                                 <div class="d-flex align-items-center my-1">
-                                    <h4 class="mb-0 me-2"></h4>
-                                    <p class="text-danger mb-0">(-14%)</p>
+                                    <h4 class="mb-0 me-2">{{ totalDraftProgram() }}</h4>
                                 </div>
-                                <small class="mb-0">Last week analytics</small>
+                                <small class="mb-0">Total Draft Program</small>
                             </div>
                             <div class="avatar">
                                 <span class="avatar-initial rounded bg-label-success">
-                                    <i class="ti ti-pelanggan-check ti-26px"></i>
+                                    <i class="ti ti-progress ti-26px"></i>
                                 </span>
                             </div>
                         </div>
@@ -75,16 +72,15 @@
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div class="content-left">
-                                <span class="text-heading">Pending pelanggan</span>
+                                <span class="text-heading">Closed Program</span>
                                 <div class="d-flex align-items-center my-1">
-                                    <h4 class="mb-0 me-2">237</h4>
-                                    <p class="text-success mb-0">(+42%)</p>
+                                    <h4 class="mb-0 me-2">{{ totalClosedProgram() }}</h4>
                                 </div>
-                                <small class="mb-0">Last week analytics</small>
+                                <small class="mb-0">Total Closed Program</small>
                             </div>
                             <div class="avatar">
                                 <span class="avatar-initial rounded bg-label-warning">
-                                    <i class="ti ti-pelanggan-search ti-26px"></i>
+                                    <i class="ti ti-lock ti-26px"></i>
                                 </span>
                             </div>
                         </div>

@@ -14,7 +14,7 @@ class JenisProgramController extends Controller
         // Menampilkan Data pegawai
         if ($request->ajax()) {
             // Optimasi: Query data hanya saat AJAX request
-            $jenis_program = JenisProgram::select(['id', 'nama_jenis', 'deskripsi', 'created_at']);
+            $jenis_program = JenisProgram::select(['id', 'nama_jenis_program', 'deskripsi_jenis_program', 'gambar_jenis_program', 'created_at']);
 
             return datatables()->of($jenis_program)
                 ->addColumn('aksi', function ($data) {

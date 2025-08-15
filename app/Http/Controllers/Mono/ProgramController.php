@@ -121,4 +121,31 @@ class ProgramController extends Controller
             'message' => 'Data Program Berhasil Dihapus'
         ]);
     }
+
+    public function getProgram($id)
+    {
+        try {
+            $program = Program::select(['id', 'name', 'status'])
+                ->where('id', $id)
+                ->first();
+
+            if (!$program) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Program tidak ditemukan'
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => 200,
+                'data' => $program
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Terjadi kesalahan pada server',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

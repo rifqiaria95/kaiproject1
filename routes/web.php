@@ -224,6 +224,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->middleware('permission:reject_daftar_program');
     });
 
+
+    // Route untuk mendapatkan data program berdasarkan ID
+    Route::get('/program/get-program/{id}', [ProgramController::class, 'getProgram'])
+        ->name('program.get-program')
+        ->middleware('auth');
+
+    // Route untuk debugging - mendapatkan semua program
+    Route::get('/program/debug-programs', function() {
+        $programs = \App\Models\Program::select(['id', 'name', 'status'])->get();
+        return response()->json($programs);
+    })->middleware('auth');
+
+    // Route untuk debugging - mendapatkan data program registration
+    Route::get('/program/debug-registration/{id}', function($id) {
+        $registration = \App\Models\ProgramRegistration::find($id);
+        $program = null;
+        if ($registration && $registration->program_id) {
+            $program = \App\Models\Program::find($registration->program_id);
+        }
+        return response()->json([
+            'registration' => $registration,
+            'program' => $program,
+            'program_id' => $registration ? $registration->program_id : null
+        ]);
+    })->middleware('auth');
+
     // Route Program Requirement
     Route::prefix('program/program-requirement')->name('program-requirement.')->group(function () {
         Route::get('/', [ProgramReqController::class, 'index'])

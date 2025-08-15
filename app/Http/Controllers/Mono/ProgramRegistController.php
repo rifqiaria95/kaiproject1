@@ -48,9 +48,10 @@ class ProgramRegistController extends Controller
         // Cache data dropdown yang jarang berubah
         $program = \Cache::remember('programs_list_regist', 1800, function() {
             return Program::select(['id', 'name', 'status'])
-                ->where('status', 'active')
+                ->whereIn('status', ['active', 'open'])
                 ->get();
         });
+
         $user = \Cache::remember('users_list_regist', 900, function() {
             return User::select(['id', 'name', 'email'])
                 ->where('active', true)
@@ -120,13 +121,51 @@ class ProgramRegistController extends Controller
 
     public function edit($id)
     {
-        $programregist = ProgramRegistration::with('program', 'user')->where('id', $id)->first();
+        $programregist = ProgramRegistration::where('id', $id)->first();
 
         if (!$programregist) {
             return response()->json(['error' => 'Data tidak ditemukan'], 404);
         }
 
-        return response()->json($programregist);
+        // Ambil data program dan user secara terpisah
+        $program = null;
+        $user = null;
+
+        if ($programregist->program_id) {
+            $program = Program::withoutTrashed()->find($programregist->program_id);
+        }
+
+        if ($programregist->user_id) {
+            $user = User::find($programregist->user_id);
+        }
+
+        // Format tanggal untuk input type="date" (YYYY-MM-DD)
+        $formattedDate = null;
+        if ($programregist->registered_at) {
+            try {
+                // Coba parse dengan Carbon untuk handling yang lebih baik
+                $date = \Carbon\Carbon::parse($programregist->registered_at);
+                $formattedDate = $date->format('Y-m-d');
+            } catch (\Exception $e) {
+                // Fallback ke date() jika Carbon gagal
+                $formattedDate = date('Y-m-d', strtotime($programregist->registered_at));
+            }
+        }
+
+        // Buat response dengan data yang lengkap
+        $response = [
+            'id'            => $programregist->id,
+            'program_id'    => $programregist->program_id,
+            'user_id'       => $programregist->user_id,
+            'alasan'        => $programregist->alasan,
+            'status'        => $programregist->status,
+            'notes_admin'   => $programregist->notes_admin,
+            'registered_at' => $formattedDate,
+            'program'       => $program,
+            'user'          => $user
+        ];
+
+        return response()->json($response);
     }
 
     public function update($id, ProgramRegistRequest $request)

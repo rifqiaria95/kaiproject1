@@ -33,7 +33,7 @@ function initializeDataTable() {
             console.error('DataTable library not loaded');
             return;
         }
-        
+
         // Pastikan elemen table ada
         var table = $('#TableProgramReq');
         if (!table.length) {
@@ -322,19 +322,8 @@ window.ViewData = function (id) {
                     $('#field').val(response.field);
                     $('#operator').val(response.operator);
                     $('#value').val(response.value);
-                    $.ajax({
-                        url: "/program/get-program/" + response.program_id,
-                        type: "GET",
-                        success: function(programResponse) {
-                            $('#program_id').empty().append('<option selected disabled>Pilih Program</option>');
-
-                            programResponse.forEach(function (data) {
-                                $('#program_id').append('<option value="' + data.id + '">' + data.name + '</option>');
-                            });
-
-                            $('#program_id').val(response.program_id).trigger('change');
-                        }
-                    });
+                    // Set program_id langsung karena dropdown sudah terisi
+                    $('#program_id').val(response.program_id).trigger('change');
                 }
             },
             error: function() {

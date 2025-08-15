@@ -6,6 +6,9 @@ use App\Models\Pegawai;
 use App\Models\Absensi;
 use App\Models\Karyawan;
 use App\Models\PurchaseOrder;
+use App\Models\Program;
+use App\Models\JenisProgram;
+use App\Models\ProgramRegistration;
 
 
 function totalKaryawan()
@@ -55,23 +58,52 @@ function totalInactiveUser()
     return User::where('status_user', '<', 1)->count();
 }
 
-function totalTask()
+function totalProgram()
 {
-    return Task::count();
+    return Program::count();
 }
 
-function finishedTask()
+function openProgram()
 {
-    return Task::where('task_status', '=', 'Finished')->count();
+    return Program::where('status', '=', 'open')->count();
 }
 
-function totalProgressTask()
+function totalDraftProgram()
 {
-    return Task::where('task_status', '=', 'On Progress')->count();
+    return Program::where('status', '=', 'draft')->count();
 }
 
-function totalUnfinishedTask()
+function totalClosedProgram()
 {
-    return Task::where('task_status', '=', 'Unfinished')->count();
+    return Program::where('status', '=', 'closed')->count();
 }
 
+function totalJenisProgram()
+{
+    return JenisProgram::count();
+}
+
+function totalProgramRegistration()
+{
+    return ProgramRegistration::count();
+}
+
+function totalPendaftar()
+{
+    return ProgramRegistration::with('user')->count();
+}
+
+function totalPendaftarPending()
+{
+    return ProgramRegistration::where('status', '=', 'pending')->count();
+}
+
+function totalPendaftarApproved()
+{
+    return ProgramRegistration::where('status', '=', 'approved')->count();
+}
+
+function totalPendaftarRejected()
+{
+    return ProgramRegistration::where('status', '=', 'rejected')->count();
+}
