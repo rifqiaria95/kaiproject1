@@ -148,6 +148,11 @@ $(document).ready(function () {
     $("#formCabang").submit(function (e) {
         e.preventDefault();
 
+        // Tambahkan loader pada tombol submit
+        var submitBtn = $(this).find('button[type="submit"]');
+        var originalText = submitBtn.html();
+        submitBtn.html('<i class="ti ti-loader ti-spin me-2"></i>Menyimpan...').prop('disabled', true);
+
         $('.form-control, .form-select').removeClass('is-invalid');
         $('.text-danger').text('');
 
@@ -181,6 +186,8 @@ $(document).ready(function () {
                     $(".data-submit").text("Submit").removeAttr("id");
                     selectedId = null;
                 }
+                // Kembalikan tombol ke kondisi semula
+                submitBtn.html(originalText).prop('disabled', false);
             },
             error: function (xhr) {
                 if (xhr.status === 422) {
@@ -192,6 +199,8 @@ $(document).ready(function () {
                 } else {
                     toastr.error('Gagal menyimpan data!');
                 }
+                // Kembalikan tombol ke kondisi semula
+                submitBtn.html(originalText).prop('disabled', false);
             }
         });
     });
@@ -200,7 +209,7 @@ $(document).ready(function () {
     $('#filter_perusahaan').on('change', function() {
         let perusahaanId = $(this).val();
         let table = $('#TableCabang').DataTable();
-        
+
         if (perusahaanId) {
             // Filter berdasarkan perusahaan
             table.column(2).search(perusahaanId).draw();
@@ -258,4 +267,4 @@ $(document).ready(function () {
             }
         });
     });
-}); 
+});

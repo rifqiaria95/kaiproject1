@@ -473,6 +473,11 @@ $(document).ready(function () {
     $('#formNews').on('submit', function(e){
         e.preventDefault();
 
+        // Tambahkan loader pada tombol submit
+        var submitBtn = $(this).find('button[type="submit"]');
+        var originalText = submitBtn.html();
+        submitBtn.html('<i class="ti ti-loader ti-spin me-2"></i>Menyimpan...').prop('disabled', true);
+
         $('#formNews .form-control, #formNews .form-select').removeClass('is-invalid');
         $('#formNews .text-danger.small').text('');
 
@@ -509,6 +514,8 @@ $(document).ready(function () {
                 } else {
                     toastr.error('Terjadi kesalahan, silakan coba lagi!');
                 }
+                // Kembalikan tombol ke kondisi semula
+                submitBtn.html(originalText).prop('disabled', false);
             },
             error: function (xhr) {
               if (xhr.status === 422) {
@@ -520,6 +527,8 @@ $(document).ready(function () {
               } else {
                   toastr.error('Gagal menyimpan data!');
               }
+              // Kembalikan tombol ke kondisi semula
+              submitBtn.html(originalText).prop('disabled', false);
             }
         });
     });

@@ -40,6 +40,7 @@ use App\Http\Controllers\Mono\KategoriGaleriController;
 use App\Http\Controllers\Mono\RolePermissionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Ext\ProgramRegistController as ExtProgramRegistController;
+use App\Http\Controllers\Mono\TestimoniController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -435,6 +436,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/delete/{id}', [ExperienceController::class, 'destroy'])
             ->name('destroy')
             ->middleware('permission:delete_experience');
+    });
+
+    // Route Testimoni
+    Route::prefix('portfolio/testimoni')->name('testimoni.')->group(function () {
+        Route::get('/', [TestimoniController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_testimoni');
+        Route::post('/store', [TestimoniController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_testimoni');
+        Route::get('/edit/{id}', [TestimoniController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_testimoni');
+        Route::put('/update/{id}', [TestimoniController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_testimoni');
+        Route::delete('/delete/{id}', [TestimoniController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_testimoni');
     });
 
     // Route User

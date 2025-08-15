@@ -301,6 +301,11 @@ $(document).ready(function () {
         $('#formPegawai').on('submit', function(e){
             e.preventDefault();
 
+            // Tambahkan loader pada tombol submit
+            var submitBtn = $(this).find('button[type="submit"]');
+            var originalText = submitBtn.html();
+            submitBtn.html('<i class="ti ti-loader ti-spin me-2"></i>Menyimpan...').prop('disabled', true);
+
             let formData = new FormData(this);
             let id = $('#id').val();
             let url = '';
@@ -332,6 +337,8 @@ $(document).ready(function () {
                     } else {
                         toastr.error('Terjadi kesalahan, silakan coba lagi!');
                     }
+                    // Kembalikan tombol ke kondisi semula
+                    submitBtn.html(originalText).prop('disabled', false);
                 },
                 error: function(xhr){
                     if(xhr.status === 400) {
@@ -347,6 +354,9 @@ $(document).ready(function () {
 
                     } else {
                         toastr.error('Terjadi kesalahan, silakan coba lagi!');
+                    }
+                    // Kembalikan tombol ke kondisi semula
+                    submitBtn.html(originalText).prop('disabled', false);
                     }
                 }
             });

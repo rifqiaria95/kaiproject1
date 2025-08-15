@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ExperienceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GaleriController;
 use App\Http\Controllers\Api\OrganisasiController;
+use App\Http\Controllers\Api\TestimoniController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -41,6 +42,9 @@ Route::get('/experience', [ExperienceController::class, 'index']);
 
 // Program endpoint
 Route::get('/programs/open', [App\Http\Controllers\Api\ProgramController::class, 'getOpenPrograms']);
+
+// Testimoni endpoint
+Route::get('/testimoni', [TestimoniController::class, 'index']);
 
 // Auth endpoints
 Route::post('/auth/login', [AuthController::class, 'login']);

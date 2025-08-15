@@ -156,6 +156,11 @@ $(document).ready(function () {
     $("#formMenuDetails").submit(function (e) {
         e.preventDefault();
 
+        // Tambahkan loader pada tombol submit
+        var submitBtn = $(this).find('button[type="submit"]');
+        var originalText = submitBtn.html();
+        submitBtn.html('<i class="ti ti-loader ti-spin me-2"></i>Menyimpan...').prop('disabled', true);
+
         let formData = new FormData(this);
         let url      = selectedId ? `admin/menu-detail/update/${selectedId}` : "admin/menu-detail/store";
 
@@ -177,9 +182,13 @@ $(document).ready(function () {
                     $(".data-submit").text("Submit").removeAttr("id");
                     selectedId = null;
                 }
+                // Kembalikan tombol ke kondisi semula
+                submitBtn.html(originalText).prop('disabled', false);
             },
             error: function () {
                 toastr.error('Gagal menyimpan data!');
+                // Kembalikan tombol ke kondisi semula
+                submitBtn.html(originalText).prop('disabled', false);
             }
         });
     });

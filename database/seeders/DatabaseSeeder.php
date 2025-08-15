@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             VendorSeeder::class,
             UserSeeder::class,
             NewsSeeder::class,
+            TestimoniSeeder::class,
         ]);
 
         Pelanggan::factory(10)->create();

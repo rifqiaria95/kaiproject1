@@ -219,8 +219,20 @@ $(document).ready(function () {
               name: 'institution'
             },
             {
-              data: 'description',
-              name: 'description'
+            data: 'description',
+            name: 'description',
+                render: function (data, type, full, meta) {
+                    // Tampilkan maksimal 3 kata saja, lalu tambahkan "..."
+                    if (!data) return '';
+                    // Hilangkan tag HTML jika ada
+                    let text = $('<div>').html(data).text();
+                    let words = text.trim().split(/\s+/);
+                    if (words.length > 3) {
+                        return words.slice(0, 3).join(' ') + ' ...';
+                    } else {
+                        return text;
+                    }
+                }
             },
             {
               data: 'year',
