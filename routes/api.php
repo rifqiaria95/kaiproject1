@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GaleriController;
 use App\Http\Controllers\Api\OrganisasiController;
 use App\Http\Controllers\Api\TestimoniController;
+use App\Http\Controllers\Api\VisiMisiController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -21,6 +22,9 @@ Route::post('/chat', [ChatController::class, 'handle']);
 
 // About endpoint
 Route::get('/about', [AboutController::class, 'index']);
+
+// Visi Misi endpoint
+Route::get('/visimisi', [VisiMisiController::class, 'index']);
 
 // Galeri endpoint
 Route::get('/galeri', [GaleriController::class, 'index']);

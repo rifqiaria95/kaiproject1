@@ -14,6 +14,7 @@ use App\Http\Controllers\Mono\CabangController;
 use App\Http\Controllers\Mono\DivisiController;
 use App\Http\Controllers\Mono\GaleriController;
 use App\Http\Controllers\Mono\GudangController;
+use App\Http\Controllers\Mono\VisiMisiController;
 use App\Http\Controllers\Mono\VendorController;
 use App\Http\Controllers\Mono\ChatLogController;
 use App\Http\Controllers\Mono\JabatanController;
@@ -367,6 +368,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/delete/{id}', [AboutController::class, 'destroy'])
             ->name('destroy')
             ->middleware('permission:delete_about');
+    });
+
+    // Route Visi Misi
+    Route::prefix('portfolio/visi-misi')->name('visi-misi.')->group(function () {
+        Route::get('/', [VisiMisiController::class, 'index'])
+            ->name('index')
+            ->middleware('permission:view_visi_misi');
+        Route::post('/store', [VisiMisiController::class, 'store'])
+            ->name('store')
+            ->middleware('permission:create_visi_misi');
+        Route::get('/edit/{id}', [VisiMisiController::class, 'edit'])
+            ->name('edit')
+            ->middleware('permission:edit_visi_misi');
+        Route::put('/update/{id}', [VisiMisiController::class, 'update'])
+            ->name('update')
+            ->middleware('permission:edit_visi_misi');
+        Route::delete('/delete/{id}', [VisiMisiController::class, 'destroy'])
+            ->name('destroy')
+            ->middleware('permission:delete_visi_misi');
     });
 
     // Route Education
