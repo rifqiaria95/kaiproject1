@@ -230,26 +230,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('program.get-program')
         ->middleware('auth');
 
-    // Route untuk debugging - mendapatkan semua program
-    Route::get('/program/debug-programs', function() {
-        $programs = \App\Models\Program::select(['id', 'name', 'status'])->get();
-        return response()->json($programs);
-    })->middleware('auth');
-
-    // Route untuk debugging - mendapatkan data program registration
-    Route::get('/program/debug-registration/{id}', function($id) {
-        $registration = \App\Models\ProgramRegistration::find($id);
-        $program = null;
-        if ($registration && $registration->program_id) {
-            $program = \App\Models\Program::find($registration->program_id);
-        }
-        return response()->json([
-            'registration' => $registration,
-            'program' => $program,
-            'program_id' => $registration ? $registration->program_id : null
-        ]);
-    })->middleware('auth');
-
     // Route Program Requirement
     Route::prefix('program/program-requirement')->name('program-requirement.')->group(function () {
         Route::get('/', [ProgramReqController::class, 'index'])
@@ -533,6 +513,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::get('/edit/{id}', [PermissionController::class, 'edit'])->name('edit');
         Route::put('/update/{id}', [PermissionController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [PermissionController::class, 'destroy'])->name('destroy');
+        Route::delete('/delete-batch', [PermissionController::class, 'destroyBatch'])->name('destroy.batch');
         Route::get('/profile/{id}', [PermissionController::class, 'profile'])->name('profile');
         Route::get('/permissions', [PermissionController::class, 'getPermissions']);
         Route::get('/get-menu-groups', [PermissionController::class, 'getMenuGroups'])->name('get.menu.groups');
@@ -557,6 +538,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
         Route::get('/edit/{id}', [MenuDetailController::class, 'edit'])->name('edit');
         Route::post('/update/{id}', [MenuDetailController::class, 'update'])->name('update');
         Route::delete('/delete/{id}', [MenuDetailController::class, 'destroy'])->name('destroy');
+        Route::delete('/delete-batch', [MenuDetailController::class, 'destroyBatch'])->name('destroy.batch');
     });
 
     // Route Sub Menu Details

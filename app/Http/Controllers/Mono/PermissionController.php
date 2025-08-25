@@ -161,6 +161,55 @@ class PermissionController extends Controller
         }
     }
 
+    public function destroyBatch(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:permissions,id'
+        ]);
+
+        try {
+            $ids = $request->input('ids');
+            $deletedCount = 0;
+            $failedCount = 0;
+
+            foreach ($ids as $id) {
+                try {
+                    $permission = Permission::findOrFail($id);
+                    
+                    // Detach relationships
+                    $permission->roles()->detach();
+                    $permission->menuDetails()->detach();
+                    $permission->menuGroups()->detach();
+                    
+                    // Delete permission
+                    $permission->delete();
+                    $deletedCount++;
+                } catch (\Exception $e) {
+                    $failedCount++;
+                }
+            }
+
+            $message = "Berhasil menghapus {$deletedCount} permission";
+            if ($failedCount > 0) {
+                $message .= ", {$failedCount} permission gagal dihapus";
+            }
+
+            return response()->json([
+                'status' => 200,
+                'message' => $message,
+                'deleted_count' => $deletedCount,
+                'failed_count' => $failedCount
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     public function getMenuGroups()
     {
         $menuGroups = MenuGroup::select('id', 'name')->get();

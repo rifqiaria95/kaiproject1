@@ -219,6 +219,53 @@ class MenuDetailController extends Controller
         }
     }
 
+    public function destroyBatch(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:menu_details,id'
+        ]);
+
+        try {
+            $ids = $request->input('ids');
+            $deletedCount = 0;
+            $failedCount = 0;
+
+            foreach ($ids as $id) {
+                try {
+                    $menuDetail = MenuDetail::findOrFail($id);
+                    
+                    // Hapus relasi permissions dengan menu detail ini
+                    $this->cleanupMenuPermissions($menuDetail);
+                    
+                    // Hapus menu detail
+                    $menuDetail->delete();
+                    $deletedCount++;
+                } catch (\Exception $e) {
+                    $failedCount++;
+                }
+            }
+
+            $message = "Berhasil menghapus {$deletedCount} menu detail";
+            if ($failedCount > 0) {
+                $message .= ", {$failedCount} menu detail gagal dihapus";
+            }
+
+            return response()->json([
+                'status' => 200,
+                'message' => $message,
+                'deleted_count' => $deletedCount,
+                'failed_count' => $failedCount
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
+        }
+    }
+
     /**
      * Membersihkan permissions yang terkait dengan menu detail
      */
