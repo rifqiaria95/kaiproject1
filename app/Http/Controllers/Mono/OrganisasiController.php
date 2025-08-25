@@ -29,11 +29,8 @@ class OrganisasiController extends Controller
                     return optional($data->deleter)->name ?? '-';
                 })
                 ->editColumn('image', function ($data) {
-                    // Return full storage URL untuk image
-                    if ($data->image) {
-                        return \Storage::disk('public')->url($data->image);
-                    }
-                    return null;
+                    // Data sudah berupa URL lengkap dari accessor model
+                    return $data->image;
                 })
                 ->addColumn('aksi', function ($data) {
                     $button = '';
