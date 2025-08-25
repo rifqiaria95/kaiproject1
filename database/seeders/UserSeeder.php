@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
             'name'              => 'Rifqi Aria',
             'email'             => 'rifqiaria95@gmail.com',
             'email_verified_at' => now(),
-            'password'          => bcrypt('password'), // Bisa diganti dengan password yang lebih aman
+            'password'          => bcrypt('password123'), // Bisa diganti dengan password yang lebih aman
             'remember_token'    => Str::random(10)
         ]);
 

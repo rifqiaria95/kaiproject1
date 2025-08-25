@@ -55,3 +55,6 @@ Thumbs.db
 .env.local
 .env.staging
 .env.testing
+
+# Run PHP
+runphp84.bat

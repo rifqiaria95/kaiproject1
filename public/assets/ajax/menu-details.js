@@ -1,4 +1,7 @@
 $(document).ready(function () {
+    $('.select2').select2({
+        dropdownParent: $('#offcanvasAddMenu')
+    });
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -12,7 +15,15 @@ $(document).ready(function () {
         dom:
             '<"row me-2"' +
             '<"col-md-2"<"me-3"l>>' +
-            '<"col-md-10"<"dt-action-buttons text-xl-end text-lg-start text-md-end text-start d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-3"fB>>' +
+            // Tambahkan flex dan gap agar search dan button terpisah rapi
+            '<"col-md-10"' +
+                '<"dt-action-buttons d-flex align-items-center justify-content-end flex-md-row flex-column mb-3 mb-md-3 gap-2"' +
+                    // Search box
+                    'f' +
+                    // Button Hapus Terpilih
+                    '<"ms-md-3 me-2" B>' +
+                '>' +
+            '>' +
             '>t' +
             '<"row mx-2"' +
             '<"col-sm-12 col-md-6"i>' +
@@ -25,12 +36,18 @@ $(document).ready(function () {
         },
         buttons: [
             {
+                text: '<i class="ti ti-trash me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Hapus Terpilih</span>',
+                className: 'btn btn-danger waves-effect waves-light delete-selected me-3',
+                action: function () {
+                    deleteSelectedRecords();
+                }
+            },
+            {
                 text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Menu</span>',
-                className: 'add-new btn btn-primary waves-effect waves-light mx-4',
+                className: 'add-new btn btn-primary waves-effect waves-light ms-2',
                 attr: {
                     'data-bs-toggle': 'offcanvas',
                     'data-bs-target': '#offcanvasAddMenu',
-
                 }
             }
         ],
@@ -41,6 +58,15 @@ $(document).ready(function () {
             type: 'GET'
         },
         columns: [
+            {
+                data: null,
+                name: 'checkbox',
+                orderable: false,
+                searchable: false,
+                render: function (data, type, full, meta) {
+                    return '<input type="checkbox" class="form-check-input dt-checkboxes" value="' + full.id + '">';
+                }
+            },
             {
                 data: null,
                 name: 'id',
@@ -105,16 +131,46 @@ $(document).ready(function () {
             }
         ],
         order: [
-            [0, 'asc']
+            [1, 'asc']
         ],
 
+    });
+
+    // Event handler untuk select all checkbox
+    $('#TableMDetails').on('change', '#select-all', function() {
+        let isChecked = $(this).prop('checked');
+        $('#TableMDetails tbody input[type="checkbox"]').prop('checked', isChecked);
+        toggleDeleteButton();
+    });
+
+    // Event handler untuk checkbox individual
+    $('#TableMDetails').on('change', 'tbody input[type="checkbox"]', function() {
+        toggleDeleteButton();
+    });
+
+    // Fungsi untuk menampilkan/menyembunyikan tombol delete batch
+    function toggleDeleteButton() {
+        let checkedCount = $('#TableMDetails tbody input[type="checkbox"]:checked').length;
+        let deleteButton = $('.delete-selected');
+        
+        if (checkedCount > 0) {
+            deleteButton.addClass('show');
+            deleteButton.find('span').text(`Hapus Terpilih (${checkedCount})`);
+        } else {
+            deleteButton.removeClass('show');
+            deleteButton.find('span').text('Hapus Terpilih');
+        }
+    }
+
+    $('.select2').select2({
+        dropdownParent: $('#offcanvasAddMenu')
     });
 
     let selectedId = null;
 
     // Fungsi untuk menampilkan data ke dalam offcanvas (Edit)
     window.ViewData = function (id) {
-        $('#tambahModal').modal('show');
+        $('#offcanvasAddMenu').offcanvas('show');
 
         if (id === 0) {
             // Mode Insert (Tambah Data)
@@ -133,7 +189,7 @@ $(document).ready(function () {
                     if (response.success) {
                         selectedId = id;
                         $("#nama_menu").val(response.menuDetail.name);
-                        $("#menu_group_id").val(response.menuDetail.menu_group_id);
+                        $("#menu_group_id").val(response.menuDetail.menu_group_id).trigger('change');
                         $("#icon").val(response.menuDetail.icon);
                         $("#route").val(response.menuDetail.route);
                         $("#order").val(response.menuDetail.order);
@@ -216,29 +272,93 @@ $(document).ready(function () {
                     },
                     success: function (response) {
                         if (response.status === 200) {
-                            Swal.fire(
-                                'Deleted!',
-                                'Data Pegawai Berhasil Dihapus.',
-                                'success'
-                            );
-                            $('#datatable').DataTable().ajax.reload();
+                            toastr.success(response.message);
+                            $('#TableMDetails').DataTable().ajax.reload(null, false);
                         } else {
-                            Swal.fire(
-                                'Error!',
-                                response.errors,
-                                'error'
-                            );
+                            toastr.error(response.errors);
                         }
                     },
                     error: function () {
-                        Swal.fire(
-                            'Oops!',
-                            'Terjadi kesalahan saat menghapus data.',
-                            'error'
-                        );
+                        toastr.error('Terjadi kesalahan saat menghapus data.');
                     }
                 });
             }
         });
+    });
+
+    // Fungsi untuk menghapus records yang dipilih
+    function deleteSelectedRecords() {
+        let table = $('#TableMDetails').DataTable();
+        let selectedIds = [];
+        
+        // Ambil semua checkbox yang dicentang
+        $('#TableMDetails tbody input[type="checkbox"]:checked').each(function() {
+            selectedIds.push($(this).val());
+        });
+        
+        if (selectedIds.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan!',
+                text: 'Silakan pilih data yang akan dihapus terlebih dahulu.',
+                customClass: {
+                    confirmButton: 'btn btn-warning waves-effect waves-light'
+                }
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Anda akan menghapus ${selectedIds.length} data menu detail yang dipilih!`,
+            icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-danger waves-effect waves-light ml-3',
+                cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            confirmButtonText: 'Ya, Hapus!',
+            buttonsStyling: false,
+            didRender: function () {
+                $('.swal2-actions').css('gap', '10px');
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'admin/menu-detail/delete-batch',
+                    type: 'DELETE',
+                    data: {
+                        ids: selectedIds,
+                        _method: 'DELETE',
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        if (response.status === 200) {
+                            toastr.success(response.message);
+                            
+                            // Reload table dan reset selection
+                            table.ajax.reload(null, false);
+                            $('#select-all').prop('checked', false);
+                            toggleDeleteButton();
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errorMessage = 'Terjadi kesalahan saat menghapus data.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        toastr.error(errorMessage);
+                    }
+                });
+            }
+        });
+    }
+
+    // Event handler untuk tombol delete selected (jika tidak menggunakan DataTable buttons)
+    $(document).on('click', '.delete-selected', function() {
+        deleteSelectedRecords();
     });
 });

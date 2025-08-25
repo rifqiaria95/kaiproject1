@@ -162,6 +162,13 @@ $(document).ready(function () {
               ]
             },
             {
+                text: '<i class="ti ti-trash me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Hapus Terpilih</span>',
+                className: 'btn btn-danger waves-effect waves-light delete-selected me-3',
+                action: function () {
+                    deleteSelectedRecords();
+                }
+            },
+            {
                 text: '<i class="ti ti-plus me-0 me-sm-1 ti-xs"></i><span class="d-none d-sm-inline-block">Tambah Permission</span>',
                 className: 'add-new btn btn-primary waves-effect waves-light',
                 action: function () {
@@ -176,6 +183,15 @@ $(document).ready(function () {
             type: 'GET'
         },
         columns: [
+            {
+                data: null,
+                name: 'checkbox',
+                orderable: false,
+                searchable: false,
+                render: function (data, type, full, meta) {
+                    return '<input type="checkbox" class="form-check-input dt-checkboxes" value="' + full.id + '">';
+                }
+            },
             {
                 data: null,
                 name: 'id',
@@ -247,10 +263,38 @@ $(document).ready(function () {
             }
         ],
         order: [
-            [0, 'desc']
+            [1, 'desc']
         ],
-
+        orderClasses: false
     });
+
+
+
+    // Event handler untuk select all checkbox
+    $('#TablePermission').on('change', '#select-all', function() {
+        let isChecked = $(this).prop('checked');
+        $('#TablePermission tbody input[type="checkbox"]').prop('checked', isChecked);
+        toggleDeleteButton();
+    });
+
+    // Event handler untuk checkbox individual
+    $('#TablePermission').on('change', 'tbody input[type="checkbox"]', function() {
+        toggleDeleteButton();
+    });
+
+    // Fungsi untuk menampilkan/menyembunyikan tombol delete batch
+    function toggleDeleteButton() {
+        let checkedCount = $('#TablePermission tbody input[type="checkbox"]:checked').length;
+        let deleteButton = $('.delete-selected');
+        
+        if (checkedCount > 0) {
+            deleteButton.addClass('show');
+            deleteButton.find('span').text(`Hapus Terpilih (${checkedCount})`);
+        } else {
+            deleteButton.removeClass('show');
+            deleteButton.find('span').text('Hapus Terpilih');
+        }
+    }
 
     $('.select2').select2({
         dropdownParent: $('#tambahModal')
@@ -423,32 +467,93 @@ $(document).ready(function () {
                     },
                     success: function (response) {
                         if (response.status === 200) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Deleted!',
-                                text: response.message,
-                                customClass: {
-                                  confirmButton: 'btn btn-success waves-effect waves-light'
-                                }
-                            });
+                            toastr.success(response.message);
                             $('#TablePermission').DataTable().ajax.reload(null, false);
                         } else {
-                            Swal.fire(
-                                'Error!',
-                                response.errors,
-                                'error'
-                            );
+                            toastr.error(response.errors);
                         }
                     },
                     error: function () {
-                        Swal.fire(
-                            'Oops!',
-                            'Terjadi kesalahan saat menghapus data.',
-                            'error'
-                        );
+                        toastr.error('Terjadi kesalahan saat menghapus data.');
                     }
                 });
             }
         });
+    });
+
+    // Fungsi untuk menghapus records yang dipilih
+    function deleteSelectedRecords() {
+        let table = $('#TablePermission').DataTable();
+        let selectedIds = [];
+        
+        // Ambil semua checkbox yang dicentang
+        $('#TablePermission tbody input[type="checkbox"]:checked').each(function() {
+            selectedIds.push($(this).val());
+        });
+        
+        if (selectedIds.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan!',
+                text: 'Silakan pilih data yang akan dihapus terlebih dahulu.',
+                customClass: {
+                    confirmButton: 'btn btn-warning waves-effect waves-light'
+                }
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Anda akan menghapus ${selectedIds.length} data permission yang dipilih!`,
+            icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-danger waves-effect waves-light ml-3',
+                cancelButton: 'btn btn-label-secondary waves-effect waves-light'
+            },
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            confirmButtonText: 'Ya, Hapus!',
+            buttonsStyling: false,
+            didRender: function () {
+                $('.swal2-actions').css('gap', '10px');
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'admin/permission/delete-batch',
+                    type: 'DELETE',
+                    data: {
+                        ids: selectedIds,
+                        _method: 'DELETE',
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        if (response.status === 200) {
+                            toastr.success(response.message);
+                            
+                            // Reload table dan reset selection
+                            table.ajax.reload(null, false);
+                            $('#select-all').prop('checked', false);
+                            toggleDeleteButton();
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errorMessage = 'Terjadi kesalahan saat menghapus data.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        toastr.error(errorMessage);
+                    }
+                });
+            }
+        });
+    }
+
+    // Event handler untuk tombol delete selected (jika tidak menggunakan DataTable buttons)
+    $(document).on('click', '.delete-selected', function() {
+        deleteSelectedRecords();
     });
 });
