@@ -411,19 +411,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('portfolio/galeri/kategori-galeri')->name('kategori-galeri.')->group(function () {
         Route::get('/', [KategoriGaleriController::class, 'index'])
             ->name('index')
-            ->middleware('permission:view_kategori_galeri');
+            ->middleware('permission:view_galeri');
         Route::post('/store', [KategoriGaleriController::class, 'store'])
             ->name('store')
-            ->middleware('permission:create_kategori_galeri');
+            ->middleware('permission:create_galeri');
         Route::get('/edit/{id}', [KategoriGaleriController::class, 'edit'])
             ->name('edit')
-            ->middleware('permission:edit_kategori_galeri');
+            ->middleware('permission:show_galeri');
         Route::put('/update/{id}', [KategoriGaleriController::class, 'update'])
             ->name('update')
-            ->middleware('permission:edit_kategori_galeri');
+            ->middleware('permission:edit_galeri');
         Route::delete('/delete/{id}', [KategoriGaleriController::class, 'destroy'])
             ->name('destroy')
-            ->middleware('permission:delete_kategori_galeri');
+            ->middleware('permission:delete_galeri');
     });
 
     // Route Organisasi

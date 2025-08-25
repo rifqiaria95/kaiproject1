@@ -207,8 +207,8 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                   let userPermissions = window.userPermissions || [];
-                  let canEdit         = userPermissions.includes("edit_kategori");
-                  let canDelete       = userPermissions.includes("delete_kategori");
+                  let canEdit         = userPermissions.includes("edit_galeri");
+                  let canDelete       = userPermissions.includes("delete_galeri");
 
                   let buttons = '<div class="d-flex align-items-center">';
 
