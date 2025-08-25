@@ -357,7 +357,6 @@ $(document).ready(function () {
                     }
                     // Kembalikan tombol ke kondisi semula
                     submitBtn.html(originalText).prop('disabled', false);
-                    }
                 }
             });
         });

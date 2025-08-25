@@ -347,26 +347,14 @@ $(document).ready(function () {
                     },
                     success: function (response) {
                         if (response.status === 200) {
-                            Swal.fire(
-                                'Deleted!',
-                                'Data Pegawai Berhasil Dihapus.',
-                                'success'
-                            );
+                            toastr.success('Data berhasil dihapus!');
                             $('#TableUser').DataTable().ajax.reload(null, false);
                         } else {
-                            Swal.fire(
-                                'Error!',
-                                response.errors,
-                                'error'
-                            );
+                            toastr.error(response.errors);
                         }
                     },
                     error: function () {
-                        Swal.fire(
-                            'Oops!',
-                            'Terjadi kesalahan saat menghapus data.',
-                            'error'
-                        );
+                        toastr.error('Terjadi kesalahan saat menghapus data.');
                     }
                 });
             }

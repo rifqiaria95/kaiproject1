@@ -332,41 +332,41 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Route About
-    Route::prefix('portfolio/about')->name('about.')->group(function () {
+    Route::prefix('portfolio/profile/about')->name('about.')->group(function () {
         Route::get('/', [AboutController::class, 'index'])
             ->name('index')
-            ->middleware('permission:view_about');
+            ->middleware('permission:view_profile');
         Route::post('/store', [AboutController::class, 'store'])
             ->name('store')
-            ->middleware('permission:create_about');
+            ->middleware('permission:create_profile');
         Route::get('/edit/{id}', [AboutController::class, 'edit'])
             ->name('edit')
-            ->middleware('permission:edit_about');
+            ->middleware('permission:edit_profile');
         Route::put('/update/{id}', [AboutController::class, 'update'])
             ->name('update')
-            ->middleware('permission:edit_about');
+            ->middleware('permission:edit_profile');
         Route::delete('/delete/{id}', [AboutController::class, 'destroy'])
             ->name('destroy')
-            ->middleware('permission:delete_about');
+            ->middleware('permission:delete_profile');
     });
 
     // Route Visi Misi
-    Route::prefix('portfolio/visi-misi')->name('visi-misi.')->group(function () {
+    Route::prefix('portfolio/profile/visi-misi')->name('visi-misi.')->group(function () {
         Route::get('/', [VisiMisiController::class, 'index'])
             ->name('index')
-            ->middleware('permission:view_visi_misi');
+            ->middleware('permission:view_profile');
         Route::post('/store', [VisiMisiController::class, 'store'])
             ->name('store')
-            ->middleware('permission:create_visi_misi');
+            ->middleware('permission:create_profile');
         Route::get('/edit/{id}', [VisiMisiController::class, 'edit'])
             ->name('edit')
-            ->middleware('permission:edit_visi_misi');
+            ->middleware('permission:edit_profile');
         Route::put('/update/{id}', [VisiMisiController::class, 'update'])
             ->name('update')
-            ->middleware('permission:edit_visi_misi');
+            ->middleware('permission:edit_profile');
         Route::delete('/delete/{id}', [VisiMisiController::class, 'destroy'])
             ->name('destroy')
-            ->middleware('permission:delete_visi_misi');
+            ->middleware('permission:delete_profile');
     });
 
     // Route Education

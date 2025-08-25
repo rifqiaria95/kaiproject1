@@ -180,7 +180,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "portfolio/about/",
+            url: "portfolio/profile/about/",
             type: 'GET'
         },
         columns: [{
@@ -279,8 +279,8 @@ $(document).ready(function () {
                 name: 'aksi',
                 render: function (data, type, full, meta) {
                   let userPermissions = window.userPermissions || [];
-                  let canEdit         = userPermissions.includes("edit_about");
-                  let canDelete       = userPermissions.includes("delete_about");
+                  let canEdit         = userPermissions.includes("edit_profile");
+                  let canDelete       = userPermissions.includes("delete_profile");
 
                   let buttons = '<div class="d-flex align-items-center">';
 
@@ -335,11 +335,11 @@ $(document).ready(function () {
         let method = '';
 
         if(id){
-            url = '/portfolio/about/update/' + id;
+            url = '/portfolio/profile/about/update/' + id;
             method = 'POST';
             formData.append('_method', 'PUT');
         } else {
-            url = '/portfolio/about/store';
+            url = '/portfolio/profile/about/store';
             method = 'POST';
         }
 
@@ -411,7 +411,7 @@ function editAbout(id) {
     setTinyMCEError(false);
 
     $.ajax({
-        url: '/portfolio/about/edit/' + id,
+        url: '/portfolio/profile/about/edit/' + id,
         type: 'GET',
         success: function(response) {
             if (response.success) {
@@ -469,7 +469,7 @@ $(document).on('click', '.delete-record', function () {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/portfolio/about/delete/' + id,
+                url: '/portfolio/profile/about/delete/' + id,
                 type: 'DELETE',
                 data: {
                     _method: 'DELETE',
